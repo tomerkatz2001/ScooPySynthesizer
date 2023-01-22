@@ -453,7 +453,7 @@ abstract sealed class ListLookup[T](lhs: ListNode[T], rhs: IntNode) extends Bina
 	override def doOp(l: Any, r: Any): Option[T] = (l, r) match {
 		case (lst: List[T], idx: Int) =>
 			if (idx >= 0 && idx < lst.length) Some(lst(idx))
-			if (idx<0 && -idx < lst.length) Some(lst(lst.length + idx)) // negatieve indexing
+			else if (idx<0 && -idx < lst.length) Some(lst(lst.length + idx)) // negatieve indexing
 			else None
 		case _ => wrongType(l, r)
 	}
