@@ -10,11 +10,14 @@ trait ListCompNode[T] extends ListNode[T]
 	val varName: String
 
 	override val childType: Types = map.nodeType
-	override val values: List[Option[List[T]]] = {
+
+	override val requireBit = list.requireBit || map.requireBit
+
+	override val _values: List[Option[List[T]]] = {
 		var rs: List[Option[List[T]]] = Nil
 		var start = 0
 
-		val deltas = list.values.map {
+		val deltas = list.exampleValues.map {
 			case Some(lst: List[_]) => Some(lst.length)
 			case _ => None
 		}
@@ -23,7 +26,7 @@ trait ListCompNode[T] extends ListNode[T]
 			delta match {
 				case Some(delta) =>
 					// TODO Test this carefully
-					val values = map.values.asInstanceOf[List[Option[T]]].slice(start, start + delta)
+					val values = map.exampleValues.asInstanceOf[List[Option[T]]].slice(start, start + delta)
 					if (values.forall(_.isDefined)) {
 						rs = rs :+ Some(values.map(_.get))
 					} else {

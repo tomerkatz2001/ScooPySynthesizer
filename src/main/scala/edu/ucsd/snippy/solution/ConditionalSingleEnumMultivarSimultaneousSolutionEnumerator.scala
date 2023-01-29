@@ -35,8 +35,8 @@ class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 
 	// Setup the conditional enum listener
 	graph.onStep = {
-		case program: BoolNode if program.values.forall(_.isDefined) =>
-			val values: List[Boolean] = program.values.map(_.get)
+		case program: BoolNode if program.exampleValues.forall(_.isDefined) =>
+			val values: List[Boolean] = program.exampleValues.map(_.get)
 			for ((store, index) <- this.conditionals.zipWithIndex.filter(_._1.cond.isEmpty)) {
 				val (thenIndices, elseIndices) = this.partitions(index)
 				if (trueForIndices(values, thenIndices) && falseForIndices(values, elseIndices)) {

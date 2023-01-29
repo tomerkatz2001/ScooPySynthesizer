@@ -10,22 +10,23 @@ trait QuaternaryOpNode[T] extends ASTNode
 	val arg2: ASTNode
 	val arg3: ASTNode
 
-	lazy val values: List[Option[T]] = arg0.values
-		.lazyZip(arg1.values)
-		.lazyZip(arg2.values)
-		.lazyZip(arg3.values)
+	lazy val _values: List[Option[T]] = arg0.exampleValues
+		.lazyZip(arg1.exampleValues)
+		.lazyZip(arg2.exampleValues)
+		.lazyZip(arg3.exampleValues)
 		.map {
 			case (Some(arg0), Some(arg1), Some(arg2), Some(arg3)) => doOp(arg0, arg1, arg2, arg3)
 			case _ => None
 		}
 
+	override val requireBit: Boolean = arg0.requireBit || arg1.requireBit || arg2.requireBit || arg3.requireBit
 	override val height: Int = 1 + Math.max(arg0.height, Math.max(arg1.height, Math.max(arg2.height, arg3.height)))
 	override val terms: Int = 1 + arg0.terms + arg1.terms + arg2.terms + arg3.terms
 	override val children: Iterable[ASTNode] = Iterable(arg0, arg1, arg2, arg3)
 
-	assert(arg0.values.length == arg1.values.length &&
-		arg1.values.length == arg2.values.length &&
-		arg2.values.length == arg3.values.length)
+	assert(arg0.exampleValues.length == arg1.exampleValues.length &&
+		arg1.exampleValues.length == arg2.exampleValues.length &&
+		arg2.exampleValues.length == arg3.exampleValues.length)
 
 	def doOp(a0: Any, a1: Any, a2: Any, a3: Any): Option[T]
 

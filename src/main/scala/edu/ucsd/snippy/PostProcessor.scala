@@ -4,11 +4,11 @@ import edu.ucsd.snippy.ast._
 
 object PostProcessor
 {
-	def clean(node: ASTNode): ASTNode = if (!node.usesVariables && node.values.toSet.size == 1) //second check is a tad redundant but just to be safe
-		Types.typeof(node.values.head.get) match {
-			case Types.String => StringLiteral(node.values.head.get.asInstanceOf[String], node.values.length)
-			case Types.Bool => BoolLiteral(node.values.head.get.asInstanceOf[Boolean], node.values.length)
-			case Types.Int => IntLiteral(node.values.head.get.asInstanceOf[Int], node.values.length)
+	def clean(node: ASTNode): ASTNode = if (!node.usesVariables && node.exampleValues.toSet.size == 1) //second check is a tad redundant but just to be safe
+		Types.typeof(node.exampleValues.head.get) match {
+			case Types.String => StringLiteral(node.exampleValues.head.get.asInstanceOf[String], node.exampleValues.length)
+			case Types.Bool => BoolLiteral(node.exampleValues.head.get.asInstanceOf[Boolean], node.exampleValues.length)
+			case Types.Int => IntLiteral(node.exampleValues.head.get.asInstanceOf[Int], node.exampleValues.length)
 			case _ => node
 		}
 	else node match {
@@ -17,9 +17,9 @@ object PostProcessor
 			val rhs: IntNode = clean(add.rhs).asInstanceOf[IntNode]
 
 			(lhs, rhs) match {
-				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value + b.value, a.values.length)
+				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value + b.value, a.exampleValues.length)
 				case (a, b: NegateInt) => IntSubtraction(a, b.arg)
-				case (a, b: IntLiteral) if b.value < 0 => IntSubtraction(a, IntLiteral(-b.value, b.values.length))
+				case (a, b: IntLiteral) if b.value < 0 => IntSubtraction(a, IntLiteral(-b.value, b.exampleValues.length))
 				case _ => IntAddition(lhs, rhs)
 			}
 		case sub: IntSubtraction =>
@@ -27,7 +27,7 @@ object PostProcessor
 			val rhs: IntNode = clean(sub.rhs).asInstanceOf[IntNode]
 
 			(lhs, rhs) match {
-				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value - b.value, a.values.length)
+				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value - b.value, a.exampleValues.length)
 				case (a: IntLiteral, b) => if (a.value == 0) {
 					NegateInt(b)
 				} else {
@@ -40,32 +40,32 @@ object PostProcessor
 			val rhs: IntNode = clean(sub.rhs).asInstanceOf[IntNode]
 
 			(lhs, rhs) match {
-				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value / b.value, a.values.length)
+				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value / b.value, a.exampleValues.length)
 				case _ => IntDivision(lhs, rhs)
 			}
 		case concat: StringConcat =>
 			val lhs: StringNode = clean(concat.lhs).asInstanceOf[StringNode]
 			val rhs: StringNode = clean(concat.rhs).asInstanceOf[StringNode]
 			(lhs, rhs) match {
-				case (a: StringLiteral, b: StringLiteral) => StringLiteral(a.value + b.value, a.values.length)
+				case (a: StringLiteral, b: StringLiteral) => StringLiteral(a.value + b.value, a.exampleValues.length)
 				case _ => StringConcat(lhs, rhs)
 			}
 		case gt: GreaterThan =>
 			val lhs: IntNode = clean(gt.lhs).asInstanceOf[IntNode]
 			val rhs: IntNode = clean(gt.rhs).asInstanceOf[IntNode]
 			if (lhs == rhs)
-				BoolLiteral(false,gt.lhs.values.length)
+				BoolLiteral(false,gt.lhs.exampleValues.length)
 			else (lhs,rhs) match {
-				case (a: IntLiteral, b:IntLiteral) => BoolLiteral(a.value > b.value, a.values.length)
+				case (a: IntLiteral, b:IntLiteral) => BoolLiteral(a.value > b.value, a.exampleValues.length)
 				case _ => GreaterThan(lhs,rhs)
 			}
 		case gt: GreaterThanDoubles =>
 			val lhs: DoubleNode = clean(gt.lhs).asInstanceOf[DoubleNode]
 			val rhs: DoubleNode = clean(gt.rhs).asInstanceOf[DoubleNode]
 			if (lhs == rhs)
-				BoolLiteral(false,gt.lhs.values.length)
+				BoolLiteral(false,gt.lhs.exampleValues.length)
 			else (lhs,rhs) match {
-				case (a: DoubleLiteral, b:DoubleLiteral) => BoolLiteral(a.value > b.value, a.values.length)
+				case (a: DoubleLiteral, b:DoubleLiteral) => BoolLiteral(a.value > b.value, a.exampleValues.length)
 				case _ => GreaterThanDoubles(lhs,rhs)
 			}
 		case NegateBool(NegateBool(inner)) =>

@@ -12,12 +12,13 @@ trait MapCompNode[K, V] extends MapNode[K, V]
 	val value: ASTNode
 	val varName: String
 
-	assert(key.values.length == value.values.length, "Key and value did not match")
+	assert(key.exampleValues.length == value.exampleValues.length, "Key and value did not match")
 
 	override val keyType: Types = Types.childOf(list.nodeType)
 	override val valType: Types = value.nodeType
 
-	override val values: List[Option[Map[K, V]]] = {
+	override val requireBit: Boolean = list.requireBit || key.requireBit || value.requireBit
+	override val _values: List[Option[Map[K, V]]] = {
 //		val entries: Iterable[(Option[K], Option[V])] = key
 //			.values
 //			.zip(value.values)
@@ -25,12 +26,12 @@ trait MapCompNode[K, V] extends MapNode[K, V]
 
 		var idx = 0
 
-		list.values.map {
+		list.exampleValues.map {
 			case None => None
 			case Some(value: String) =>
 				// First collect the tuples matching this value
-				val keys: List[Option[K]] = this.key.values.slice(idx, idx + value.length).asInstanceOf[List[Option[K]]]
-				val vals: List[Option[V]] = this.value.values.slice(idx, idx + value.length).asInstanceOf[List[Option[V]]]
+				val keys: List[Option[K]] = this.key.exampleValues.slice(idx, idx + value.length).asInstanceOf[List[Option[K]]]
+				val vals: List[Option[V]] = this.value.exampleValues.slice(idx, idx + value.length).asInstanceOf[List[Option[V]]]
 				idx += value.length
 
 				if (keys.contains(None) || vals.contains(None)) {
@@ -40,8 +41,8 @@ trait MapCompNode[K, V] extends MapNode[K, V]
 				}
 			case Some(value: Iterable[_]) =>
 				// First collect the tuples matching this value
-				val keys: List[Option[K]] = this.key.values.slice(idx, idx + value.size).asInstanceOf[List[Option[K]]]
-				val vals: List[Option[V]] = this.value.values.slice(idx, idx + value.size).asInstanceOf[List[Option[V]]]
+				val keys: List[Option[K]] = this.key.exampleValues.slice(idx, idx + value.size).asInstanceOf[List[Option[K]]]
+				val vals: List[Option[V]] = this.value.exampleValues.slice(idx, idx + value.size).asInstanceOf[List[Option[V]]]
 				idx += value.size
 
 				if (keys.contains(None) || vals.contains(None)) {
@@ -71,7 +72,8 @@ trait FilteredMapNode[K, V] extends MapNode[K, V]
 	override val keyType: Types = map.keyType
 	override val valType: Types = map.valType
 
-	override val values: List[Option[Map[K, V]]] = filterOp(map, filter)
+	override val requireBit: Boolean = map.requireBit || filter.requireBit
+	override val _values: List[Option[Map[K, V]]] = filterOp(map, filter)
 	override val height: Int = 1 + Math.max(map.height, filter.height)
 	override val terms: Int = 1 + map.terms + filter.terms
 	override val children: Iterable[ASTNode] = List(map, filter)
@@ -106,15 +108,15 @@ trait FilteredMapNode[K, V] extends MapNode[K, V]
 		val keyNode: VariableNode[K] = findKeyVar(filter.children).get.asInstanceOf[VariableNode[K]]
 
 		// Create the key map
-		val filterValues: List[Option[List[Boolean]]] = splitByIterable(map.values, filter.values)
-		val keyValues: List[Option[List[K]]] = splitByIterable(map.values, keyNode.values)
+		val filterValues: List[Option[List[Boolean]]] = splitByIterable(map.exampleValues, filter.exampleValues)
+		val keyValues: List[Option[List[K]]] = splitByIterable(map.exampleValues, keyNode.exampleValues)
 		val keyMap: List[Option[List[(K, Boolean)]]] =
 			keyValues.zip(filterValues).map {
 				case (Some(k), Some(b)) => Some(k.zip(b))
 				case _ => None
 			}
 
-		map.values
+		map.exampleValues
 			.zip(keyMap)
 			.map({
 				case (Some(valMap: Map[K, V]), Some(keyMap: List[(K, Boolean)])) =>

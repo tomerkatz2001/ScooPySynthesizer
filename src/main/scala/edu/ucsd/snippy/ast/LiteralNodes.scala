@@ -10,7 +10,8 @@ abstract class LiteralNode[T](numContexts: Int) extends ASTNode
 	val height = 0
 	val terms = 1
 	val value: T
-	override val values: List[Option[T]] = List.fill(numContexts)(Some(value))
+	override val requireBit: Boolean = false // assume it is not a Literal
+	override val _values: List[Option[T]] = List.fill(numContexts)(Some(value))// hope this doesn't break anything, was overridden to List[Option[T]]]
 	override val children: Iterable[ASTNode] = Iterable.empty
 	override lazy val usesVariables: Boolean = false
 

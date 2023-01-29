@@ -55,7 +55,7 @@ class ProbEnumerator(
 	mainBank.values
 		.flatten
 		.toList
-		.map(p => if (p.values.length != this.contexts.length) {
+		.map(p => if (p.exampleValues.length != this.contexts.length) {
 			oeManager.isRepresentative(p.updateValues(this.contextsObj))
 		} else {
 			oeManager.isRepresentative(p)
@@ -138,7 +138,7 @@ class ProbEnumerator(
 
 			if (rootMaker.hasNext) {
 				val program = rootMaker.next
-				if (program.values.exists(_.isDefined) && oeManager.isRepresentative(program)) {
+				if (program.exampleValues.exists(_.isDefined) && oeManager.isRepresentative(program)) {
 					res = Some(program)
 					progs += 1
 				}

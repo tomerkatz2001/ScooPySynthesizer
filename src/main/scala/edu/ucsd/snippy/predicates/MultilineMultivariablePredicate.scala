@@ -86,7 +86,7 @@ class Node(
 		var graphChanged = false
 
 		// Check, for this starting state, what the final values of the program are:
-		val values: List[Option[Any]] = program.values
+		val values: List[Option[Any]] = program.exampleValues
 			.zipWithIndex
 			.filter(tup => this.valueIndices.contains(tup._2))
 			.map(_._1)

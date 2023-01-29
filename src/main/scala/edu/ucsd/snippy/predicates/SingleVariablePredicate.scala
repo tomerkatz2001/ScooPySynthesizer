@@ -12,10 +12,10 @@ class SingleVariablePredicate(
 	val values: List[Any]) extends Predicate {
 
 	override def evaluate(program: ASTNode): Option[SingleAssignment] = {
-		if (program.nodeType != this.retType || program.values.contains(None)) {
+		if (program.nodeType != this.retType || program.exampleValues.contains(None)) {
 			None
 		} else {
-			if (values.zip(program.values).forall(pair => pair._1 == pair._2.get)) {
+			if (values.zip(program.exampleValues).forall(pair => pair._1 == pair._2.get)) {
 				if (program.usesVariables) {
 					Some(SingleAssignment(this.varName, program))
 				}

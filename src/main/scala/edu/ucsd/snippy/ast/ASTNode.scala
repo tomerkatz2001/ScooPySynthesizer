@@ -6,7 +6,9 @@ import edu.ucsd.snippy.enumeration.{Contexts, ProbUpdate}
 trait ASTNode
 {
 	val nodeType: Types.Types
-	val values: List[Option[Any]]
+	val _values: List[Option[Any]]
+	def exampleValues: List[Option[Any]] = _values
+	val requireBit : Boolean = false
 	val code: String
 	val height: Int
 	val terms: Int
@@ -60,28 +62,29 @@ trait IterableNode extends ASTNode
 
 trait StringNode extends IterableNode
 {
-	override val values: List[Option[String]]
+	override val _values: List[Option[String]]
 	override val nodeType: Types = Types.String
 	override def updateValues(contexts: Contexts): StringNode
 }
 
 trait IntNode extends ASTNode
 {
-	override val values: List[Option[Int]]
+	override val _values: List[Option[Int]]
 	override val nodeType: Types = Types.Int
 	override def updateValues(contexts: Contexts): IntNode
 }
 
 trait BoolNode extends ASTNode
 {
-	override val values: List[Option[Boolean]]
+	override val _values: List[Option[Boolean]]
+	override def exampleValues: List[Option[Boolean]] = _values
 	override val nodeType: Types = Types.Bool
 	override def updateValues(contexts: Contexts): BoolNode
 }
 
 trait DoubleNode extends ASTNode
 {
-	override val values: List[Option[Double]]
+	override val _values: List[Option[Double]]
 	override val nodeType: Types = Types.Double
 	override def updateValues(contexts: Contexts): DoubleNode
 }
@@ -89,7 +92,7 @@ trait DoubleNode extends ASTNode
 trait ListNode[T] extends IterableNode
 {
 	val childType: Types
-	override val values: List[Option[Iterable[T]]]
+	override val _values: List[Option[Iterable[T]]]
 	override lazy val nodeType: Types = Types.listOf(childType)
 	override def updateValues(contexts: Contexts): ListNode[T]
 }
@@ -97,7 +100,7 @@ trait ListNode[T] extends IterableNode
 trait SetNode[T] extends IterableNode
 {
 	val childType: Types
-	override val values: List[Option[Set[T]]]
+	override val _values: List[Option[Set[T]]]
 	override lazy val nodeType: Types = Types.setOf(childType)
 
 	override def updateValues(contexts: Contexts): SetNode[T]
@@ -132,7 +135,8 @@ trait MapNode[K, V] extends IterableNode
 	val keyType: Types
 	val valType: Types
 
-	override val values: List[Option[Map[K, V]]]
+	override val _values: List[Option[Map[K, V]]]
+	override def exampleValues: List[Option[Map[K, V]]] = _values
 	override lazy val nodeType: Types = Types.mapOf(keyType, valType)
 	override def updateValues(contexts: Contexts): MapNode[K, V]
 }

@@ -62,9 +62,9 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 		// Cleanup!
 
 		// First check if the condition is all true or false
-		if (cond.values.forall(_.get)) {
+		if (cond.exampleValues.forall(_.get)) {
 			this.flatten(thenCase).filter(deadCodeFilter).map(_.code()).mkString("\n")
-		} else if (cond.values.forall(!_.get)) {
+		} else if (cond.exampleValues.forall(!_.get)) {
 			this.flatten(elseCase).filter(deadCodeFilter).map(_.code()).mkString("\n")
 		} else {
 			// TODO This cleanup code is (a) very ugly and (b) not well tested

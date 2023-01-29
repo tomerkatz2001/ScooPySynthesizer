@@ -33,7 +33,7 @@ class InputsValuesManager extends OEValuesManager
 	override def isRepresentative(program: ASTNode): Boolean =
 	{
 		try {
-			classValues.add(program.values)
+			classValues.add(program.exampleValues)
 		} catch {
 			case _: Exception => false
 		}
@@ -41,12 +41,28 @@ class InputsValuesManager extends OEValuesManager
 
 	override def irrelevant(program: ASTNode): Boolean =
 	{
-		val results: List[Option[Any]] = program.values
+		val results: List[Option[Any]] = program.exampleValues
 		program.includes("var") && program.terms > 1 && results.length > 1 && results.tail.forall(_ == results.head)
 	}
 
 	override def clear(): Unit = classValues.clear()
 
 	override def remove(program: ASTNode): Boolean =
-		this.classValues.remove(program.values)
+		this.classValues.remove(program.exampleValues)
+}
+
+class MyManager extends InputsValuesManager
+{
+	override def isRepresentative(program: ASTNode): Boolean =
+	{
+		try {
+			classValues.add((program.exampleValues).appended(Some(program.requireBit)))
+		} catch {
+			case _: Exception => false
+		}
+	}
+
+	override def remove(program: ASTNode): Boolean =
+		this.classValues.remove(program.exampleValues.appended(Some(program.requireBit)))
+
 }

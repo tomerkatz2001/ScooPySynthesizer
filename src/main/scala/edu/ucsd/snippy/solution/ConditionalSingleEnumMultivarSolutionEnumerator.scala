@@ -27,8 +27,8 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 
 	// Setup the conditional enum listener
 	graph.onStep = {
-		case program: BoolNode if program.values.forall(_.isDefined) =>
-			val values: List[Boolean] = program.values.map(_.get)
+		case program: BoolNode if program.exampleValues.forall(_.isDefined) =>
+			val values: List[Boolean] = program.exampleValues.map(_.get)
 			for ((store, index) <- this.conditionals.zipWithIndex.filter(_._1.cond.isEmpty)) {
 				val (thenIndices, elseIndices) = this.partitions(index)
 				if (trueForIndices(values, thenIndices) && falseForIndices(values, elseIndices)) {
@@ -221,7 +221,7 @@ case class Node(
 					if (variable.typ == program.nodeType) {
 						for (store <- stores) {
 							if (store.thenCase.program.isEmpty) {
-								val programValues = filterByIndices(program.values, store.thenCase.indices)
+								val programValues = filterByIndices(program.exampleValues, store.thenCase.indices)
 								if (programValues.zip(store.thenCase.values).forall(Utils.programConnects)) {
 									if (program.usesVariables) {
 										store.thenCase.program = Some(program)
@@ -233,7 +233,7 @@ case class Node(
 							}
 
 							if (store.elseCase.program.isEmpty) {
-								val programValues = filterByIndices(program.values, store.elseCase.indices)
+								val programValues = filterByIndices(program.exampleValues, store.elseCase.indices)
 								if (programValues.zip(store.elseCase.values).forall(Utils.programConnects)) {
 									if (program.usesVariables) {
 										store.elseCase.program = Some(program)

@@ -32,8 +32,8 @@ class InterleavedSolutionEnumerator(
 			if (enumerator.hasNext) {
 				val program = enumerator.next()
 
-				if (program.usesVariables && program.values.forall(_.isDefined)) {
-					val values: List[Any] = program.values.map(_.get)
+				if (program.usesVariables && program.exampleValues.forall(_.isDefined)) {
+					val values: List[Any] = program.exampleValues.map(_.get)
 					var graphChanged = false
 
 					for (edge <- node.edges) {

@@ -193,11 +193,11 @@ abstract class ListCompVocabMaker(inputListType: Types, outputListType: Types) e
 		while (!done && listIter.hasNext) {
 			val lst = listIter.next()
 
-			if (lst.values.exists(_.isDefined) && lst.values.filter(_.isDefined).forall(_.get.asInstanceOf[List[Any]].nonEmpty)) {
+			if (lst.exampleValues.exists(_.isDefined) && lst.exampleValues.filter(_.isDefined).forall(_.get.asInstanceOf[List[Any]].nonEmpty)) {
 				this.currList = lst
 				val newContexts = new Contexts(this.contexts.zipWithIndex.flatMap(
 					context =>
-						this.currList.values(context._2) match {
+						this.currList.exampleValues(context._2) match {
 							case Some(lst: List[Any]) => lst.map(value => context._1 + (this.varName -> value))
 							case None => Nil // We skip these, and handle them when unrolling later
 						}

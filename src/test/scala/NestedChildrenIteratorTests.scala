@@ -57,7 +57,7 @@ class NestedChildrenIteratorsTests extends JUnitSuite
 		assertEquals(List("\"s\"", "name"), chit.next().map(_.code))
 		val child = chit.next()
 		assertEquals(List("\"s\"", "var"), child.map(_.code))
-		assertEquals(List(List("s", "s", "s"), List("SL", "N", "SB")), child.map(_.values.map(_.get)))
+		assertEquals(List(List("s", "s", "s"), List("SL", "N", "SB")), child.map(_.exampleValues.map(_.get)))
 		assertEquals(List("name", "name"), chit.next().map(_.code))
 		assertEquals(List("name", "var"), chit.next().map(_.code))
 		assertEquals(List("var", "name"), chit.next().map(_.code))
@@ -153,7 +153,7 @@ class NestedChildrenIteratorsTests extends JUnitSuite
 		val nodes = List(
 			new IntNode
 			{
-				override val values: List[Option[Int]] = List(Some(0))
+				override val _values: List[Option[Int]] = List(Some(0))
 				override val code: String = "0"
 				override val height: Int = 0
 				override val terms: Int = 1
@@ -169,7 +169,7 @@ class NestedChildrenIteratorsTests extends JUnitSuite
 				override def cost: Int = 1
 			}, new IntNode
 			{
-				override val values: List[Option[Int]] = List(Some(1))
+				override val _values: List[Option[Int]] = List(Some(1))
 				override val code: String = "1"
 				override val height: Int = 0
 				override val terms: Int = 1
@@ -186,7 +186,7 @@ class NestedChildrenIteratorsTests extends JUnitSuite
 
 			}, new IntNode
 			{
-				override val values: List[Option[Int]] = List(Some(2))
+				override val _values: List[Option[Int]] = List(Some(2))
 				override val code: String = "x"
 				override val height: Int = 0
 				override val terms: Int = 1

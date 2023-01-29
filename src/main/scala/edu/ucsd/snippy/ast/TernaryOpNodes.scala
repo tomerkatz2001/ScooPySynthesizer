@@ -10,9 +10,10 @@ trait TernaryOpNode[T] extends ASTNode
 	val arg1: ASTNode
 	val arg2: ASTNode
 
-	assert(arg0.values.length == arg1.values.length && arg1.values.length == arg2.values.length)
+	assert(arg0.exampleValues.length == arg1.exampleValues.length && arg1.exampleValues.length == arg2.exampleValues.length)
 
-	lazy val values: List[Option[T]] = arg0.values.lazyZip(arg1.values).lazyZip(arg2.values).map {
+	override val requireBit: Boolean = arg0.requireBit || arg1.requireBit || arg2.requireBit
+	lazy val _values: List[Option[T]] = arg0.exampleValues.lazyZip(arg1.exampleValues).lazyZip(arg2.exampleValues).map {
 		case (Some(arg0), Some(arg1), Some(arg2)) => this.doOp(arg0, arg1, arg2)
 		case _ => None
 	}

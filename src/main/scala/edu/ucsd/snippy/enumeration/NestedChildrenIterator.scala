@@ -42,7 +42,7 @@ class NestedChildrenIterator(
 
 		mainBankIndex.foreach(c => elements += (c -> mainBank.getOrElse(cost(c), Nil)
 			.filter(d => childTypes(c).equals(d.nodeType)).toList
-			.map(c => if (c.values.length != contexts.contextLen) c.updateValues(contexts) else c)))
+			.map(c => if (c.exampleValues.length != contexts.contextLen) c.updateValues(contexts) else c)))
 
 		val sortedElem = mutable.Map(elements.toList.sortBy(_._1):_*)
 		childrenLists = sortedElem.toList.map(_._2)

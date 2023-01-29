@@ -15,16 +15,24 @@ trait BinaryOpNode[T] extends ASTNode
 	override lazy val usesVariables: Boolean = lhs.usesVariables || rhs.usesVariables
 	override protected val parenless: Boolean = false
 
-	if (lhs.values.length != rhs.values.length) println(lhs.code, lhs.values, rhs.code, rhs.values)
-	assert(lhs.values.length == rhs.values.length)
+	if (lhs.exampleValues.length != rhs.exampleValues.length) println(lhs.code, lhs.exampleValues, rhs.code, rhs.exampleValues)
+	assert(lhs.exampleValues.length == rhs.exampleValues.length)
 
 	def doOp(l: Any, r: Any): Option[T]
 	def make(l: ASTNode, r: ASTNode): BinaryOpNode[T]
 
-	override val values: List[Option[T]] = lhs.values.zip(rhs.values).map {
+
+
+	override val requireBit : Boolean= (lhs._values.last, rhs._values.last) match {
+		case (Some(l:Boolean), Some(r:Boolean)) => l || r
+		case _ => false
+	}
+
+	override val _values: List[Option[T]] = lhs.exampleValues.zip(rhs.exampleValues).map {
 		case (Some(left), Some(right)) => this.doOp(left, right)
 		case _ => None
 	}
+
 
 	def includes(varName: String): Boolean = lhs.includes(varName) || rhs.includes(varName)
 

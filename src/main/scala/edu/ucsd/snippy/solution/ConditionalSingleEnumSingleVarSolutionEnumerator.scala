@@ -35,9 +35,9 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 
 			if (store.cond.isEmpty &&
 				program.nodeType == Types.Bool &&
-				program.values.forall(_.isDefined)) {
+				program.exampleValues.forall(_.isDefined)) {
 
-				if (program.values.asInstanceOf[List[Option[Boolean]]]
+				if (program.exampleValues.asInstanceOf[List[Option[Boolean]]]
 					.map(_.get)
 					.zipWithIndex
 					.forall(tup =>
@@ -50,7 +50,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 					} else {
 						enumerator.oeManager.remove(program)
 					}
-				} else if (program.values.asInstanceOf[List[Option[Boolean]]]
+				} else if (program.exampleValues.asInstanceOf[List[Option[Boolean]]]
 					.zipWithIndex
 					.forall(tup =>
 						(thenPart.contains(tup._2) && !tup._1.get) ||
@@ -67,7 +67,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 
 			if (program.nodeType == this.retType) {
 				if (store.thenCase.isEmpty &&
-					filterByIndices(program.values, thenPart)
+					filterByIndices(program.exampleValues, thenPart)
 						.zip(store.thenVals)
 						.forall(Utils.programConnects)) {
 					if (program.usesVariables) {
@@ -79,7 +79,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 				}
 
 				if (store.elseCase.isEmpty &&
-					filterByIndices(program.values, elsePart)
+					filterByIndices(program.exampleValues, elsePart)
 						.zip(store.elseVals)
 						.forall(Utils.programConnects)) {
 					if (program.usesVariables) {

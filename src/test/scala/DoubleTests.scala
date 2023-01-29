@@ -51,7 +51,7 @@ class DoubleTests extends JUnitSuite
 		)
 		val outs = List(0.9, 0.3, 1.2, 1.5)
 		val sumLastTwo = DoublesSum(ListVariable[Double]("lastTwo", contexts, Types.Double))
-		assertTrue(sumLastTwo.values.zip(outs).forall(Utils.programConnects))
+		assertTrue(sumLastTwo.exampleValues.zip(outs).forall(Utils.programConnects))
 	}
 
 	@Test def programEnvToEnvLists(): Unit =
@@ -65,6 +65,6 @@ class DoubleTests extends JUnitSuite
 		val outs = List(List(1.5, -0.6, 0.9), List(1.5, -0.6, 0.9, 0.3), List(1.5, -0.6, 0.9, 0.3, 1.2), List(1.5, -0.6, 0.9, 0.3, 1.2, 1.5))
 		val sumLastTwo = DoublesSum(ListVariable[Double]("lastTwo", contexts, Types.Double))
 		val outPlusSum = ListAppend[Double, DoubleNode](ListVariable[Double]("out", contexts, Types.Double), sumLastTwo)
-		assertTrue(outPlusSum.values.zip(outs).forall(Utils.programConnects))
+		assertTrue(outPlusSum.exampleValues.zip(outs).forall(Utils.programConnects))
 	}
 }

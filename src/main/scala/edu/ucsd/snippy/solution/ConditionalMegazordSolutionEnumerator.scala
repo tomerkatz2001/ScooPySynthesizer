@@ -123,8 +123,8 @@ class ConditionalMegazordSolutionEnumerator(
 		//   enumerate conditions and see if we have a complete tuple
 		val nextCond = condEnumerator.next()
 
-		if (nextCond.nodeType == Types.Bool && nextCond.values.forall(_.isDefined)) {
-			val key = nextCond.values.asInstanceOf[List[Option[Boolean]]].zipWithIndex.foldLeft((Set[Int](), Set[Int]())) {
+		if (nextCond.nodeType == Types.Bool && nextCond.exampleValues.forall(_.isDefined)) {
+			val key = nextCond.exampleValues.asInstanceOf[List[Option[Boolean]]].zipWithIndex.foldLeft((Set[Int](), Set[Int]())) {
 				case ((thenIdxs, elseIdxs), (cond, idx)) => if (cond.get) {
 					(thenIdxs + idx, elseIdxs)
 				}else {

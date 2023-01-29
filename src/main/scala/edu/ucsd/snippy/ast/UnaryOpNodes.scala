@@ -8,7 +8,8 @@ trait UnaryOpNode[T] extends ASTNode
 {
 	val arg: ASTNode
 
-	override lazy val values: List[Option[T]] = arg.values.map(_.flatMap(doOp))
+	override val requireBit: Boolean = arg.requireBit
+	override lazy val _values: List[Option[T]] = arg.exampleValues.map(_.flatMap(doOp))
 
 	override val height: Int = 1 + arg.height
 	override val terms: Int = 1 + arg.terms

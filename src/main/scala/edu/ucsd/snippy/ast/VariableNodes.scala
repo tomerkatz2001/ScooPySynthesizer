@@ -12,8 +12,9 @@ abstract class VariableNode[T](contexts: List[Map[String, Any]]) extends ASTNode
 
 	val terms = 1
 	val name: String
-	val values: List[Option[T]] = contexts.map(context => context.get(name).asInstanceOf[Option[T]])
-
+	override val requireBit: Boolean = false // assume it is not just a variable.
+	override val _values: List[Option[T]] = contexts.map(context => context.get(name).asInstanceOf[Option[T]])
+	override def exampleValues: List[Option[T]] = _values
 	def includes(varName: String): Boolean = name == varName
 
 	override lazy val usesVariables: Boolean = true
