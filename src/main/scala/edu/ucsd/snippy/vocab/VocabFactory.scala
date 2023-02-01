@@ -21,7 +21,8 @@ object VocabFactory
 	}
 
 	def apply(variables: List[(String, Types.Value)],
-		additionalLiterals: Iterable[String]): VocabFactory =
+		additionalLiterals: Iterable[String],
+			  additionalMaker: VocabMaker=null): VocabFactory =
 	{
 		val defaultStringLiterals = List(" ")
 		val defaultIntLiterals = List(-1, 0, 1, 2)
@@ -133,7 +134,7 @@ object VocabFactory
 					override def apply(children : List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						IntLiteral(num, contexts.length)
 				}
-			} ++ List(
+			} ++ List(additionalMaker,
 				new BasicVocabMaker {
 					override val returnType: Types = IntSet
 					override val arity: Int = 1
@@ -977,9 +978,11 @@ object VocabFactory
 
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						TernarySubList[Double](children.head.asInstanceOf[ListNode[Double]], children(1).asInstanceOf[IntNode], children(2).asInstanceOf[IntNode])
-				}
+				},
+
 			)
 		}
+
 
 		VocabFactory(vocab)
 	}

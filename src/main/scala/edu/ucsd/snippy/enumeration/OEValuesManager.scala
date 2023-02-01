@@ -51,7 +51,7 @@ class InputsValuesManager extends OEValuesManager
 		this.classValues.remove(program.exampleValues)
 }
 
-class MyManager extends InputsValuesManager
+class RequiresValuesManager extends InputsValuesManager
 {
 	override def isRepresentative(program: ASTNode): Boolean =
 	{

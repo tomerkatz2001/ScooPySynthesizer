@@ -1,7 +1,7 @@
 package edu.ucsd.snippy
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, MyManager , OEValuesManager}
+import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager, RequiresValuesManager}
 import edu.ucsd.snippy.predicates._
 import edu.ucsd.snippy.solution.{BasicSolutionEnumerator, ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator, ConditionalSingleEnumMultivarSolutionEnumerator, ConditionalSingleEnumSingleVarSolutionEnumerator, SolutionEnumerator}
 import edu.ucsd.snippy.utils._
@@ -38,7 +38,7 @@ object SynthesisTask
 	val reserved_names: Set[String] =
 		Set("time", "#", "$", "lineno", "prev_lineno", "next_lineno", "__run_py__")
 
-	def fromString(jsonString: String, simAssign: Boolean = false, my:Boolean = false ): SynthesisTask = {
+	def fromString(jsonString: String, requiredMaker:VocabMaker=null, simAssign: Boolean = false): SynthesisTask = {
 		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
 		val outputVarNames: List[String] = input("varNames").asInstanceOf[List[String]]
 		val envs: List[Map[String, Any]] = input("envs").asInstanceOf[List[Map[String, Any]]]
@@ -78,7 +78,7 @@ object SynthesisTask
 			case (None, env) => env.filter(entry => !outputVarNames.contains(entry._1))
 		}
 
-		val oeManager = if(my) new MyManager else new InputsValuesManager
+		val oeManager = new InputsValuesManager
 		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames)
 
 		val predicate: Predicate = outputVarNames match {
@@ -94,7 +94,7 @@ object SynthesisTask
 			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
 			.filter(!_._2.equals(Types.Unknown))
 			.toList
-		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals)
+		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals, requiredMaker)
 
 		val enumerator: SolutionEnumerator = predicate match {
 			case pred: MultilineMultivariablePredicate if simAssign =>
