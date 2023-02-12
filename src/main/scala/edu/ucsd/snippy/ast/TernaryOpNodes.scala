@@ -56,6 +56,11 @@ case class StringReplace(arg0: StringNode, arg1: StringNode, arg2: StringNode) e
 		arg0.updateValues(contexts),
 		arg1.updateValues(contexts),
 		arg2.updateValues(contexts))
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+		arg0 = children.head.asInstanceOf[StringNode],
+		arg1 = children(1).asInstanceOf[StringNode],
+		arg2 = children(2).asInstanceOf[StringNode])
 }
 
 case class TernarySubstring(arg0: StringNode, arg1: IntNode, arg2: IntNode) extends TernaryOpNode[String] with StringNode
@@ -86,6 +91,11 @@ case class TernarySubstring(arg0: StringNode, arg1: IntNode, arg2: IntNode) exte
 		arg0.updateValues(contexts),
 		arg1.updateValues(contexts),
 		arg2.updateValues(contexts))
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+		arg0 = children.head.asInstanceOf[StringNode],
+		arg1 = children(1).asInstanceOf[IntNode],
+		arg2 = children(2).asInstanceOf[IntNode])
 }
 
 case class ListInsert[T, E <: ASTNode](arg0: ListNode[T], arg1: IntNode, arg2: E) extends TernaryOpNode[Iterable[T]] with ListNode[T]
@@ -111,6 +121,11 @@ case class ListInsert[T, E <: ASTNode](arg0: ListNode[T], arg1: IntNode, arg2: E
 		arg0.updateValues(contexts),
 		arg1.updateValues(contexts),
 		arg2.updateValues(contexts))
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+		arg0 = children.head.asInstanceOf[ListNode[T]],
+		arg1 = children(1).asInstanceOf[IntNode],
+		arg2 = children(2).asInstanceOf[E])
 }
 
 case class TernarySubList[T](arg0: ListNode[T], arg1: IntNode, arg2: IntNode) extends TernaryOpNode[Iterable[T]] with ListNode[T]
@@ -145,4 +160,9 @@ case class TernarySubList[T](arg0: ListNode[T], arg1: IntNode, arg2: IntNode) ex
 		arg2.updateValues(contexts))
 
 	override val childType: Types = arg0.childType
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+		arg0 = children.head.asInstanceOf[ListNode[T]],
+		arg1 = children(1).asInstanceOf[IntNode],
+		arg2 = children(2).asInstanceOf[IntNode])
 }

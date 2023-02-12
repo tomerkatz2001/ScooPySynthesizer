@@ -56,19 +56,30 @@ trait ListCompNode[T] extends ListNode[T]
 case class StringToStringListCompNode(list: ListNode[String], map: StringNode, varName: String) extends ListCompNode[String] {
 	override def updateValues(contexts: Contexts): StringToStringListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
+
+	override def updateChildren(children: Seq[ASTNode]): StringToStringListCompNode=copy(
+		children.toList.asInstanceOf[ListNode[String]],map, varName)
+
 }
 
 case class StringToIntListCompNode(list: ListNode[String], map: IntNode, varName: String) extends ListCompNode[Int] {
 	override def updateValues(contexts: Contexts): StringToIntListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
+
+	override def updateChildren(children: Seq[ASTNode]): StringToIntListCompNode=copy(
+		children.toList.asInstanceOf[ListNode[String]],map, varName)
 }
 
 case class IntToStringListCompNode(list: ListNode[Int], map: StringNode, varName: String) extends ListCompNode[String] {
 	override def updateValues(contexts: Contexts): IntToStringListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
+	override def updateChildren(children: Seq[ASTNode]): IntToStringListCompNode=copy(
+		children.toList.asInstanceOf[ListNode[Int]],map, varName)
 }
 
 case class IntToIntListCompNode(list: ListNode[Int], map: IntNode, varName: String) extends ListCompNode[Int] {
 	override def updateValues(contexts: Contexts): IntToIntListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
+	override def updateChildren(children: Seq[ASTNode]): IntToIntListCompNode=copy(
+		children.toList.asInstanceOf[ListNode[Int]],map, varName)
 }

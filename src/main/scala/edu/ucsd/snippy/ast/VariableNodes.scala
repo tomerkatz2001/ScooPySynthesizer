@@ -18,6 +18,8 @@ abstract class VariableNode[T](contexts: List[Map[String, Any]]) extends ASTNode
 	def includes(varName: String): Boolean = name == varName
 
 	override lazy val usesVariables: Boolean = true
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = this
 }
 
 object VariableNode {

@@ -92,4 +92,11 @@ class QuaternarySubstring(val arg0: StringNode, val arg1: IntNode, val arg2: Int
 			this.arg1.updateValues(contexts),
 			this.arg2.updateValues(contexts),
 			this.arg3.updateValues(contexts))
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode =
+		new QuaternarySubstring(
+			children.head.asInstanceOf[StringNode],
+			children(1).asInstanceOf[IntNode],
+			children(2).asInstanceOf[IntNode],
+			children(3).asInstanceOf[IntNode])
 }

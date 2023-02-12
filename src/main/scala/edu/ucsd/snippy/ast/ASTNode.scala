@@ -8,7 +8,8 @@ trait ASTNode
 	val nodeType: Types.Types
 	val _values: List[Option[Any]]
 	def exampleValues: List[Option[Any]] = _values
-	val requireBit : Boolean = false
+
+	val requireBit: Boolean = false
 	val code: String
 	val height: Int
 	val terms: Int
@@ -16,6 +17,7 @@ trait ASTNode
 	val usesVariables: Boolean
 	protected val parenless: Boolean
 	private var _cost: Option[Int] = None
+
 
 	def includes(varName: String): Boolean
 
@@ -34,6 +36,8 @@ trait ASTNode
 	}
 
 	def updateValues(contexts: Contexts): ASTNode
+
+	def updateChildren(children: Seq[ASTNode]): ASTNode = ???
 }
 
 trait IterableNode extends ASTNode

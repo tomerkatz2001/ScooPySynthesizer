@@ -16,6 +16,8 @@ abstract class LiteralNode[T](numContexts: Int) extends ASTNode
 	override lazy val usesVariables: Boolean = false
 
 	def includes(varName: String): Boolean = false
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = this
 }
 
 case class StringLiteral(value: String, numContexts: Int) extends LiteralNode[String](numContexts) with StringNode
@@ -39,6 +41,7 @@ case class StringLiteral(value: String, numContexts: Int) extends LiteralNode[St
 	}) + '"'
 
 	override def updateValues(contexts: Contexts): StringLiteral = copy(value, numContexts = contexts.contextLen)
+
 }
 
 case class IntLiteral(value: Int, numContexts: Int) extends LiteralNode[Int](numContexts) with IntNode
@@ -47,6 +50,7 @@ case class IntLiteral(value: Int, numContexts: Int) extends LiteralNode[Int](num
 	override val code: String = value.toString
 
 	override def updateValues(contexts: Contexts): IntLiteral = copy(value, numContexts = contexts.contextLen)
+
 }
 
 case class BoolLiteral(value: Boolean, numContexts: Int) extends LiteralNode[Boolean](numContexts) with BoolNode

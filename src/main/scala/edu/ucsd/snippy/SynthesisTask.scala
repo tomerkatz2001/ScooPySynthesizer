@@ -38,7 +38,7 @@ object SynthesisTask
 	val reserved_names: Set[String] =
 		Set("time", "#", "$", "lineno", "prev_lineno", "next_lineno", "__run_py__")
 
-	def fromString(jsonString: String, requiredMaker:VocabMaker=null, simAssign: Boolean = false): SynthesisTask = {
+	def fromString(jsonString: String, requiredMaker:Option[VocabMaker]=None, simAssign: Boolean = false): SynthesisTask = {
 		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
 		val outputVarNames: List[String] = input("varNames").asInstanceOf[List[String]]
 		val envs: List[Map[String, Any]] = input("envs").asInstanceOf[List[Map[String, Any]]]

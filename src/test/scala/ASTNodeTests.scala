@@ -177,6 +177,8 @@ class ASTNodeTests extends JUnitSuite
 			override lazy val usesVariables: Boolean = false
 
 			override def updateValues(contexts: Contexts): IntListNode = ???
+
+
 		}, new IntListNode
 		{
 			override val _values: List[Option[Iterable[Int]]] = List(-2212 :: 3 :: 2 :: Nil).map(Some(_))

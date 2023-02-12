@@ -21,15 +21,21 @@ object VocabFactory
 	}
 
 	def apply(variables: List[(String, Types.Value)],
-		additionalLiterals: Iterable[String],
-			  additionalMaker: VocabMaker=null): VocabFactory =
+			  additionalLiterals: Iterable[String],
+			  additionalMaker: Option[VocabMaker] = None): VocabFactory =
 	{
 		val defaultStringLiterals = List(" ")
 		val defaultIntLiterals = List(-1, 0, 1, 2)
 		val stringLiterals = (defaultStringLiterals ++ additionalLiterals).distinct
+		val requiredMaker = additionalMaker match {
+			case Some(maker) => List(maker)
+			case None => List()
+		}
 
 		val vocab: List[VocabMaker] = {
+
 			// First, add the variables
+			requiredMaker ++
 			variables.map {
 				case (name, Types.String) => new BasicVocabMaker
 				{
@@ -134,7 +140,7 @@ object VocabFactory
 					override def apply(children : List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						IntLiteral(num, contexts.length)
 				}
-			} ++ List(additionalMaker,
+			} ++ List(
 				new BasicVocabMaker {
 					override val returnType: Types = IntSet
 					override val arity: Int = 1
