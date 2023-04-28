@@ -77,7 +77,7 @@ abstract class ListCompVocabMaker(inputListType: Types, outputListType: Types) e
 			vocabFactory.leavesMakers :::
 			vocabFactory.nodeMakers.filter(c => c.isInstanceOf[BasicVocabMaker])
 
-		this.mapVocab = VocabFactory.apply(vocabs)
+		this.mapVocab = VocabFactory.apply(vocabs, true)
 		this.nextList()
 		this
 	}
@@ -131,7 +131,7 @@ abstract class ListCompVocabMaker(inputListType: Types, outputListType: Types) e
 			vocabFactory.nodeMakers.filter(c => c.isInstanceOf[BasicVocabMaker]
 				&& c.returnType.equals(this.outputListType)) // We don't support nested list comprehensions
 
-		this.mapVocab = VocabFactory.apply(vocabs)
+		this.mapVocab = VocabFactory.apply(vocabs, true)
 		this.nextList()
 		this
 	}

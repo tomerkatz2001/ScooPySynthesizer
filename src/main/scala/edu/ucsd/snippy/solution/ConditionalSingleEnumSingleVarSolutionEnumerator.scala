@@ -5,14 +5,17 @@ import edu.ucsd.snippy.enumeration.Enumerator
 import edu.ucsd.snippy.utils.Utils.{filterByIndices, getBinaryPartitions}
 import edu.ucsd.snippy.utils.{Assignment, ConditionalAssignment, SingleAssignment, Utils}
 
+import scala.collection.immutable.Set
+
 class ConditionalSingleEnumSingleVarSolutionEnumerator(
 	val enumerator: Enumerator,
 	val varName: String,
 	val retType: Types.Types,
 	val values: List[Any],
-	val contexts: List[Map[String, Any]]) extends SolutionEnumerator
+	val contexts: List[Map[String, Any]],
+	val partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
 {
-	val stores: List[((Set[Int], Set[Int]), SolutionStore)] = getBinaryPartitions(contexts.indices.toList)
+	val stores: List[((Set[Int], Set[Int]), SolutionStore)] = partitionFunction(contexts.indices.toList)
 		.map{part =>
 			val store = new SolutionStore(
 				filterByIndices(values, part._1),
@@ -28,8 +31,19 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 		}
 	var solution: Option[Assignment] = None
 
+	/*default constructor if the partitioning is not known*/
+	def this(
+		enumerator: Enumerator,
+		varName: String,
+		retType: Types.Types,
+		values: List[Any],
+		contexts: List[Map[String, Any]]){
+			this(enumerator, varName, retType, values, contexts, (indices:List[Any]) => getBinaryPartitions(indices));
+		}
+
 	override def step(): Unit = {
 		val program = enumerator.next()
+		print(program.code+" .... "+program.exampleValues+" .... "+program.height + "\n")
 		val paths = for (((thenPart, elsePart), store) <- stores) yield {
 			var updated = false
 
@@ -94,6 +108,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 				store.thenCase.get.terms + store.elseCase.get.terms + store.cond.get.terms else Int.MaxValue)
 		}
 		for ((store, _) <- paths.sortBy(_._2); if store.isComplete) {
+
 				this.solution = Some(ConditionalAssignment(
 					store.cond.get,
 					SingleAssignment(varName, store.thenCase.get),

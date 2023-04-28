@@ -5,6 +5,7 @@ import edu.ucsd.snippy.enumeration.{Contexts, ProbUpdate}
 
 trait ASTNode
 {
+
 	val nodeType: Types.Types
 	val _values: List[Option[Any]]
 	def exampleValues: List[Option[Any]] = _values

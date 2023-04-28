@@ -88,7 +88,7 @@ abstract class MapCompVocabMaker(iterableType: Types, valueType: Types) extends 
 		val vocabs = newVarVocab ::
 			vocabFactory.leavesMakers :::
 			vocabFactory.nodeMakers.filter(c => c.isInstanceOf[BasicVocabMaker])
-		this.mapVocab = VocabFactory.apply(vocabs)
+		this.mapVocab = VocabFactory.apply(vocabs, true)
 		this.nextList()
 		this
 	}
@@ -156,7 +156,7 @@ abstract class MapCompVocabMaker(iterableType: Types, valueType: Types) extends 
 		val vocabs = newVarVocab ::
 			vocabFactory.leavesMakers :::
 			vocabFactory.nodeMakers.filter(c => c.isInstanceOf[BasicVocabMaker])
-		this.mapVocab = VocabFactory.apply(vocabs)
+		this.mapVocab = VocabFactory.apply(vocabs, true)
 		this.nextList()
 		this
 	}
@@ -336,7 +336,7 @@ abstract class FilteredMapVocabMaker(keyType: Types, valueType: Types) extends V
 			vocabFactory.leavesMakers :::
 			vocabFactory.nodeMakers.filter(c => c.isInstanceOf[BasicVocabMaker])
 
-		this.filterVocab = VocabFactory.apply(vocabs)
+		this.filterVocab = VocabFactory.apply(vocabs, true)
 		this.nextMap()
 		this
 	}
@@ -393,7 +393,7 @@ abstract class FilteredMapVocabMaker(keyType: Types, valueType: Types) extends V
 			vocabFactory.leavesMakers :::
 			vocabFactory.nodeMakers.filter(_.isInstanceOf[BasicVocabMaker])
 
-		this.filterVocab = VocabFactory.apply(vocabs)
+		this.filterVocab = VocabFactory.apply(vocabs, true)
 		this.nextMap()
 		this
 	}

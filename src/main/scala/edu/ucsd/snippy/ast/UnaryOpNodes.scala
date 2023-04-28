@@ -63,6 +63,22 @@ case class ToList(arg: StringNode) extends UnaryOpNode[List[String]] with String
 	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(arg = children.head.asInstanceOf[StringNode])
 }
 
+case class IntToList(arg: IntNode) extends UnaryOpNode[List[Int]] with IntListNode {
+	override lazy val code: String = f"[${arg.code}]"
+
+	override def doOp(x: Any): Option[List[Int]] = x match {
+		case i: Int => Some(List(i))
+		case _ => wrongType(x)
+	}
+
+	override def make(x: ASTNode): IntToList =
+		IntToList(x.asInstanceOf[IntNode])
+
+	override def updateValues(contexts: Contexts): IntToList = copy(arg.updateValues(contexts))
+
+	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(arg = children.head.asInstanceOf[IntNode])
+}
+
 case class IntToString(arg: IntNode) extends UnaryOpNode[String] with StringNode
 {
 	override lazy val code: String = "str(" + arg.code + ")"

@@ -72,7 +72,7 @@ object BenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("src/test/resources")
+	val benchmarksDir = new File("synthesizer/src/test/resources")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false

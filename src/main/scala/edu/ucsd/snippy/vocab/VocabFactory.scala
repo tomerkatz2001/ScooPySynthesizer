@@ -14,9 +14,10 @@ class VocabFactory(
 
 object VocabFactory
 {
-	def apply(vocab: List[VocabMaker]): VocabFactory =
+	def apply(vocab: List[VocabMaker], nested:Boolean): VocabFactory =
 	{
-		val (leavesMakers, nodeMakers) = vocab.partition(m => m.arity == 0)
+		val newVocab = if(nested) vocab.filter(!_.isInstanceOf[RequiredVocabMaker]) else vocab
+		val (leavesMakers, nodeMakers) = newVocab.partition(m => m.arity == 0)
 		new VocabFactory(leavesMakers, nodeMakers)
 	}
 
@@ -140,7 +141,9 @@ object VocabFactory
 					override def apply(children : List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						IntLiteral(num, contexts.length)
 				}
-			} ++ List(
+			} ++
+				//and then all other combinations
+				List(
 				new BasicVocabMaker {
 					override val returnType: Types = IntSet
 					override val arity: Int = 1
@@ -604,6 +607,27 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						ListConcat[Int](children.head.asInstanceOf[ListNode[Int]], children.tail.head.asInstanceOf[ListNode[Int]])
 				},
+				new BasicVocabMaker
+				{
+					override val arity: Int = 2
+					override val childTypes: List[Types] = List(Types.Int, Types.Int)
+					override val returnType: Types = Types.Int
+					override val nodeType: Class[_ <: ASTNode] = classOf[BinaryOpNode[Int]]
+					override val head: String = ""
+
+					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+						min2(children.head.asInstanceOf[IntNode], children.tail.head.asInstanceOf[IntNode])
+				},
+				new BasicVocabMaker {
+					override val arity: Int = 1
+					override val childTypes: List[Types] = List(Types.Int)
+					override val returnType: Types = Types.IntList
+					override val nodeType: Class[_ <: ASTNode] = classOf[BinaryOpNode[List[Int]]]
+					override val head: String = ""
+
+					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+						IntToList(children.head.asInstanceOf[IntNode])
+				},
 				new ListCompVocabMaker(Types.String, Types.String) {
 					override val nodeType: Class[_ <: ASTNode] = classOf[StringToStringListCompNode]
 					override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
@@ -804,6 +828,7 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						ToList(children.head.asInstanceOf[StringNode])
 				}
+
 				//Doubles
 				,new BasicVocabMaker {
 					override val arity: Int = 1
@@ -990,6 +1015,6 @@ object VocabFactory
 		}
 
 
-		VocabFactory(vocab)
+		VocabFactory(vocab,false) // this function is not being called by inner enumarators
 	}
 }

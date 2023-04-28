@@ -12,9 +12,10 @@ import scala.collection.mutable
 class ConditionalSingleEnumMultivarSolutionEnumerator(
 	predicate: MultilineMultivariablePredicate,
 	variables: List[(String, Types)],
-	literals: Iterable[String]) extends SolutionEnumerator
+	literals: Iterable[String],
+	val partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
 {
-	val partitions: List[(Set[Int], Set[Int])] = getBinaryPartitions(predicate.graphStart.state.indices.toList)
+	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
 	val conditionals: List[CondStore] = this.partitions.map(part => {
 		val rs = new CondStore
 		if (part._2.isEmpty) {
@@ -48,6 +49,11 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 		case _ => ()
 	}
 
+	def this(predicate: MultilineMultivariablePredicate,
+	         variables: List[(String, Types)],
+	         literals: Iterable[String]) {
+		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices))
+	}
 	def step(): Unit = {
 		if (this.graph.step()) {
 			this.graph.computeShortestPaths()

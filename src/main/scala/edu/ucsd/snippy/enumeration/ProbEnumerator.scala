@@ -63,8 +63,12 @@ class ProbEnumerator(
 
 	if (vars != null) vars.values.flatten.toList.map(p => oeManager.isRepresentative(p)) // OE
 
-	var rootMaker: Iterator[ASTNode] = currIterator.next().
-		probe_init(vocab, costLevel, contexts, mainBank, nested, varBank, vars)
+	var rootMaker: Iterator[ASTNode]= null;
+	if (rootMaker == null) {
+		rootMaker = currIterator.next().
+			probe_init(vocab, costLevel, contexts, mainBank, nested, varBank, vars);
+	}
+
 
 	def resetEnumeration(): Unit =
 	{

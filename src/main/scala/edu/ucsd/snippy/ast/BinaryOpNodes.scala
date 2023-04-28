@@ -19,7 +19,8 @@ trait BinaryOpNode[T] extends ASTNode
 	override val requireBit: Boolean = lhs.requireBit || rhs.requireBit
 
 
-	if (lhs.exampleValues.length != rhs.exampleValues.length) println(lhs.code, lhs.exampleValues, rhs.code, rhs.exampleValues)
+	if (lhs.exampleValues.length != rhs.exampleValues.length)
+		println(lhs.code, lhs.exampleValues, rhs.code, rhs.exampleValues)
 	assert(lhs.exampleValues.length == rhs.exampleValues.length)
 
 	def doOp(l: Any, r: Any): Option[T]
@@ -61,6 +62,30 @@ case class LessThanEq(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean] 
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
 			children.last.asInstanceOf[IntNode])
+	}
+
+}
+
+case class min2(lhs: ASTNode, rhs: ASTNode) extends BinaryOpNode[Int] with IntNode
+{
+	override lazy val code: String = "min("+lhs.code +", "+ rhs.code+")"
+
+	override def doOp(l: Any, r: Any): Option[Int] = (l, r) match {
+		case (l: Integer, r: Integer) => Some(Math.min(l, r))
+		case _ => wrongType(l, r)
+	}
+
+	override def make(l: ASTNode, r: ASTNode): BinaryOpNode[Int] =
+		min2(l.asInstanceOf[ASTNode], r.asInstanceOf[ASTNode])
+
+	override def updateValues(contexts: Contexts): min2 = copy(
+		lhs.updateValues(contexts),
+		rhs.updateValues(contexts))
+
+	override def updateChildren(children: Seq[ASTNode]): min2 = {
+		assert(children.length == 2)
+		copy(children.head.asInstanceOf[ASTNode],
+			children.last.asInstanceOf[ASTNode])
 	}
 
 }
@@ -451,7 +476,7 @@ case class BinarySubstring(lhs: StringNode, rhs: IntNode, abc: Int=0) extends Bi
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + "[" + rhs.code + "]"
-	override val height: Int = abc
+	override val height: Int = abc // dedicated
 
 	override def doOp(l: Any, r: Any): Option[String] = (l, r) match {
 		case (str: String, idx: Int) =>
@@ -696,6 +721,7 @@ case class ListAppend[T, E <: ASTNode](lhs: ListNode[T], rhs: E) extends BinaryO
 			children.last.asInstanceOf[E])
 	}
 }
+
 
 case class SetAppend[T, E <: ASTNode](lhs: SetNode[T], rhs: E) extends BinaryOpNode[Set[T]] with SetNode[T]
 {
