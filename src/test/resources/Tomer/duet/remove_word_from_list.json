@@ -1,0 +1,62 @@
+
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"time": 4,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'General Electric'",
+			"rs": "''General Electric'"
+		},
+		{
+			"time": 8,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'General Electric Inc'",
+			"rs": "'General Electric'"
+		},
+        {
+			"time": 9,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'General Electric Company'",
+			"rs": "'General Electric'"
+		},
+        {
+			"time": 10,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'Microsoft'",
+			"rs": "'Microsoft'"
+		},
+        {
+			"time": 11,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'Microsoft Corporation'",
+			"rs": "'Microsoft'"
+		},
+        {
+			"time": 12,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'Nintendo'",
+			"rs": "'Nintendo'"
+		},
+        {
+			"time": 13,
+			"#": "",
+            "aux": "['Inc', 'Company', 'Corporation', 'Enterprises']",
+			"x": "'Nintendo Enterprises'",
+			"rs": "'Nintendo'"
+		}
+	],
+	"solutions": [
+		"if x.split()[-1] in aux:\n\treturn ' '.join(x.split()[0:-1])\nelse:\n\treturn x"
+	],
+	"previousEnvs": {},
+    "src": " https=//stackoverflow.com/questions/33619752/checking-for-duplicate-substrings-in-excel"
+}

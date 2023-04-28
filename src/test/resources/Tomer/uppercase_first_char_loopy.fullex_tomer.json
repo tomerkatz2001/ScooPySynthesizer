@@ -1,0 +1,53 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"#": "0",
+			"inp": "'computer science is COOL'",
+			"out": "'Computer science is COOL'",
+			"time": 1
+		},
+
+		{
+			"#": "0",
+			"inp": "'a'",
+			"out": "'A'",
+			"time": 5
+		},
+
+
+	],
+	"previousEnvs": {
+		"1": {
+			"#": "0",
+			"time": 0,
+			"inp": "'computer science is COOL'"
+		},
+		"3": {
+			"#": "0",
+			"time": 2,
+			"inp": "'123abc'"
+		},
+		"5": {
+			"#": "0",
+			"time": 4,
+			"inp": "'aaa'"
+		},
+		"7": {
+			"#": "0",
+			"time": 6,
+			"inp": "'a'"
+		},
+		"9": {
+			"#": "0",
+			"time": 8,
+			"inp": "''"
+		}
+	},
+	"solutions": [
+		"out = inp.capitalize()[0] + inp[1:len(inp)]",
+		"if len(inp) > 0:\n\tout = inp.capitalize()[0] + inp[1:len(inp)]\nelse:\n\tout = \"\""
+	]
+}

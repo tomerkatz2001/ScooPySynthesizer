@@ -1,0 +1,44 @@
+
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"time": 4,
+			"#": "",
+			"x": "'Mining US'",
+			"rs": "''Mining'"
+		},
+		{
+			"time": 8,
+			"#": "",
+			"x": "'Soybean Farming CAN'",
+			"rs": "'Soybean Farming'"
+		},
+		{
+			"time": 12,
+			"#": "",
+			"x": "'Soybean Farming'",
+			"rs": "'Soybean Farming'"
+		},
+		{
+			"time": 16,
+			"#": "",
+			"x": "'Oil Extraction US'",
+			"rs": "'Oil Extraction'"
+		},
+        {
+			"time": 17,
+			"#": "",
+			"x": "'Fishing'",
+			"rs": "'Fishing'"
+		}
+	],
+	"solutions": [
+		"x.replace('US', '').replace('CAN', '')",
+        "x.replace('US', 'CAN').replace('CAN', '')"
+	],
+	"previousEnvs": {},
+    "src": "https=//stackoverflow.com/questions/11440431/remove-trailing-us-and-can-strings-from-a-range-of-cells/11440731%11440731"
+}
