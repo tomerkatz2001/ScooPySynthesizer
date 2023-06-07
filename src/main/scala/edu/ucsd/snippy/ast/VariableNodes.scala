@@ -5,14 +5,15 @@ import edu.ucsd.snippy.enumeration.Contexts
 
 abstract class VariableNode[T](contexts: List[Map[String, Any]]) extends ASTNode
 {
+	val reqVeq : List[Boolean];
 	override lazy val code: String = name
 	override val height: Int = 0
 	override val children: Iterable[ASTNode] = Iterable.empty
 	override protected val parenless: Boolean = true
+	override val requireBits: List[Boolean] = reqVeq
 
 	val terms = 1
 	val name: String
-	override val requireBit: Boolean = false // assume it is not just a variable.
 
 	override val _values: List[Option[T]] = contexts.map(context => context.get(name).asInstanceOf[Option[T]])
 	override def exampleValues: List[Option[T]] = _values
@@ -20,7 +21,6 @@ abstract class VariableNode[T](contexts: List[Map[String, Any]]) extends ASTNode
 
 	override lazy val usesVariables: Boolean = true
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = this
 }
 
 object VariableNode {
@@ -44,37 +44,59 @@ object VariableNode {
 	}
 }
 
-case class StringVariable(name: String, contexts: List[Map[String, Any]]) extends VariableNode[String](contexts) with StringNode
+case class StringVariable(name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] = List()) extends VariableNode[String](contexts) with StringNode
 {
+
 	override def updateValues(contexts: Contexts): StringVariable = copy(name, contexts = contexts.contexts)
+
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts, reqVeq)
+
 }
 
-case class IntVariable(name: String, contexts: List[Map[String, Any]]) extends VariableNode[Int](contexts) with IntNode
+case class IntVariable(name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] = List()) extends VariableNode[Int](contexts) with IntNode
 {
+
 	override def updateValues(contexts: Contexts): IntVariable = copy(name, contexts = contexts.contexts)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts, reqVeq)
+
 }
 
-case class BoolVariable(name: String, contexts: List[Map[String, Any]]) extends VariableNode[Boolean](contexts) with BoolNode
+case class BoolVariable(name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] = List()) extends VariableNode[Boolean](contexts) with BoolNode
 {
+
 	override def updateValues(contexts: Contexts): BoolVariable = copy(name, contexts = contexts.contexts)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts, reqVeq)
+
 }
 
-case class DoubleVariable(name: String, contexts: List[Map[String, Any]]) extends  VariableNode[Double](contexts) with DoubleNode
+case class DoubleVariable(name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] = List()) extends  VariableNode[Double](contexts) with DoubleNode
 {
+
 	override def updateValues(contexts: Contexts): DoubleVariable = copy(name, contexts = contexts.contexts)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts, reqVeq)
+
 }
 
-case class ListVariable[T](name: String, contexts: List[Map[String, Any]], childType: Types) extends VariableNode[List[T]](contexts) with ListNode[T]
+case class ListVariable[T](name: String, contexts: List[Map[String, Any]], childType: Types, reqVeq: List[Boolean] = List()) extends VariableNode[List[T]](contexts) with ListNode[T]
 {
+
 	override def updateValues(contexts: Contexts): ListVariable[T] = copy(name, contexts = contexts.contexts)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts,childType, reqVeq)
+
 }
 
-case class MapVariable[K, V](name: String, contexts: List[Map[String, Any]], keyType: Types, valType: Types) extends VariableNode[Map[K, V]](contexts) with MapNode[K, V]
+case class MapVariable[K, V](name: String, contexts: List[Map[String, Any]], keyType: Types, valType: Types, reqVeq: List[Boolean] = List()) extends VariableNode[Map[K, V]](contexts) with MapNode[K, V]
 {
+
 	override def updateValues(contexts: Contexts): MapVariable[K, V] = copy(name, contexts = contexts.contexts)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts,keyType, valType, reqVeq)
+
 }
 
-case class SetVariable[T](name: String, contexts: List[Map[String, Any]], childType: Types) extends VariableNode[Set[T]](contexts) with SetNode[T]
+case class SetVariable[T](name: String, contexts: List[Map[String, Any]], childType: Types, reqVeq: List[Boolean] = List()) extends VariableNode[Set[T]](contexts) with SetNode[T]
 {
+
 	override def updateValues(contexts: Contexts): SetNode[T] = copy(name, contexts = contexts.contexts)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts,childType, reqVeq)
+
 }

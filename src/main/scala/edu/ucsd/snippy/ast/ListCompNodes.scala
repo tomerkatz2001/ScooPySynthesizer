@@ -8,10 +8,11 @@ trait ListCompNode[T] extends ListNode[T]
 	val list: ListNode[_]
 	val map: ASTNode
 	val varName: String
+	val reqVeq: List[Boolean]
 
 	override val childType: Types = map.nodeType
 
-	override val requireBit = list.requireBit || map.requireBit
+	override val requireBits = if(reqVeq.isEmpty)list.requireBits.zipAll(map.requireBits, false,false).map(x=>x._1 || x._2 ) else reqVeq
 
 	override val _values: List[Option[List[T]]] = {
 		var rs: List[Option[List[T]]] = Nil
@@ -53,33 +54,48 @@ trait ListCompNode[T] extends ListNode[T]
 		varName.equals(this.varName) || list.includes(varName) || map.includes(varName)
 }
 
-case class StringToStringListCompNode(list: ListNode[String], map: StringNode, varName: String) extends ListCompNode[String] {
+case class StringToStringListCompNode(list: ListNode[String], map: StringNode, varName: String, reqVeq: List[Boolean] = List()) extends ListCompNode[String] {
 	override def updateValues(contexts: Contexts): StringToStringListCompNode
-	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
+	= {
+		val newList = list.updateValues(contexts)
+		copy(newList, map.updateValues(contexts), varName)}
 
-	override def updateChildren(children: Seq[ASTNode]): StringToStringListCompNode=copy(
-		children.toList.asInstanceOf[ListNode[String]],map, varName)
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): StringToStringListCompNode=
+		{
+			val new_list = children.head.asInstanceOf[ListNode[String]]
+			val new_map = children.last.asInstanceOf[StringNode]
+			copy(new_list, new_map, varName, reqVeq)
+		}
 
 }
 
-case class StringToIntListCompNode(list: ListNode[String], map: IntNode, varName: String) extends ListCompNode[Int] {
+case class StringToIntListCompNode(list: ListNode[String], map: IntNode, varName: String, reqVeq: List[Boolean] = List()) extends ListCompNode[Int] {
 	override def updateValues(contexts: Contexts): StringToIntListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
 
-	override def updateChildren(children: Seq[ASTNode]): StringToIntListCompNode=copy(
-		children.toList.asInstanceOf[ListNode[String]],map, varName)
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] = List()): StringToIntListCompNode={
+		val new_list = children.head.asInstanceOf[ListNode[String]]
+		val new_map = children.last.asInstanceOf[IntNode]
+		copy(new_list, new_map, varName, reqVeq)
+	}
 }
 
-case class IntToStringListCompNode(list: ListNode[Int], map: StringNode, varName: String) extends ListCompNode[String] {
+case class IntToStringListCompNode(list: ListNode[Int], map: StringNode, varName: String, reqVeq: List[Boolean] = List()) extends ListCompNode[String] {
 	override def updateValues(contexts: Contexts): IntToStringListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
-	override def updateChildren(children: Seq[ASTNode]): IntToStringListCompNode=copy(
-		children.toList.asInstanceOf[ListNode[Int]],map, varName)
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] = List()): IntToStringListCompNode={
+
+		val new_list = children.head.asInstanceOf[ListNode[Int]]
+		val new_map = children.last.asInstanceOf[StringNode]
+		copy(new_list, new_map, varName, reqVeq)
+	}
 }
 
-case class IntToIntListCompNode(list: ListNode[Int], map: IntNode, varName: String) extends ListCompNode[Int] {
+case class IntToIntListCompNode(list: ListNode[Int], map: IntNode, varName: String, reqVeq: List[Boolean] = List()) extends ListCompNode[Int] {
 	override def updateValues(contexts: Contexts): IntToIntListCompNode
 	= copy(list.updateValues(contexts), map.updateValues(contexts), varName)
-	override def updateChildren(children: Seq[ASTNode]): IntToIntListCompNode=copy(
-		children.toList.asInstanceOf[ListNode[Int]],map, varName)
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] = List()): IntToIntListCompNode={
+		val new_list = children.head.asInstanceOf[ListNode[Int]]
+		val new_map =children.last.asInstanceOf[IntNode]
+		copy(new_list,new_map, varName, reqVeq)}
 }

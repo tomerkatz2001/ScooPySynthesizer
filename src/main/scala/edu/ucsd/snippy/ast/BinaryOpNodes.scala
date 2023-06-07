@@ -4,20 +4,18 @@ import edu.ucsd.snippy.DebugPrints
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.enumeration.Contexts
 
-import scala.tools.scalap.scalax.rules.scalasig.Children
-
 trait BinaryOpNode[T] extends ASTNode
 {
 	val lhs: ASTNode
 	val rhs: ASTNode
+	val reqVeq: List[Boolean]
 
 	override val height: Int = 1 + Math.max(lhs.height, rhs.height)
 	override val terms: Int = 1 + lhs.terms + rhs.terms
 	override val children: Iterable[ASTNode] = Iterable(lhs, rhs)
 	override lazy val usesVariables: Boolean = lhs.usesVariables || rhs.usesVariables
 	override protected val parenless: Boolean = false
-	override val requireBit: Boolean = lhs.requireBit || rhs.requireBit
-
+	override val requireBits: List[Boolean] = if(reqVeq.isEmpty) lhs.requireBits.zipAll(rhs.requireBits,false,false).map(x=>x._1 || x._2 ) else reqVeq
 
 	if (lhs.exampleValues.length != rhs.exampleValues.length)
 		println(lhs.code, lhs.exampleValues, rhs.code, rhs.exampleValues)
@@ -42,9 +40,10 @@ trait BinaryOpNode[T] extends ASTNode
 
 }
 
-case class LessThanEq(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean] with BoolNode
+case class LessThanEq(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " <= " + rhs.code
+
 
 	override def doOp(l: Any, r: Any): Option[Boolean] = (l, r) match {
 		case (l: Int, r: Int) => Some(l <= r)
@@ -58,15 +57,16 @@ case class LessThanEq(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean] 
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): LessThanEq = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): LessThanEq = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 
 }
 
-case class min2(lhs: ASTNode, rhs: ASTNode) extends BinaryOpNode[Int] with IntNode
+case class min2(lhs: ASTNode, rhs: ASTNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override lazy val code: String = "min("+lhs.code +", "+ rhs.code+")"
 
@@ -82,15 +82,16 @@ case class min2(lhs: ASTNode, rhs: ASTNode) extends BinaryOpNode[Int] with IntNo
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): min2 = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): min2 = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ASTNode],
-			children.last.asInstanceOf[ASTNode])
+			children.last.asInstanceOf[ASTNode],
+			reqVeq)
 	}
 
 }
 
-case class GreaterThan(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean] with BoolNode
+case class GreaterThan(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " > " + rhs.code
 
@@ -106,14 +107,15 @@ case class GreaterThan(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean]
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): GreaterThan = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): GreaterThan = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode]
+			,reqVeq)
 	}
 }
 
-case class Equals(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean] with BoolNode
+case class Equals(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " == " + rhs.code
 
@@ -127,14 +129,15 @@ case class Equals(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Boolean] with
 
 	override def updateValues(contexts: Contexts): Equals = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): Equals = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): Equals = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode]
+			,reqVeq)
 	}
 }
 
-case class StringEquals(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boolean] with BoolNode
+case class StringEquals(lhs: StringNode, rhs: StringNode,reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " == " + rhs.code
 
@@ -148,14 +151,15 @@ case class StringEquals(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[B
 
 	override def updateValues(contexts: Contexts): StringEquals = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): StringEquals = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringEquals = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class StringConcat(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[String] with StringNode
+case class StringConcat(lhs: StringNode, rhs: StringNode,reqVeq: List[Boolean] =List()) extends BinaryOpNode[String] with StringNode
 {
 	override lazy val code: String = lhs.code + " + " + rhs.code
 
@@ -171,14 +175,15 @@ case class StringConcat(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[S
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): StringConcat = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringConcat = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class MapGet(lhs: MapNode[String, Int], rhs: StringNode) extends BinaryOpNode[Int] with IntNode
+case class MapGet(lhs: MapNode[String, Int], rhs: StringNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + "[" + rhs.code + "]"
@@ -193,14 +198,15 @@ case class MapGet(lhs: MapNode[String, Int], rhs: StringNode) extends BinaryOpNo
 
 	override def updateValues(contexts: Contexts): MapGet = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): MapGet = {
+	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] =List()): MapGet = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[MapNode[String, Int]],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class StringMapGet(lhs: MapNode[String, String], rhs: StringNode) extends BinaryOpNode[String] with StringNode
+case class StringMapGet(lhs: MapNode[String, String], rhs: StringNode,reqVeq: List[Boolean] =List()) extends BinaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + "[" + rhs.code + "]"
@@ -215,14 +221,15 @@ case class StringMapGet(lhs: MapNode[String, String], rhs: StringNode) extends B
 
 	override def updateValues(contexts: Contexts): StringMapGet = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): StringMapGet = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringMapGet = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[MapNode[String, String]],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class IntAddition(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] with IntNode
+case class IntAddition(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override lazy val code: String = lhs.code + " + " + rhs.code
 
@@ -236,14 +243,16 @@ case class IntAddition(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] wit
 
 	override def updateValues(contexts: Contexts): IntAddition = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): IntAddition = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): IntAddition = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
+
 	}
 }
 
-case class IntMultiply(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] with IntNode
+case class IntMultiply(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override lazy val code: String = lhs.parensIfNeeded + " * " + rhs.parensIfNeeded
 
@@ -257,14 +266,15 @@ case class IntMultiply(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] wit
 
 	override def updateValues(contexts: Contexts): IntMultiply = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): IntMultiply = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): IntMultiply = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class StringMultiply(lhs: StringNode, rhs: IntNode) extends BinaryOpNode[String] with StringNode
+case class StringMultiply(lhs: StringNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[String] with StringNode
 {
 	override lazy val code: String = lhs.code + " * " + rhs.code
 
@@ -277,14 +287,15 @@ case class StringMultiply(lhs: StringNode, rhs: IntNode) extends BinaryOpNode[St
 		StringMultiply(l.asInstanceOf[StringNode], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): StringMultiply = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): StringMultiply = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringMultiply = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class IntSubtraction(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] with IntNode
+case class IntSubtraction(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override lazy val code: String = lhs.code + " - " + rhs.code
 
@@ -297,14 +308,15 @@ case class IntSubtraction(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] 
 		IntSubtraction(l.asInstanceOf[IntNode], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): IntSubtraction = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): IntSubtraction = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): IntSubtraction = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class IntDivision(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] with IntNode
+case class IntDivision(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override lazy val code: String = lhs.parensIfNeeded + " // " + rhs.parensIfNeeded
 
@@ -319,14 +331,15 @@ case class IntDivision(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] wit
 		IntDivision(l.asInstanceOf[IntNode], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): IntDivision = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): IntDivision = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): IntDivision = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class Modulo(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] with IntNode
+case class Modulo(lhs: IntNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override lazy val code: String = lhs.parensIfNeeded + " % " + rhs.parensIfNeeded
 
@@ -343,14 +356,15 @@ case class Modulo(lhs: IntNode, rhs: IntNode) extends BinaryOpNode[Int] with Int
 	override def updateValues(contexts: Contexts): Modulo = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): Modulo = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): Modulo = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class Find(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Int] with IntNode
+case class Find(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + ".find(" + rhs.code + ")"
@@ -364,14 +378,15 @@ case class Find(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Int] with
 		Find(l.asInstanceOf[StringNode], r.asInstanceOf[StringNode])
 
 	override def updateValues(contexts: Contexts): Find = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): Find = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): Find = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class Contains(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boolean] with BoolNode
+case class Contains(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] = List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.parensIfNeeded + " in " + rhs.parensIfNeeded
 
@@ -384,14 +399,15 @@ case class Contains(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boole
 		Contains(l.asInstanceOf[StringNode], r.asInstanceOf[StringNode])
 
 	override def updateValues(contexts: Contexts): Contains = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): Contains = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): Contains = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class StringSplit(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Iterable[String]] with StringListNode
+case class StringSplit(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Iterable[String]] with StringListNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + ".split(" + rhs.code + ")"
@@ -408,14 +424,15 @@ case class StringSplit(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[It
 	override def updateValues(contexts: Contexts): StringSplit = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): StringSplit = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringSplit = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class StringJoin(lhs: StringNode, rhs: ListNode[String]) extends BinaryOpNode[String] with StringNode
+case class StringJoin(lhs: StringNode, rhs: ListNode[String], reqVeq: List[Boolean] =List()) extends BinaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + ".join(" + rhs.code + ")"
@@ -429,14 +446,15 @@ case class StringJoin(lhs: StringNode, rhs: ListNode[String]) extends BinaryOpNo
 		StringJoin(l.asInstanceOf[StringNode], r.asInstanceOf[ListNode[String]])
 
 	override def updateValues(contexts: Contexts): StringJoin = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): StringJoin = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringJoin = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[ListNode[String]])
+			children.last.asInstanceOf[ListNode[String]],
+			reqVeq)
 	}
 }
 
-case class Count(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Int] with IntNode
+case class Count(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Int] with IntNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + ".count(" + rhs.code + ")"
@@ -465,18 +483,18 @@ case class Count(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Int] wit
 		Count(l.asInstanceOf[StringNode], r.asInstanceOf[StringNode])
 
 	override def updateValues(contexts: Contexts): Count = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): Count = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): Count = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class BinarySubstring(lhs: StringNode, rhs: IntNode, abc: Int=0) extends BinaryOpNode[String] with StringNode
+case class BinarySubstring(lhs: StringNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + "[" + rhs.code + "]"
-	override val height: Int = abc // dedicated
 
 	override def doOp(l: Any, r: Any): Option[String] = (l, r) match {
 		case (str: String, idx: Int) =>
@@ -490,14 +508,15 @@ case class BinarySubstring(lhs: StringNode, rhs: IntNode, abc: Int=0) extends Bi
 		BinarySubstring(l.asInstanceOf[StringNode], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): BinarySubstring = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): BinarySubstring = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): BinarySubstring = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class StartsWith(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boolean] with BoolNode
+case class StartsWith(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.code + ".startswith(" + rhs.code + ")"
@@ -511,14 +530,15 @@ case class StartsWith(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boo
 		StartsWith(l.asInstanceOf[StringNode], r.asInstanceOf[StringNode])
 
 	override def updateValues(contexts: Contexts): StartsWith = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): StartsWith = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StartsWith = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class EndsWith(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boolean] with BoolNode
+case class EndsWith(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.code + ".endswith(" + rhs.code + ")"
@@ -532,14 +552,15 @@ case class EndsWith(lhs: StringNode, rhs: StringNode) extends BinaryOpNode[Boole
 		EndsWith(l.asInstanceOf[StringNode], r.asInstanceOf[StringNode])
 
 	override def updateValues(contexts: Contexts): EndsWith = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): EndsWith = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): EndsWith = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[StringNode])
+			children.last.asInstanceOf[StringNode],
+			reqVeq)
 	}
 }
 
-case class StringStep(lhs: StringNode, rhs: IntNode) extends BinaryOpNode[String] with StringNode
+case class StringStep(lhs: StringNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String = lhs.parensIfNeeded + "[::" + rhs.code + "]"
@@ -561,14 +582,15 @@ case class StringStep(lhs: StringNode, rhs: IntNode) extends BinaryOpNode[String
 		StringStep(l.asInstanceOf[StringNode], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): StringStep = copy( lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): StringStep = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringStep = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[StringNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class ListStep[T](lhs: ListNode[T], rhs: IntNode) extends BinaryOpNode[Iterable[T]] with ListNode[T]
+case class ListStep[T](lhs: ListNode[T], rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Iterable[T]] with ListNode[T]
 {
 	override val childType: Types = lhs.childType
 	override protected val parenless: Boolean = true
@@ -592,10 +614,11 @@ case class ListStep[T](lhs: ListNode[T], rhs: IntNode) extends BinaryOpNode[Iter
 
 	override def updateValues(contexts: Contexts): ListStep[T] =
 		copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): ListStep[T] = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ListStep[T] = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ListNode[T]],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
@@ -604,7 +627,6 @@ abstract sealed class ListLookup[T](lhs: ListNode[T], rhs: IntNode) extends Bina
 	override protected val parenless: Boolean = true
 	override val nodeType: Types = lhs.childType
 	override val code: String = s"${lhs.parensIfNeeded}[${rhs.code}]"
-
 	override def doOp(l: Any, r: Any): Option[T] = (l, r) match {
 		case (lst: List[T], idx: Int) =>
 			if (idx >= 0 && idx < lst.length) Some(lst(idx))
@@ -612,50 +634,56 @@ abstract sealed class ListLookup[T](lhs: ListNode[T], rhs: IntNode) extends Bina
 			else None
 		case _ => wrongType(l, r)
 	}
-
 }
 
-case class StringListLookup(lhs: ListNode[String], rhs: IntNode, root: Boolean=false) extends ListLookup[String](lhs, rhs) with StringNode
+case class StringListLookup(lhs: ListNode[String], rhs: IntNode, reqVeq: List[Boolean] =List()) extends ListLookup[String](lhs, rhs) with StringNode
 {
+
 	override def make(l: ASTNode, r: ASTNode): ListLookup[String] =
 		StringListLookup(l.asInstanceOf[ListNode[String]], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): StringListLookup = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
 
-	override val requireBit: Boolean = root
-	override def updateChildren(children: Seq[ASTNode]): StringListLookup = {
+
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): StringListLookup = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ListNode[String]],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class IntListLookup(lhs: ListNode[Int], rhs: IntNode) extends ListLookup[Int](lhs, rhs) with IntNode
+case class IntListLookup(lhs: ListNode[Int], rhs: IntNode, reqVeq: List[Boolean] =List()) extends ListLookup[Int](lhs, rhs) with IntNode
 {
+
 	override def make(l: ASTNode, r: ASTNode): ListLookup[Int] =
 		IntListLookup(l.asInstanceOf[ListNode[Int]], r.asInstanceOf[IntNode])
 
 	override def updateValues(contexts: Contexts): IntListLookup = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): IntListLookup = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): IntListLookup = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ListNode[Int]],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class DoubleListLookup(lhs: ListNode[Double], rhs: IntNode) extends ListLookup[Double](lhs,rhs) with DoubleNode{
+case class DoubleListLookup(lhs: ListNode[Double], rhs: IntNode, reqVeq: List[Boolean] =List()) extends ListLookup[Double](lhs,rhs) with DoubleNode{
+
 	override def make(l: ASTNode, r: ASTNode): BinaryOpNode[Double] =
 		DoubleListLookup(l.asInstanceOf[ListNode[Double]], r.asInstanceOf[IntNode])
 	override def updateValues(contexts: Contexts): DoubleNode = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): DoubleNode = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): DoubleNode = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ListNode[Double]],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class ListContains[T, E <: ASTNode](lhs: E, rhs: ListNode[T]) extends BinaryOpNode[Boolean] with BoolNode
+case class ListContains[T, E <: ASTNode](lhs: E, rhs: ListNode[T], reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
+
 	override protected val parenless: Boolean = false
 	override val code: String = s"${lhs.parensIfNeeded} in ${rhs.parensIfNeeded}"
 
@@ -669,14 +697,15 @@ case class ListContains[T, E <: ASTNode](lhs: E, rhs: ListNode[T]) extends Binar
 
 	override def updateValues(contexts: Contexts): ListContains[T, E] =
 		copy(lhs.updateValues(contexts).asInstanceOf[E], rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): ListContains[T, E] = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ListContains[T, E] = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[E],
-			children.last.asInstanceOf[ListNode[T]])
+			children.last.asInstanceOf[ListNode[T]],
+			reqVeq)
 	}
 }
 
-case class ListConcat[T](lhs: ListNode[T], rhs: ListNode[T]) extends BinaryOpNode[Iterable[T]] with ListNode[T]
+case class ListConcat[T](lhs: ListNode[T], rhs: ListNode[T], reqVeq: List[Boolean] =List()) extends BinaryOpNode[Iterable[T]] with ListNode[T]
 {
 	override val childType: Types = lhs.childType
 	override val code: String = s"${lhs.parensIfNeeded} + ${rhs.parensIfNeeded}"
@@ -692,14 +721,15 @@ case class ListConcat[T](lhs: ListNode[T], rhs: ListNode[T]) extends BinaryOpNod
 
 	override def updateValues(contexts: Contexts): ListConcat[T] =
 		copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): ListConcat[T] = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ListConcat[T] = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ListNode[T]],
-			children.last.asInstanceOf[ListNode[T]])
+			children.last.asInstanceOf[ListNode[T]],
+			reqVeq)
 	}
 }
 
-case class ListAppend[T, E <: ASTNode](lhs: ListNode[T], rhs: E) extends BinaryOpNode[Iterable[T]] with ListNode[T]
+case class ListAppend[T, E <: ASTNode](lhs: ListNode[T], rhs: E, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Iterable[T]] with ListNode[T]
 {
 	override val childType: Types = lhs.childType
 	override protected val parenless: Boolean = false
@@ -715,16 +745,18 @@ case class ListAppend[T, E <: ASTNode](lhs: ListNode[T], rhs: E) extends BinaryO
 
 	override def updateValues(contexts: Contexts): ListAppend[T, E] =
 		copy(lhs.updateValues(contexts), rhs.updateValues(contexts).asInstanceOf[E])
-	override def updateChildren(children: Seq[ASTNode]): ListAppend[T, E] = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ListAppend[T, E] = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[ListNode[T]],
-			children.last.asInstanceOf[E])
+			children.last.asInstanceOf[E],
+			reqVeq)
 	}
 }
 
 
-case class SetAppend[T, E <: ASTNode](lhs: SetNode[T], rhs: E) extends BinaryOpNode[Set[T]] with SetNode[T]
+case class SetAppend[T, E <: ASTNode](lhs: SetNode[T], rhs: E, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Set[T]] with SetNode[T]
 {
+
 	override def doOp(l: Any, r: Any): Option[Set[T]] = (l,r) match {
 		case (s: Set[T], elem: T) => Some(s + elem)
 		case _ => wrongType(l,r)
@@ -740,15 +772,17 @@ case class SetAppend[T, E <: ASTNode](lhs: SetNode[T], rhs: E) extends BinaryOpN
 
 	override val code: String = s"${lhs.code} || {${rhs.code}}"
 
-	override def updateChildren(children: Seq[ASTNode]): SetNode[T] = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): SetNode[T] = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[SetNode[T]],
-			children.last.asInstanceOf[E])
+			children.last.asInstanceOf[E],
+			reqVeq)
 	}
 }
 
-case class ListPrepend[T, E <: ASTNode](lhs: E, rhs: ListNode[T]) extends BinaryOpNode[Iterable[T]] with ListNode[T]
+case class ListPrepend[T, E <: ASTNode](lhs: E, rhs: ListNode[T], reqVeq: List[Boolean] =List()) extends BinaryOpNode[Iterable[T]] with ListNode[T]
 {
+
 	override val childType: Types = rhs.childType
 	override protected val parenless: Boolean = false
 	override val code: String = s"[${lhs.code}] + ${rhs.parensIfNeeded}"
@@ -764,15 +798,17 @@ case class ListPrepend[T, E <: ASTNode](lhs: E, rhs: ListNode[T]) extends Binary
 	override def updateValues(contexts: Contexts): ListPrepend[T, E] =
 		copy(lhs.updateValues(contexts).asInstanceOf[E], rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): ListPrepend[T, E] = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ListPrepend[T, E] = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[E],
-			children.last.asInstanceOf[ListNode[T]])
+			children.last.asInstanceOf[ListNode[T]],
+			reqVeq)
 	}
 }
 
-case class LessThanEqDoubles(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNode[Boolean] with BoolNode
+case class LessThanEqDoubles(lhs: DoubleNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
+
 	override lazy val code: String = lhs.code + " <= " + rhs.code
 
 	override def doOp(l: Any, r: Any): Option[Boolean] = (l, r) match {
@@ -786,14 +822,15 @@ case class LessThanEqDoubles(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpN
 	override def updateValues(contexts: Contexts): LessThanEqDoubles = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): LessThanEqDoubles = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): LessThanEqDoubles = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class GreaterThanDoubles(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNode[Boolean] with BoolNode
+case class GreaterThanDoubles(lhs: DoubleNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " > " + rhs.code
 
@@ -808,14 +845,15 @@ case class GreaterThanDoubles(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOp
 	override def updateValues(contexts: Contexts): GreaterThanDoubles = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): GreaterThanDoubles = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): GreaterThanDoubles = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class LessThanEqDoubleInt(lhs: DoubleNode, rhs: IntNode) extends BinaryOpNode[Boolean] with BoolNode
+case class LessThanEqDoubleInt(lhs: DoubleNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " <= " + rhs.code
 
@@ -830,14 +868,15 @@ case class LessThanEqDoubleInt(lhs: DoubleNode, rhs: IntNode) extends BinaryOpNo
 	override def updateValues(contexts: Contexts): LessThanEqDoubleInt = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): LessThanEqDoubleInt = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): LessThanEqDoubleInt = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
 
-case class GreaterThanDoubleInt(lhs: DoubleNode, rhs: IntNode) extends BinaryOpNode[Boolean] with BoolNode
+case class GreaterThanDoubleInt(lhs: DoubleNode, rhs: IntNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " > " + rhs.code
 
@@ -852,13 +891,14 @@ case class GreaterThanDoubleInt(lhs: DoubleNode, rhs: IntNode) extends BinaryOpN
 	override def updateValues(contexts: Contexts): GreaterThanDoubleInt = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): GreaterThanDoubleInt = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): GreaterThanDoubleInt = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[IntNode])
+			children.last.asInstanceOf[IntNode],
+			reqVeq)
 	}
 }
-case class LessThanEqIntDouble(lhs: IntNode, rhs: DoubleNode) extends BinaryOpNode[Boolean] with BoolNode
+case class LessThanEqIntDouble(lhs: IntNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " <= " + rhs.code
 
@@ -874,14 +914,15 @@ case class LessThanEqIntDouble(lhs: IntNode, rhs: DoubleNode) extends BinaryOpNo
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): LessThanEqIntDouble = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): LessThanEqIntDouble = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class GreaterThanIntDouble(lhs: IntNode, rhs: DoubleNode) extends BinaryOpNode[Boolean] with BoolNode
+case class GreaterThanIntDouble(lhs: IntNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override lazy val code: String = lhs.code + " > " + rhs.code
 
@@ -896,14 +937,15 @@ case class GreaterThanIntDouble(lhs: IntNode, rhs: DoubleNode) extends BinaryOpN
 	override def updateValues(contexts: Contexts): GreaterThanIntDouble = copy(
 		lhs.updateValues(contexts),
 		rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): GreaterThanIntDouble = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): GreaterThanIntDouble = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[IntNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class DoublesAddition(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNode[Double] with DoubleNode
+case class DoublesAddition(lhs: DoubleNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Double] with DoubleNode
 {
 	override lazy val code: String = lhs.code + " + " + rhs.code
 
@@ -916,14 +958,15 @@ case class DoublesAddition(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNod
 		DoublesAddition(l.asInstanceOf[DoubleNode], r.asInstanceOf[DoubleNode])
 
 	override def updateValues(contexts: Contexts): DoublesAddition = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): DoublesAddition = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): DoublesAddition = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class DoublesMultiply(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNode[Double] with DoubleNode
+case class DoublesMultiply(lhs: DoubleNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Double] with DoubleNode
 {
 	override lazy val code: String = lhs.parensIfNeeded + " * " + rhs.parensIfNeeded
 
@@ -936,14 +979,15 @@ case class DoublesMultiply(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNod
 		DoublesMultiply(l.asInstanceOf[DoubleNode], r.asInstanceOf[DoubleNode])
 
 	override def updateValues(contexts: Contexts): DoublesMultiply = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): DoublesMultiply = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): DoublesMultiply = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class DoublesSubtraction(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNode[Double] with DoubleNode
+case class DoublesSubtraction(lhs: DoubleNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Double] with DoubleNode
 {
 	override lazy val code: String = lhs.code + " - " + rhs.code
 
@@ -956,14 +1000,15 @@ case class DoublesSubtraction(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOp
 		DoublesSubtraction(l.asInstanceOf[DoubleNode], r.asInstanceOf[DoubleNode])
 
 	override def updateValues(contexts: Contexts): DoublesSubtraction = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): DoublesSubtraction = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): DoublesSubtraction = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class DoublesDivision(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNode[Double] with DoubleNode
+case class DoublesDivision(lhs: DoubleNode, rhs: DoubleNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Double] with DoubleNode
 {
 	override lazy val code: String = lhs.parensIfNeeded + " / " + rhs.parensIfNeeded
 
@@ -978,14 +1023,15 @@ case class DoublesDivision(lhs: DoubleNode, rhs: DoubleNode) extends BinaryOpNod
 		DoublesDivision(l.asInstanceOf[DoubleNode], r.asInstanceOf[DoubleNode])
 
 	override def updateValues(contexts: Contexts): DoublesDivision = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): DoublesDivision = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): DoublesDivision = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[DoubleNode],
-			children.last.asInstanceOf[DoubleNode])
+			children.last.asInstanceOf[DoubleNode],
+			reqVeq)
 	}
 }
 
-case class LAnd(lhs: BoolNode, rhs: BoolNode) extends BinaryOpNode[Boolean] with BoolNode
+case class LAnd(lhs: BoolNode, rhs: BoolNode, reqVeq: List[Boolean] =List()) extends BinaryOpNode[Boolean] with BoolNode
 {
 	override val code: String = lhs.code + " and " + rhs.code
 
@@ -999,9 +1045,10 @@ case class LAnd(lhs: BoolNode, rhs: BoolNode) extends BinaryOpNode[Boolean] with
 		LAnd(l.asInstanceOf[BoolNode], r.asInstanceOf[BoolNode])
 
 	override def updateValues(contexts: Contexts): LAnd = copy(lhs.updateValues(contexts), rhs.updateValues(contexts))
-	override def updateChildren(children: Seq[ASTNode]): LAnd = {
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): LAnd = {
 		assert(children.length == 2)
 		copy(children.head.asInstanceOf[BoolNode],
-			children.last.asInstanceOf[BoolNode])
+			children.last.asInstanceOf[BoolNode],
+			reqVeq)
 	}
 }

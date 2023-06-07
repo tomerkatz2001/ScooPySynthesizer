@@ -12,7 +12,7 @@ object SimBenchmarksCSV extends App
 		val suite = if (dir.getParentFile.getName == "resources") "" else dir.getParentFile.getName
 		val group = dir.getName
 		dir.listFiles()
-			.filter(_.getName.contains(".examples.json"))
+			.filter(_.getName.contains(".json"))
 			.filter(!_.getName.contains(".out"))
 			.sorted
 			.zipWithIndex
@@ -33,6 +33,7 @@ object SimBenchmarksCSV extends App
 						case (Some(program: String), tim: Int, coun: Int) =>
 							time = tim
 							count = coun
+							println("the program:" + program)
 
 							correct = task.get("solutions") match {
 								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => "+"
@@ -45,7 +46,7 @@ object SimBenchmarksCSV extends App
 				} catch {
 					case e: AssertionError => throw e
 					case _: java.lang.OutOfMemoryError => correct = "OutOfMemory"
-					case _: Throwable => correct = "Error" //sys.process.stderr.println(e)
+					case e: Throwable => correct = e.toString()
 				}
 
 				if (print) println(s"$suite,$group,$name,$variables,$time,$count,$correct")
@@ -53,7 +54,7 @@ object SimBenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("src/test/resources")
+	val benchmarksDir = new File("C:\\Users\\tomerkatz\\Desktop\\LooPy\\synthesizer\\src\\test\\resources\\Tomer\\Loopy")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false
@@ -85,8 +86,8 @@ object SimBenchmarksCSV extends App
 	}
 
 	// First, warm up
-	benchmarks.foreach(this.runBenchmark(_, timeout, print = false))
+	benchmarks.foreach(this.runBenchmark(_, 10, print = true))
 
 	// Then actually run
-	benchmarks.foreach(this.runBenchmark(_, timeout))
+	//benchmarks.foreach(this.runBenchmark(_, timeout))
 }

@@ -3,6 +3,7 @@ package edu.ucsd.snippy
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager, RequiresValuesManager}
 import edu.ucsd.snippy.predicates._
+import edu.ucsd.snippy.scoopy.ScopeSpecification
 import edu.ucsd.snippy.solution.{BasicSolutionEnumerator, ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator, ConditionalSingleEnumMultivarSolutionEnumerator, ConditionalSingleEnumSingleVarSolutionEnumerator, SolutionEnumerator}
 import edu.ucsd.snippy.utils._
 import edu.ucsd.snippy.vocab._
@@ -38,37 +39,14 @@ object SynthesisTask
 	val reserved_names: Set[String] =
 		Set("time", "#", "$", "lineno", "prev_lineno", "next_lineno", "__run_py__")
 
-	def fromString(jsonString: String, requiredMaker:Option[VocabMaker]=None, simAssign: Boolean = false): SynthesisTask = {
+	def fromString(jsonString: String, simAssign: Boolean = false): SynthesisTask = {
 		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
 		val outputVarNames: List[String] = input("varNames").asInstanceOf[List[String]]
 		val envs: List[Map[String, Any]] = input("envs").asInstanceOf[List[Map[String, Any]]]
 		val previousEnvMap: Map[Int, Map[String, Any]] = input("previousEnvs").asInstanceOf[Map[String, Map[String, Any]]].map(tup => tup._1.toInt -> tup._2)
 
 		// First, build a tuple of (prevEnv, env) for all the envs
-		val allEnvs: List[(Option[Map[String, Any]], Map[String, Any])] = envs.map(env =>
-		{
-			val time = env("time").asInstanceOf[BigInt].toInt
-			if (previousEnvMap.contains(time)) {
-				Some(previousEnvMap(time)) -> env
-			} else {
-				// We need to use the time + iter to see if we can find the previous env in the
-				// other envs
-				val iterStr = env("#").asInstanceOf[String]
-				if (iterStr.isEmpty) {
-					// Not a loop, and no prev env, so no luck :(
-					None -> env
-				} else {
-					// Find the nearest entry with the iter one less than this one
-					val iter = iterStr.toInt
-					val prevEnv = envs
-						.filter(env => env("time").asInstanceOf[BigInt].toInt < time)
-						.filter(env => env.contains("#") && env("#").asInstanceOf[String].toInt == iter - 1)
-						.lastOption
-					prevEnv -> env
-				}
-			}
-		})
-		.map(tup => tup._1.map(cleanupInputs)-> cleanupInputs(tup._2))
+		val allEnvs: List[(Option[Map[String, Any]], Map[String, Any])] = organizeEnvs(envs, previousEnvMap);
 		val justEnvs = allEnvs.map(_._2)
 
 		var contexts: List[Context] = allEnvs.map {
@@ -94,7 +72,7 @@ object SynthesisTask
 			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
 			.filter(!_._2.equals(Types.Unknown))
 			.toList
-		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals, requiredMaker)
+		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals)
 
 		val enumerator: SolutionEnumerator = predicate match {
 			case pred: MultilineMultivariablePredicate if simAssign =>
@@ -121,6 +99,83 @@ object SynthesisTask
 			enumerator)
 	}
 
+
+	def fromSpec(flatSpec:ScopeSpecification, simAssign: Boolean = false): SynthesisTask={
+		val outputVarNames: List[String] = flatSpec.outputVarNames
+		val examples: List[Map[String, Any]] = flatSpec.scopeExamples
+
+		var contexts: List[Context] = examples.map {
+			env => env.filter(entry => !outputVarNames.contains(entry._1))
+		}
+
+		val oeManager = new RequiresValuesManager
+		val additionalLiterals = getStringLiterals(examples, outputVarNames)
+
+		val predicate: Predicate = outputVarNames match {
+			case single :: Nil => Predicate.getPredicate(single, examples, oeManager)
+			case multiple =>
+				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, examples)
+				contexts = newContexts
+				pred
+		}
+
+		val parameters = contexts.flatMap(_.keys)
+			.toSet[String]
+			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
+			.filter(!_._2.equals(Types.Unknown))
+			.toList
+		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals,  flatSpec.requiredVocabMakers ++ flatSpec.optionalVocabMakers )
+
+
+		val enumerator: SolutionEnumerator = predicate match {
+			case pred: MultilineMultivariablePredicate if simAssign =>
+				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, flatSpec.getPartitionFunc)
+			case pred: MultilineMultivariablePredicate =>
+				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, flatSpec.getPartitionFunc)
+			case pred: SingleVariablePredicate =>
+				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
+				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
+				val enumerator = new enumeration.ProbEnumerator(vocab, oeManager, contexts, false, 0, bank, mini, 100)
+				new ConditionalSingleEnumSingleVarSolutionEnumerator(enumerator, pred.varName, pred.retType, pred.values, contexts, flatSpec.getPartitionFunc)
+		}
+
+		new SynthesisTask(
+			parameters,
+			outputVarNames,
+			vocab,
+			contexts,
+			predicate,
+			oeManager,
+			enumerator)
+
+
+	}
+	//build a tuple of (prevEnv, env) for all the envs
+	def organizeEnvs(envs: List[Map[String, Any]], previousEnvMap:Map[Int, Map[String, Any]]): List[(Option[Map[String, Any]], Map[String, Any])] ={
+		envs.map(env => {
+			val time = env("time").asInstanceOf[BigInt].toInt
+			if (previousEnvMap.contains(time)) {
+				Some(previousEnvMap(time)) -> env
+			} else {
+				// We need to use the time + iter to see if we can find the previous env in the
+				// other envs
+				val iterStr = env("#").asInstanceOf[String]
+				if (iterStr.isEmpty) {
+					// Not a loop, and no prev env, so no luck :(
+					None -> env
+				} else {
+					// Find the nearest entry with the iter one less than this one
+					val iter = iterStr.toInt
+					val prevEnv = envs
+						.filter(env => env("time").asInstanceOf[BigInt].toInt < time)
+						.filter(env => env.contains("#") && env("#").asInstanceOf[String].toInt == iter - 1)
+						.lastOption
+					prevEnv -> env
+				}
+			}
+		})
+			.map(tup => tup._1.map(cleanupInputs) -> cleanupInputs(tup._2))
+	}
 
 	def mulitvariablePredicate(
 		outputVarNames: List[String],

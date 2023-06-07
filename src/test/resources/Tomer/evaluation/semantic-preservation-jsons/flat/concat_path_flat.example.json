@@ -1,0 +1,34 @@
+{
+	"scopeTree": {
+		"1": {
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"out"
+			],
+			"commentExamples": [
+				{
+					"a": "'Hello'",
+					"b": "'World'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "'Hello.World'"
+				},
+				{
+					"a": "''",
+					"b": "'world'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "'world'"
+				}
+			],
+			"assignments": ["'out = b'"],
+			"commentId": 1
+		},
+
+	}
+}

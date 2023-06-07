@@ -23,13 +23,15 @@ trait BasicVocabMaker extends VocabMaker with Iterator[ASTNode]
 	override def next: ASTNode =
 		this (this.childIterator.next(), this.contexts)
 
-	override def rootCost: Int = //if
+	override def rootCost: Int = { //if
 		//(nodeType == classOf[IntLiteral] || nodeType == classOf[StringLiteral]
 		//|| nodeType == classOf[BoolLiteral] || nodeType == classOf[StringVariable]
 		//|| nodeType == classOf[BoolVariable] || nodeType == classOf[IntVariable]) {
 		//ProbUpdate.priors(nodeType, Some(head))
 	//} else {
+		if(head == "scoopy") return 0
 		ProbUpdate.priors(nodeType, None)
+	}
 	//}
 
 	override def init(programs: List[ASTNode], contexts: List[Map[String, Any]], vocabFactory: VocabFactory, height: Int): Iterator[ASTNode] =
@@ -70,7 +72,12 @@ trait BasicVocabMaker extends VocabMaker with Iterator[ASTNode]
 			val childrenCost = costLevel - this.rootCost
 			val children = new NestedChildrenIterator(this.childTypes, childrenCost, new Contexts(contexts), bank, mini)
 			children
-		} else {
+		} else if(this.arity == 0  && this.head == "scoopy") {
+			//this is for manually added makers.
+			// no children needed, but we still return 1 value
+			Iterator.single(Nil)
+		}
+		else {
 			Iterator.empty
 		}
 		this

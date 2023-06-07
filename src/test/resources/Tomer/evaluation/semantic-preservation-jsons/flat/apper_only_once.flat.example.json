@@ -1,0 +1,21 @@
+{
+	"scopeTree": {
+		"1": {
+
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{"a" : "[4, 5, 9, 22, 3, 22, 9]",  "rs": "False"},
+				{"a" : "[4, 2, 9, 22, 3]",  "rs": "True"},
+				{"a" : "[4, 5, 9, 22, 3, 7]",  "rs": "True"}
+			],
+			"assignments": ["'no_dups = set(a)'","'rs = len(a) == len(no_dups)'"],
+			"commentId": 1
+		}
+	}
+}

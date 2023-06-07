@@ -1,0 +1,42 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+					"1": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"time": "4",
+					"#": "",
+					"x": "'01/15/2013'",
+					"rs": "'01/2013'"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"l"
+			],
+			"commentExamples": [
+				{
+					"time": "8",
+					"#": "",
+					"x": "'03/07/2011'",
+					"l": "['03','07','2011']"
+
+				}
+			],
+			"assignments": ["'l = x.split(\"\"/\"\")'"],
+			"commentId": "1"
+		}
+	}
+}

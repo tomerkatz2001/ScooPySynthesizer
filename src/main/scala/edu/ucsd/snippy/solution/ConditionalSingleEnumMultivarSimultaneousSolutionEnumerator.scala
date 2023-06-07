@@ -1,20 +1,17 @@
 package edu.ucsd.snippy.solution
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{Enumerator, InputsValuesManager, ProbEnumerator}
 import edu.ucsd.snippy.predicates.MultilineMultivariablePredicate
-import edu.ucsd.snippy.utils.Utils.{falseForIndices, filterByIndices, getBinaryPartitions, trueForIndices}
+import edu.ucsd.snippy.utils.Utils.{falseForIndices, getBinaryPartitions, trueForIndices}
 import edu.ucsd.snippy.utils._
-import edu.ucsd.snippy.vocab.VocabFactory
-
-import scala.collection.mutable
 
 class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 	predicate: MultilineMultivariablePredicate,
 	variables: List[(String, Types)],
-	literals: Iterable[String]) extends SolutionEnumerator
+	literals: Iterable[String],
+	partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
 {
-	val partitions: List[(Set[Int], Set[Int])] = getBinaryPartitions(predicate.graphStart.state.indices.toList)
+	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
 	val conditionals: List[CondStore] = this.partitions.map(part => {
 		val rs = new CondStore
 		if (part._2.isEmpty) {
@@ -55,6 +52,12 @@ class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 			}
 		case _ => ()
 	}
+
+	def this(predicate: MultilineMultivariablePredicate,
+			 variables: List[(String, Types)],
+			 literals: Iterable[String]){
+			this (predicate, variables, literals, (indices: List[Any]) => getBinaryPartitions(indices))
+		}
 
 	def step(): Unit = {
 		if (this.graph.step()) {

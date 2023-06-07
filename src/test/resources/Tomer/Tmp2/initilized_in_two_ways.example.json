@@ -1,0 +1,57 @@
+{
+	"scopeTree": {
+		"21": {
+			"T": {
+				"22": {}
+			}
+		}
+	},
+	"scopes": {
+		"21": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "['Hello', 'World']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'H-W'"
+				},
+				{
+					"a": "['Augusta', 'Ada', 'King']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'A.A.K'"
+				}
+			],
+			"assignments": ["'rs = \"\"-\"\".join([var[0] for var in a])'"],
+			"commentId": 21
+		},
+		"22": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "['Augusta', 'Ada', 'King']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'A.A.K'"
+				},
+				{
+					"a": "['Augusta', 'ada', 'King']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'A.A.K'"
+				}
+			],
+			"assignments": ["'rs = \"\".\"\".join([var[0] for var in a]).upper()'"],
+			"commentId": 22
+		}
+	}
+}

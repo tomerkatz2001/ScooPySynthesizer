@@ -1,0 +1,21 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"s": "'abcdefg'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'a.c.e.g'"
+		}
+
+	],
+	"previousEnvs": {
+
+	},
+	"solutions": [
+
+	]
+}

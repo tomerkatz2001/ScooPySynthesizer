@@ -1,0 +1,38 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"a": "'Hello'",
+			"b": "'World'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'Hello.World'"
+		},
+		{
+			"a": "''",
+			"b": "'world'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'world'"
+		},
+		{
+			"a": "'path'",
+			"b": "'field'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'path.field'"
+		}
+		
+	],
+	"previousEnvs": {
+
+	},
+	"solutions": [
+
+	]
+}

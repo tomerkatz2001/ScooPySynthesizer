@@ -10,18 +10,17 @@ abstract class LiteralNode[T](numContexts: Int) extends ASTNode
 	val height = 0
 	val terms = 1
 	val value: T
-	override val requireBit: Boolean = false // assume it is not a Literal
 	override val _values: List[Option[T]] = List.fill(numContexts)(Some(value))// hope this doesn't break anything, was overridden to List[Option[T]]]
 	override val children: Iterable[ASTNode] = Iterable.empty
 	override lazy val usesVariables: Boolean = false
 
 	def includes(varName: String): Boolean = false
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = this
 }
 
-case class StringLiteral(value: String, numContexts: Int) extends LiteralNode[String](numContexts) with StringNode
+case class StringLiteral(value: String, numContexts: Int,  reqVeq: List[Boolean] =List()) extends LiteralNode[String](numContexts) with StringNode
 {
+	override val requireBits: List[Boolean] = reqVeq
 	override protected val parenless: Boolean = true
 	override val code: String = '"' + value.flatMap(c => if (c.toInt >= 32 && c.toInt <= 127 && c != '\\' && c != '"') {
 		c.toString
@@ -42,34 +41,46 @@ case class StringLiteral(value: String, numContexts: Int) extends LiteralNode[St
 
 	override def updateValues(contexts: Contexts): StringLiteral = copy(value, numContexts = contexts.contextLen)
 
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(value, numContexts, reqVeq)
+
+
 }
 
-case class IntLiteral(value: Int, numContexts: Int) extends LiteralNode[Int](numContexts) with IntNode
+case class IntLiteral(value: Int, numContexts: Int, reqVeq: List[Boolean] =List()) extends LiteralNode[Int](numContexts) with IntNode
 {
+	override val requireBits: List[Boolean] = reqVeq
 	override protected val parenless: Boolean = true
 	override val code: String = value.toString
 
 	override def updateValues(contexts: Contexts): IntLiteral = copy(value, numContexts = contexts.contextLen)
 
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(value, numContexts, reqVeq)
+
 }
 
-case class BoolLiteral(value: Boolean, numContexts: Int) extends LiteralNode[Boolean](numContexts) with BoolNode
+case class BoolLiteral(value: Boolean, numContexts: Int, reqVeq: List[Boolean] =List()) extends LiteralNode[Boolean](numContexts) with BoolNode
 {
+	override val requireBits: List[Boolean] = reqVeq
 	override protected val parenless: Boolean = true
 	override val code: String = value.toString.capitalize
 
 	override def updateValues(contexts: Contexts): BoolLiteral = copy(value, numContexts = contexts.contextLen)
+
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(value, numContexts, reqVeq)
 }
 
-case class DoubleLiteral(value: Double, numContexts: Int) extends LiteralNode[Double](numContexts) with DoubleNode {
+case class DoubleLiteral(value: Double, numContexts: Int, reqVeq: List[Boolean] =List()) extends LiteralNode[Double](numContexts) with DoubleNode {
+	override val requireBits: List[Boolean] = reqVeq
 	override val code: String = value.toString
 	override protected val parenless: Boolean = true
 
 	override def updateValues(contexts: Contexts): DoubleLiteral = copy(value, numContexts = contexts.contextLen)
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(value, numContexts, reqVeq)
 }
 
-case class ListLiteral[T](childType: Types, value: List[T], numContexts: Int) extends LiteralNode[List[T]](numContexts) with ListNode[T]
+case class ListLiteral[T](childType: Types, value: List[T], numContexts: Int, reqVeq: List[Boolean] =List()) extends LiteralNode[List[T]](numContexts) with ListNode[T]
 {
+	override val requireBits: List[Boolean] = reqVeq
 	val elems: List[LiteralNode[_]] = value.map {
 		case b: Boolean => BoolLiteral(b, numContexts)
 		case s: String => StringLiteral(s, numContexts)
@@ -82,4 +93,5 @@ case class ListLiteral[T](childType: Types, value: List[T], numContexts: Int) ex
 	override protected val parenless: Boolean = true
 	override val code: String = f"[${elems.map(_.code).mkString(", ")}]"
 	override def updateValues(contexts: Contexts): ListLiteral[T] = copy(childType, value, numContexts = contexts.contextLen)
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(childType, value, numContexts, reqVeq)
 }

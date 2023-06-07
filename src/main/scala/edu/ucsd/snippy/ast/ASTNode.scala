@@ -8,9 +8,11 @@ trait ASTNode
 
 	val nodeType: Types.Types
 	val _values: List[Option[Any]]
+
 	def exampleValues: List[Option[Any]] = _values
 
-	val requireBit: Boolean = false
+	val requireBits: List[Boolean] =List(false,true);
+	var manuallyInserted: Boolean = false
 	val code: String
 	val height: Int
 	val terms: Int
@@ -38,7 +40,7 @@ trait ASTNode
 
 	def updateValues(contexts: Contexts): ASTNode
 
-	def updateChildren(children: Seq[ASTNode]): ASTNode = ???
+	def updateChildren(children: Seq[ASTNode], requiredVec:List[Boolean]): ASTNode = ???
 }
 
 trait IterableNode extends ASTNode

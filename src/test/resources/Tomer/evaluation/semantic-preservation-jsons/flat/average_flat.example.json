@@ -1,0 +1,33 @@
+{
+	"scopeTree": {
+		"1": {
+
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"avg"
+			],
+			"commentExamples": [
+				{
+					"a": "[1, 2, 3, 4, 5]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"avg": "3"
+				},
+				{
+					"a": "[2, 3, 0, 2, 3]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"avg": "2"
+				}
+			],
+			"assignments": ["'_sum = sum(a)'"],
+			"commentId": 1
+		},
+
+	}
+}

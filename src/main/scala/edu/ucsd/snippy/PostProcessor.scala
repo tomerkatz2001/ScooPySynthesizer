@@ -68,7 +68,7 @@ object PostProcessor
 				case (a: DoubleLiteral, b:DoubleLiteral) => BoolLiteral(a.value > b.value, a.exampleValues.length)
 				case _ => GreaterThanDoubles(lhs,rhs)
 			}
-		case NegateBool(NegateBool(inner)) =>
+		case NegateBool(NegateBool(inner, l1),l2) =>
 			// Double negation!
 			clean(inner)
 		case uni: UnaryOpNode[_] =>

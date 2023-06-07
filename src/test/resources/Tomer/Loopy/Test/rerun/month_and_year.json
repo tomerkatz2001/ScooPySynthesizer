@@ -1,0 +1,31 @@
+
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"time": 4,
+			"#": "",
+			"x": "'01/15/2013'",
+			"rs": "''01/2013'"
+		},
+		{
+			"time": 8,
+			"#": "",
+			"x": "'03/07/2011'",
+			"rs": "'03/2011'"
+		},
+		{
+			"time": 12,
+			"#": "",
+			"x": "'05/09/2009'",
+			"rs": "'05/2009'"
+		}
+	],
+	"solutions": [
+		"'/'.join(x.split('/')[::2])"
+	],
+	"previousEnvs": {},
+    "src": "https=//stackoverflow.com/questions/17212077/stuck-substring-month-and-year-in-excel"
+}

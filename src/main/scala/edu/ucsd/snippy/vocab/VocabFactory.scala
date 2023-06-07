@@ -23,20 +23,17 @@ object VocabFactory
 
 	def apply(variables: List[(String, Types.Value)],
 			  additionalLiterals: Iterable[String],
-			  additionalMaker: Option[VocabMaker] = None): VocabFactory =
+			  additionalMaker: List[VocabMaker] = List()): VocabFactory =
 	{
 		val defaultStringLiterals = List(" ")
 		val defaultIntLiterals = List(-1, 0, 1, 2)
 		val stringLiterals = (defaultStringLiterals ++ additionalLiterals).distinct
-		val requiredMaker = additionalMaker match {
-			case Some(maker) => List(maker)
-			case None => List()
-		}
+
 
 		val vocab: List[VocabMaker] = {
 
 			// First, add the variables
-			requiredMaker ++
+			additionalMaker ++
 			variables.map {
 				case (name, Types.String) => new BasicVocabMaker
 				{

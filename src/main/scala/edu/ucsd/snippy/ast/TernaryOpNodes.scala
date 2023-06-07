@@ -9,10 +9,11 @@ trait TernaryOpNode[T] extends ASTNode
 	val arg0: ASTNode
 	val arg1: ASTNode
 	val arg2: ASTNode
+	val reqVeq: List[Boolean]
 
 	assert(arg0.exampleValues.length == arg1.exampleValues.length && arg1.exampleValues.length == arg2.exampleValues.length)
 
-	override val requireBit: Boolean = arg0.requireBit || arg1.requireBit || arg2.requireBit
+	override val requireBits: List[Boolean] = if(reqVeq.isEmpty) arg0.requireBits.zipAll(arg1.requireBits, false, false).map(x=>x._1 || x._2).zipAll(arg2.requireBits, false, false).map(x=>x._1 || x._2) else reqVeq
 	lazy val _values: List[Option[T]] = arg0.exampleValues.lazyZip(arg1.exampleValues).lazyZip(arg2.exampleValues).map {
 		case (Some(arg0), Some(arg1), Some(arg2)) => this.doOp(arg0, arg1, arg2)
 		case _ => None
@@ -37,7 +38,7 @@ trait TernaryOpNode[T] extends ASTNode
 	}
 }
 
-case class StringReplace(arg0: StringNode, arg1: StringNode, arg2: StringNode) extends TernaryOpNode[String] with StringNode
+case class StringReplace(arg0: StringNode, arg1: StringNode, arg2: StringNode, reqVeq: List[Boolean] =List()) extends TernaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = false
 	override lazy val code: String =
@@ -57,13 +58,14 @@ case class StringReplace(arg0: StringNode, arg1: StringNode, arg2: StringNode) e
 		arg1.updateValues(contexts),
 		arg2.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		arg0 = children.head.asInstanceOf[StringNode],
 		arg1 = children(1).asInstanceOf[StringNode],
-		arg2 = children(2).asInstanceOf[StringNode])
+		arg2 = children(2).asInstanceOf[StringNode],
+		reqVeq )
 }
 
-case class TernarySubstring(arg0: StringNode, arg1: IntNode, arg2: IntNode) extends TernaryOpNode[String] with StringNode
+case class TernarySubstring(arg0: StringNode, arg1: IntNode, arg2: IntNode, reqVeq: List[Boolean] =List()) extends TernaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String =
@@ -92,13 +94,14 @@ case class TernarySubstring(arg0: StringNode, arg1: IntNode, arg2: IntNode) exte
 		arg1.updateValues(contexts),
 		arg2.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		arg0 = children.head.asInstanceOf[StringNode],
 		arg1 = children(1).asInstanceOf[IntNode],
-		arg2 = children(2).asInstanceOf[IntNode])
+		arg2 = children(2).asInstanceOf[IntNode],
+		reqVeq )
 }
 
-case class ListInsert[T, E <: ASTNode](arg0: ListNode[T], arg1: IntNode, arg2: E) extends TernaryOpNode[Iterable[T]] with ListNode[T]
+case class ListInsert[T, E <: ASTNode](arg0: ListNode[T], arg1: IntNode, arg2: E, reqVeq: List[Boolean] =List()) extends TernaryOpNode[Iterable[T]] with ListNode[T]
 {
 	override val code: String = s"${arg0.parensIfNeeded}[:${arg1.code}] + [${arg2.code}] + ${arg0.parensIfNeeded}[${arg1.code}:]"
 	override protected val parenless: Boolean = false
@@ -122,13 +125,14 @@ case class ListInsert[T, E <: ASTNode](arg0: ListNode[T], arg1: IntNode, arg2: E
 		arg1.updateValues(contexts),
 		arg2.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		arg0 = children.head.asInstanceOf[ListNode[T]],
 		arg1 = children(1).asInstanceOf[IntNode],
-		arg2 = children(2).asInstanceOf[E])
+		arg2 = children(2).asInstanceOf[E],
+		reqVeq )	
 }
 
-case class TernarySubList[T](arg0: ListNode[T], arg1: IntNode, arg2: IntNode) extends TernaryOpNode[Iterable[T]] with ListNode[T]
+case class TernarySubList[T](arg0: ListNode[T], arg1: IntNode, arg2: IntNode, reqVeq: List[Boolean] =List()) extends TernaryOpNode[Iterable[T]] with ListNode[T]
 {
 	override protected val parenless: Boolean = true
 	override lazy val code: String =
@@ -161,8 +165,9 @@ case class TernarySubList[T](arg0: ListNode[T], arg1: IntNode, arg2: IntNode) ex
 
 	override val childType: Types = arg0.childType
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		arg0 = children.head.asInstanceOf[ListNode[T]],
 		arg1 = children(1).asInstanceOf[IntNode],
-		arg2 = children(2).asInstanceOf[IntNode])
+		arg2 = children(2).asInstanceOf[IntNode],
+		reqVeq )
 }

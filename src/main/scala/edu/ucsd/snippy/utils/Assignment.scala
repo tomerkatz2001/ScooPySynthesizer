@@ -48,7 +48,7 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 {
 	// PostProcessor handles double negation
 	PostProcessor.clean(cond) match {
-		case NegateBool(inner) =>
+		case NegateBool(inner, l) =>
 			// Flip the if-condition
 			cond = inner
 			val tmp = elseCase

@@ -1,0 +1,33 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"#": "",
+			"words": "['Augusta', 'Ada', 'King']",
+			"out": "'A.A.K'",
+			"time": 1
+		},
+
+		{
+			"#": "",
+			"words": "['Hello', 'World']",
+			"out": "'H-W'",
+			"time": 2
+		},
+		{
+			"#": "",
+			"words": "['goodbye', 'World', 'see', 'you',]",
+			"out": "'G.W.S.Y'",
+			"time": 2
+		}
+	],
+	"previousEnvs": {
+
+	},
+	"solutions": [
+		"out = inp.capitalize()[0] + inp[1:len(inp)]",
+		"if len(inp) > 0:\n\tout = inp.capitalize()[0] + inp[1:len(inp)]\nelse:\n\tout = \"\""
+	]
+}

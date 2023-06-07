@@ -1,0 +1,45 @@
+{
+	"scopeTree": {
+		"5": {
+			"NoBranch": {
+				"1": {},
+
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"n1"
+			],
+			"commentExamples": [
+				{
+					"n": "0",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"n1": "5"
+				}
+			],
+			"assignments": ["'n1 = n + 5'"],
+			"commentId": 1
+		},
+
+		"5": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "27"
+				}
+			],
+			"assignments": ["'n = n + 2"],
+			"commentId": 3
+		}
+	}
+}

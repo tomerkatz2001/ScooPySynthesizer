@@ -13,7 +13,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 	predicate: MultilineMultivariablePredicate,
 	variables: List[(String, Types)],
 	literals: Iterable[String],
-	val partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
+	partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
 	val conditionals: List[CondStore] = this.partitions.map(part => {

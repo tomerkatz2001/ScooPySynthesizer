@@ -1,0 +1,97 @@
+{
+	"scopeTree": {
+		"5": {
+			"NoBranch": {
+				"1": {},
+				"2": {},
+				"3": {},
+				"4": {},
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "5"
+				}
+			],
+			"assignments": ["'rs = n + 5'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in" : "25",
+					"rs": "30"
+				}
+			],
+			"assignments": ["'rs = rs_in + 5'"],
+			"commentId": 2
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in" : "30",
+					"rs": "35"
+				}
+			],
+			"assignments": ["'rs = rs_in + 5'"],
+			"commentId": 3
+		},
+		"4": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in" : "35",
+					"rs": "45"
+				}
+			],
+			"assignments": ["'rs = rs_in + 10'"],
+			"commentId": 4
+		},
+		"5": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "45"
+				}
+			],
+			"assignments": [],
+			"commentId": 3
+		}
+	}
+}

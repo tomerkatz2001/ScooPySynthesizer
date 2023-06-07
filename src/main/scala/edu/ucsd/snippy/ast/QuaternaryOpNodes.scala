@@ -9,6 +9,7 @@ trait QuaternaryOpNode[T] extends ASTNode
 	val arg1: ASTNode
 	val arg2: ASTNode
 	val arg3: ASTNode
+	val reqVeq: List[Boolean]
 
 	lazy val _values: List[Option[T]] = arg0.exampleValues
 		.lazyZip(arg1.exampleValues)
@@ -19,7 +20,7 @@ trait QuaternaryOpNode[T] extends ASTNode
 			case _ => None
 		}
 
-	override val requireBit: Boolean = arg0.requireBit || arg1.requireBit || arg2.requireBit || arg3.requireBit
+	override val requireBits: List[Boolean] =if(reqVeq.isEmpty) arg0.requireBits.zipAll(arg1.requireBits, false, false).map(x=>x._1 || x._2).zipAll(arg2.requireBits, false, false).map(x=>x._1 || x._2).zipAll(arg3.requireBits, false, false).map(x=>x._1 || x._2) else reqVeq
 	override val height: Int = 1 + Math.max(arg0.height, Math.max(arg1.height, Math.max(arg2.height, arg3.height)))
 	override val terms: Int = 1 + arg0.terms + arg1.terms + arg2.terms + arg3.terms
 	override val children: Iterable[ASTNode] = Iterable(arg0, arg1, arg2, arg3)
@@ -46,7 +47,7 @@ trait QuaternaryOpNode[T] extends ASTNode
 }
 
 // TODO Test is extensively before adding it
-class QuaternarySubstring(val arg0: StringNode, val arg1: IntNode, val arg2: IntNode, val arg3: IntNode) extends QuaternaryOpNode[String] with StringNode
+class QuaternarySubstring(val arg0: StringNode, val arg1: IntNode, val arg2: IntNode, val arg3: IntNode, val reqVeq: List[Boolean] =List()) extends QuaternaryOpNode[String] with StringNode
 {
 	override protected val parenless: Boolean = false
 	override lazy val code: String =
@@ -93,10 +94,11 @@ class QuaternarySubstring(val arg0: StringNode, val arg1: IntNode, val arg2: Int
 			this.arg2.updateValues(contexts),
 			this.arg3.updateValues(contexts))
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode =
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode =
 		new QuaternarySubstring(
 			children.head.asInstanceOf[StringNode],
 			children(1).asInstanceOf[IntNode],
 			children(2).asInstanceOf[IntNode],
-			children(3).asInstanceOf[IntNode])
+			children(3).asInstanceOf[IntNode],
+			reqVeq)
 }

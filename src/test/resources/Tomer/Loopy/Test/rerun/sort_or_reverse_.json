@@ -1,0 +1,33 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"inp": "[1,6,4,3]",
+			"sort": "True",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "[1, 3, 4, 6]"
+		},
+		{
+			"inp": "[1,6,4,3]",
+			"sort": "False",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "[3, 4, 6, 1]"
+		}
+	],
+	"solutions": [
+		"if sort:\n\trs = sorted(inp)\nelse:\n\trs = inp"
+	],
+	"previousEnvs": {
+		"1": {
+			"#": "",
+			"inp": "['b', 'e', 'a', 'd', 'c']",
+			"out1": "[]"
+		}
+	}
+}

@@ -1,0 +1,65 @@
+{
+	"scopeTree": {
+		"48": {
+			"F": {
+				"51": {}
+			}
+		}
+	},
+	"scopes": {
+		"48": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "1",
+					"b": "2",
+					"c": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'True'"
+				},
+				{
+					"a": "3",
+					"b": "1",
+					"c": "10",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'False'"
+				}
+			],
+			"assignments": ["'rs = False'"],
+			"commentId": 48
+		},
+		"51": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "1",
+					"b": "2",
+					"c": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'True'"
+				},
+				{
+					"a": "1",
+					"b": "10",
+					"c": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'False'"
+				}
+			],
+			"assignments": ["'rs = False'", "'rs = a > -1'"],
+			"commentId": 51
+		}
+	}
+}

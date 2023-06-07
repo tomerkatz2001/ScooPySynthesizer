@@ -1,9 +1,8 @@
 import edu.ucsd.snippy.{DebugPrints, Snippy}
 import net.liftweb.json
 import net.liftweb.json.JObject
-import java.io.File
-import java.nio.file.Path
 
+import java.io.File
 import scala.io.Source.fromFile
 
 object Benchmarks extends App
@@ -79,7 +78,7 @@ object Benchmarks extends App
 		"+------------------------------+")
 	println("Index V Name                     Time    Count      Program")
 
-	val benchmarksDir = new File("src/test/resources")
+	val benchmarksDir = new File("src/test/resources/Tomer/evaluation")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false

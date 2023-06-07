@@ -1,19 +1,18 @@
 package edu.ucsd.snippy
 
-import edu.ucsd.snippy.ast.ASTNode
+import edu.ucsd.snippy.ast.{ASTNode, Types}
+import edu.ucsd.snippy.enumeration.Contexts
+import edu.ucsd.snippy.utils.Utils
 import net.liftweb.json
-import net.liftweb.json.Formats
-import net.liftweb.json.JObject
+import net.liftweb.json.{Formats, JObject}
 
-import java.io.File
+import java.io.{BufferedWriter, FileWriter}
 import scala.concurrent.duration._
 import scala.io.Source.fromFile
 import scala.io.StdIn
 import scala.sys.process.stderr
 import scala.tools.nsc.io.JFile
 import scala.util.control.Breaks._
-import java.io.BufferedWriter
-import java.io.FileWriter
 
 class SynthResult(
 	val id: Int,
@@ -37,7 +36,7 @@ object Snippy extends App
 
 	def synthesize(taskStr: String, timeout: Int = 7, simAssign: Boolean = false): (Option[String], Int, Int) =
 	{
-		synthesize(SynthesisTask.fromString(taskStr, null, simAssign), timeout)
+		synthesize(SynthesisTask.fromString(taskStr, simAssign), timeout)
 	}
 
 	def synthesize(task: SynthesisTask, timeout: Int) : (Option[String], Int, Int) =
@@ -61,6 +60,41 @@ object Snippy extends App
 
 				if (!deadline.hasTimeLeft) {
 					rs = (None, timeout * 1000 - deadline.timeLeft.toMillis.toInt, task.enumerator.programsSeen)
+					break
+				}
+			}
+		}
+
+		rs
+	}
+
+	def synthesizeAST(task: SynthesisTask, timeout: Int) : Option[ASTNode]={
+		if (!task.contexts.exists(_.nonEmpty)) {
+			return None
+		}
+
+		var rs: Option[ASTNode] = None
+		val deadline = timeout.seconds.fromNow
+
+		breakable {
+			val typesMap_ = task.contexts.flatMap(_.keys)
+				.toSet[String]
+				.map(varName => varName -> Utils.getTypeOfAll(task.contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
+				.filter(!_._2.equals(Types.Unknown))
+				.toMap
+			val typesMap = collection.mutable.Map(typesMap_.toSeq: _*)
+
+			val parser =  new PythonParser(typesMap,new Contexts(task.contexts))
+			for (solution <- task.enumerator) {
+				solution match {
+					case Some(assignment) =>
+						rs = (Some(parser.parse(s"'${assignment.code().replace("\"","\"\"")}'")))
+						break
+					case _ => ()
+				}
+
+				if (!deadline.hasTimeLeft) {
+					rs = None
 					break
 				}
 			}

@@ -3,7 +3,6 @@ package edu.ucsd.snippy.enumeration
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.vocab.{VocabFactory, VocabMaker}
 
-import java.io.FileOutputStream
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -40,6 +39,7 @@ class ProbEnumerator(
 	}
 
 	var costLevel: Int = initCost
+	var rootMaker: Iterator[ASTNode]= null;
 	var currIterator: Iterator[VocabMaker] = _
 	val currLevelPrograms: mutable.ArrayBuffer[ASTNode] = mutable.ArrayBuffer()
 	val varBank: mutable.Map[(Class[_], ASTNode), mutable.Map[Int, ArrayBuffer[ASTNode]]] = mutable.Map[(Class[_], ASTNode), mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]]()
@@ -63,7 +63,7 @@ class ProbEnumerator(
 
 	if (vars != null) vars.values.flatten.toList.map(p => oeManager.isRepresentative(p)) // OE
 
-	var rootMaker: Iterator[ASTNode]= null;
+
 	if (rootMaker == null) {
 		rootMaker = currIterator.next().
 			probe_init(vocab, costLevel, contexts, mainBank, nested, varBank, vars);
@@ -72,7 +72,7 @@ class ProbEnumerator(
 
 	def resetEnumeration(): Unit =
 	{
-		currIterator = totalLeaves.sortBy(_.rootCost).iterator
+		currIterator = totalLeaves.sortBy(x=>x.rootCost+x.arity).iterator
 		rootMaker = currIterator.next().probe_init(vocab, costLevel, contexts, mainBank, nested, varBank, vars)
 		currLevelPrograms.clear()
 		oeManager.clear()
@@ -125,7 +125,7 @@ class ProbEnumerator(
 
 	def changeLevel(): Boolean =
 	{
-		currIterator = totalLeaves.sortBy(_.rootCost).iterator //todo: more efficient
+		currIterator = totalLeaves.sortBy(x=>x.rootCost+x.arity).iterator //todo: more efficient
 		if (!nested) for (p <- currLevelPrograms) updateBank(p)
 		costLevel += 1
 		currLevelPrograms.clear()

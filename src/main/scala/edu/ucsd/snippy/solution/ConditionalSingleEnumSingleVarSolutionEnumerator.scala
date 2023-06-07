@@ -5,8 +5,6 @@ import edu.ucsd.snippy.enumeration.Enumerator
 import edu.ucsd.snippy.utils.Utils.{filterByIndices, getBinaryPartitions}
 import edu.ucsd.snippy.utils.{Assignment, ConditionalAssignment, SingleAssignment, Utils}
 
-import scala.collection.immutable.Set
-
 class ConditionalSingleEnumSingleVarSolutionEnumerator(
 	val enumerator: Enumerator,
 	val varName: String,
@@ -43,7 +41,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 
 	override def step(): Unit = {
 		val program = enumerator.next()
-		print(program.code+" .... "+program.exampleValues+" .... "+program.height + "\n")
+		//print(program.code+" .... "+program.exampleValues+" .... "+program.height + "\n")
 		val paths = for (((thenPart, elsePart), store) <- stores) yield {
 			var updated = false
 
@@ -80,11 +78,11 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 			}
 
 			if (program.nodeType == this.retType) {
-				if (store.thenCase.isEmpty &&
+				if ((store.thenCase.isEmpty || (!store.thenCase.get.requireBits.exists(p=>p) && program.requireBits.exists(p=>p))) && //empty or t requires program was found
 					filterByIndices(program.exampleValues, thenPart)
 						.zip(store.thenVals)
 						.forall(Utils.programConnects)) {
-					if (program.usesVariables) {
+					if (program.usesVariables || program.manuallyInserted) {
 						store.thenCase = Some(program)
 						updated = true
 					} else {
@@ -92,11 +90,11 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 					}
 				}
 
-				if (store.elseCase.isEmpty &&
+				if ((store.elseCase.isEmpty ||(!store.elseCase.get.requireBits.exists(p=>p) && program.requireBits.exists(p=>p))) &&
 					filterByIndices(program.exampleValues, elsePart)
 						.zip(store.elseVals)
 						.forall(Utils.programConnects)) {
-					if (program.usesVariables) {
+					if (program.usesVariables || program.manuallyInserted) {
 						store.elseCase = Some(program)
 						updated = true
 					} else {
@@ -127,5 +125,14 @@ class SolutionStore(val thenVals: List[Any], val elseVals: List[Any], typ: Types
 	var thenCase: Option[ASTNode] = Utils.synthesizeLiteralOption(typ, thenVals)
 	var elseCase: Option[ASTNode] = if (elseVals.isEmpty) Some(BoolLiteral(value = true, thenVals.length)) else Utils.synthesizeLiteralOption(typ, elseVals)
 
-	@inline def isComplete: Boolean = cond.isDefined && thenCase.isDefined && elseCase.isDefined
+	def isComplete: Boolean = {
+		if (cond.isDefined && thenCase.isDefined && elseCase.isDefined ){
+			//val reqVec = cond.get.requireBits.zipAll(thenCase.get.requireBits, false, false).map(x=>x._1 || x._2 ).zipAll(elseCase.get.requireBits,false, false).map(x=>x._1 || x._2 )
+			//return reqVec.forall(p=>p) && reqVec.length == ScopeSpecification.required
+			println("ast size: "+ (cond.get.terms + thenCase.get.terms + elseCase.get.terms))
+			return true
+
+		}
+		false
+	}
 }

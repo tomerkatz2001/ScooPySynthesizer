@@ -1,22 +1,19 @@
-import edu.ucsd.snippy.{InputParser, SynthesisTask}
 import edu.ucsd.snippy.ast.Types.Types
-import org.scalatestplus.junit.JUnitSuite
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.enumeration._
-import edu.ucsd.snippy.predicates.{MultilineMultivariablePredicate, SingleVariablePredicate}
-import edu.ucsd.snippy.solution.{ConditionalSingleEnumMultivarSolutionEnumerator, ConditionalSingleEnumSingleVarSolutionEnumerator}
+import edu.ucsd.snippy.predicates.SingleVariablePredicate
+import edu.ucsd.snippy.solution.ConditionalSingleEnumSingleVarSolutionEnumerator
 import edu.ucsd.snippy.utils.Utils
 import edu.ucsd.snippy.utils.Utils.getBinaryPartitions
-import edu.ucsd.snippy.vocab.{BasicVocabMaker, RequiredVocabMaker, VocabMaker}
-import net.liftweb.json.JObject
+import edu.ucsd.snippy.vocab.{BasicVocabMaker, VocabMaker}
+import edu.ucsd.snippy.{InputParser, SynthesisTask}
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.scalatestplus.junit.JUnitSuite
 
 import java.io.File
 import scala.collection.mutable
 import scala.io.Source.fromFile
-import net.liftweb.json
-
 import scala.util.control.Breaks.{break, breakable}
 
 
@@ -115,7 +112,7 @@ class requireEnumeratorTests extends JUnitSuite {
 
 	def ASTVisitor(root: ASTNode, nodeToReplace: ASTNode, replacement: ASTNode): ASTNode = {
 		if (root === nodeToReplace) replacement
-		else root.updateChildren(root.children.map(child => ASTVisitor(child, nodeToReplace, replacement)).toSeq)
+		else root.updateChildren(root.children.map(child => ASTVisitor(child, nodeToReplace, replacement)).toSeq, List())
 	}
 
 
@@ -124,7 +121,7 @@ class requireEnumeratorTests extends JUnitSuite {
 		val wordsAST: ASTNode = UnarySplit(StringVariable("s", Map("s"-> "hello, world") :: Nil));
 		val index: IntLiteral =  IntLiteral(-1, 2);
 		val list: ListLiteral[String] = ListLiteral[String](Types.String, List("hello, world", "hello, __world__"), 2)
-		val p2AST: StringListLookup = StringListLookup(list,index, true);
+		val p2AST: StringListLookup = StringListLookup(list,index);
 		val resultAST: ASTNode = StringListLookup(UnarySplit(StringVariable("s", Map("s"-> "hello, world") :: Nil)), IntLiteral(-1, 1));
 
 		val task: SynthesisTask = SynthesisTask.fromString(
@@ -147,8 +144,12 @@ class requireEnumeratorTests extends JUnitSuite {
 			  |      "time": 1,
 			  |    },
 			  |  ]
-			  |}""".stripMargin,Some(new RequiredVocabMaker(p2AST, List(list))))
+			  |}""".stripMargin)
 
+		//Some(new RequiredVocabMaker(p2AST, List(list))
+//		val parser = new ExpressionParser(Map("s" -> Types.Int), new Contexts(task.contexts))
+//		val ast = parser.parse("s*2*2")
+//		print(ast)
 		val oeManager = new RequiresValuesManager();
 		val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 		val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
@@ -190,7 +191,7 @@ class anotherRequireEnumeratorTests extends JUnitSuite{
 
 	def ASTVisitor(root: ASTNode, nodeToReplace: ASTNode, replacement: ASTNode): ASTNode = {
 		if (root === nodeToReplace) replacement
-		else root.updateChildren(root.children.map(child => ASTVisitor(child, nodeToReplace, replacement)).toSeq)
+		else root.updateChildren(root.children.map(child => ASTVisitor(child, nodeToReplace, replacement)).toSeq, List())
 
 	}
 
@@ -216,7 +217,7 @@ class anotherRequireEnumeratorTests extends JUnitSuite{
 		val wordsAST: ASTNode = UnarySplit(StringVariable("s", Map("s" -> "hello, world") :: Nil));
 		val index: IntLiteral = IntLiteral(-1, 1);
 		val list: ListLiteral[String] = ListLiteral[String](Types.String, List("hello, world"), 1)
-		val p2AST: BinarySubstring = BinarySubstring(StringListLookup(list, index, true), index);
+		val p2AST: BinarySubstring = BinarySubstring(StringListLookup(list, index), index);
 		val resultAST: ASTNode = BinarySubstring(StringListLookup(UnarySplit(StringVariable("s", Map("s" -> "hello, world") :: Nil)), IntLiteral(-1, 1)), IntLiteral(-1, 1));
 
 
@@ -227,7 +228,7 @@ class anotherRequireEnumeratorTests extends JUnitSuite{
 			override val childTypes: List[Types] = p2AST.children.head.children.map(_.nodeType).toList
 			override val nodeType: Class[_ <: ASTNode] = p2AST.getClass
 
-			override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode = BinarySubstring(StringListLookup(children.head.asInstanceOf[ListNode[String]], IntLiteral(-1, 1), true), IntLiteral(-1, 1));
+			override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode = BinarySubstring(StringListLookup(children.head.asInstanceOf[ListNode[String]], IntLiteral(-1, 1)), IntLiteral(-1, 1));
 		}
 
 
@@ -246,7 +247,7 @@ class anotherRequireEnumeratorTests extends JUnitSuite{
 			  |      "time": 1,
 			  |    },
 			  |  ]
-			  |}""".stripMargin, Some(new RequiredVocabMaker(p2AST, List(list))))
+			  |}""".stripMargin)
 
 		val oeManager = new RequiresValuesManager();
 		val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()

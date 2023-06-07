@@ -1,0 +1,26 @@
+{
+	"scopeTree": {
+		"0": {
+
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"s": "'abcdefg'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'a.c.e.g'"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+
+	}
+}

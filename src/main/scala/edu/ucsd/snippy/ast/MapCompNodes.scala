@@ -3,8 +3,6 @@ package edu.ucsd.snippy.ast
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.enumeration.Contexts
 
-import scala.collection.immutable.WrappedString
-
 trait MapCompNode[K, V] extends MapNode[K, V]
 {
 	val list: IterableNode
@@ -17,7 +15,7 @@ trait MapCompNode[K, V] extends MapNode[K, V]
 	override val keyType: Types = Types.childOf(list.nodeType)
 	override val valType: Types = value.nodeType
 
-	override val requireBit: Boolean = list.requireBit || key.requireBit || value.requireBit
+	override val requireBits: List[Boolean] = list.requireBits.zipAll(key.requireBits, false, false).map(x=>x._1|| x._2 ).zipAll(value.requireBits, false, false).map(x=>x._1|| x._2 )
 	override val _values: List[Option[Map[K, V]]] = {
 //		val entries: Iterable[(Option[K], Option[V])] = key
 //			.values
@@ -68,11 +66,12 @@ trait FilteredMapNode[K, V] extends MapNode[K, V]
 	val map: MapNode[K, V]
 	val filter: BoolNode
 	val keyName: String
+	val reqVeq:List[Boolean]
 
 	override val keyType: Types = map.keyType
 	override val valType: Types = map.valType
 
-	override val requireBit: Boolean = map.requireBit || filter.requireBit
+	override val requireBits: List[Boolean] = if (reqVeq.isEmpty)map.requireBits.zipAll(filter.requireBits, false, false).map(x=>x._1 || x._2 ) else reqVeq
 	override val _values: List[Option[Map[K, V]]] = filterOp(map, filter)
 	override val height: Int = 1 + Math.max(map.height, filter.height)
 	override val terms: Int = 1 + map.terms + filter.terms
@@ -128,114 +127,115 @@ trait FilteredMapNode[K, V] extends MapNode[K, V]
 	}
 }
 
-case class StringStringMapCompNode(list: StringNode, key: StringNode, value: StringNode, varName: String) extends MapCompNode[String, String] {
+case class StringStringMapCompNode(list: StringNode, key: StringNode, value: StringNode, varName: String, reqVeq: List[Boolean] =List()) extends MapCompNode[String, String] {
 	override def updateValues(contexts: Contexts): StringStringMapCompNode
 	= copy(list.updateValues(contexts), key.updateValues(contexts), value.updateValues(contexts), varName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[StringNode],
-		key, value, varName
+		key, value, varName, reqVeq
 	)
 }
 
-case class StringIntMapCompNode(list: StringNode, key: StringNode, value: IntNode, varName: String) extends MapCompNode[String, Int] {
+case class StringIntMapCompNode(list: StringNode, key: StringNode, value: IntNode, varName: String, reqVeq: List[Boolean] =List()) extends MapCompNode[String, Int] {
 	override def updateValues(contexts: Contexts): StringIntMapCompNode
 	= copy(list.updateValues(contexts), key.updateValues(contexts), value.updateValues(contexts), varName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[StringNode],
-		key, value, varName
+		key, value, varName, reqVeq
 	)
 }
 
-case class StringListStringMapCompNode(list: ListNode[String], key: StringNode, value: StringNode, varName: String) extends MapCompNode[String, String] {
+case class StringListStringMapCompNode(list: ListNode[String], key: StringNode, value: StringNode, varName: String, reqVeq: List[Boolean] =List()) extends MapCompNode[String, String] {
 	override def updateValues(contexts: Contexts): StringListStringMapCompNode
 	= copy(list.updateValues(contexts), key.updateValues(contexts), value.updateValues(contexts), varName)
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[ListNode[String]],
-		key, value, varName
+		key, value, varName, reqVeq
 	)
 }
 
-case class StringListIntMapCompNode(list: ListNode[String], key: StringNode, value: IntNode, varName: String) extends MapCompNode[String, Int] {
+case class StringListIntMapCompNode(list: ListNode[String], key: StringNode, value: IntNode, varName: String, reqVeq: List[Boolean] =List()) extends MapCompNode[String, Int] {
 	override def updateValues(contexts: Contexts): StringListIntMapCompNode
 	= copy(list.updateValues(contexts), key.updateValues(contexts), value.updateValues(contexts), varName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[ListNode[String]],
-		key, value, varName
+		key, value, varName, reqVeq
 	)
 }
 
-case class IntStringMapCompNode(list: ListNode[Int], key: IntNode, value: StringNode, varName: String) extends MapCompNode[Int, String] {
+case class IntStringMapCompNode(list: ListNode[Int], key: IntNode, value: StringNode, varName: String, reqVeq: List[Boolean] =List()) extends MapCompNode[Int, String] {
 	override def updateValues(contexts: Contexts): IntStringMapCompNode
 	= copy(list.updateValues(contexts), key.updateValues(contexts), value.updateValues(contexts), varName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[ListNode[Int]],
-		key, value, varName
+		key, value, varName, reqVeq
 	)
 }
 
-case class IntIntMapCompNode(list: ListNode[Int], key: IntNode, value: IntNode, varName: String) extends MapCompNode[Int, Int] {
+case class IntIntMapCompNode(list: ListNode[Int], key: IntNode, value: IntNode, varName: String, reqVeq: List[Boolean] =List()) extends MapCompNode[Int, Int] {
 	override def updateValues(contexts: Contexts): IntIntMapCompNode
 	= copy(list.updateValues(contexts), key.updateValues(contexts), value.updateValues(contexts), varName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[ListNode[Int]],
-		key, value, varName
+		key, value, varName, reqVeq
 	)
 }
 
-case class StringStringFilteredMapNode(map: MapNode[String, String], filter: BoolNode, keyName: String) extends FilteredMapNode[String, String]
+case class StringStringFilteredMapNode(map: MapNode[String, String], filter: BoolNode, keyName: String, reqVeq: List[Boolean] =List()) extends FilteredMapNode[String, String]
 {
 	override def make(map: MapNode[String, String], filter: BoolNode, keyName: String): FilteredMapNode[String, String] =
 		StringStringFilteredMapNode(map, filter, keyName)
 	override def updateValues(contexts: Contexts): StringStringFilteredMapNode
 	= copy(map.updateValues(contexts), filter.updateValues(contexts), keyName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[MapNode[String, String]],
 		children(1).asInstanceOf[BoolNode],
-		keyName
+		keyName,
+		reqVeq
 	)
 }
 
-case class StringIntFilteredMapNode(map: MapNode[String, Int], filter: BoolNode, keyName: String) extends FilteredMapNode[String, Int]
+case class StringIntFilteredMapNode(map: MapNode[String, Int], filter: BoolNode, keyName: String, reqVeq: List[Boolean] =List()) extends FilteredMapNode[String, Int]
 {
 	override def make(map: MapNode[String, Int], filter: BoolNode, keyName: String): FilteredMapNode[String, Int] =
 		StringIntFilteredMapNode(map, filter, keyName)
 	override def updateValues(contexts: Contexts): StringIntFilteredMapNode
 	= copy(map.updateValues(contexts), filter.updateValues(contexts), keyName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[MapNode[String, Int]],
-		filter, keyName
+		filter, keyName, reqVeq
 	)
 }
 
-case class IntStringFilteredMapNode(map: MapNode[Int, String], filter: BoolNode, keyName: String) extends FilteredMapNode[Int, String]
+case class IntStringFilteredMapNode(map: MapNode[Int, String], filter: BoolNode, keyName: String, reqVeq: List[Boolean] =List()) extends FilteredMapNode[Int, String]
 {
 	override def make(map: MapNode[Int, String], filter: BoolNode, keyName: String): FilteredMapNode[Int, String] =
 		IntStringFilteredMapNode(map, filter, keyName)
 	override def updateValues(contexts: Contexts): IntStringFilteredMapNode
 	= copy(map.updateValues(contexts), filter.updateValues(contexts), keyName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[MapNode[Int, String]],
-		filter, keyName
+		filter, keyName, reqVeq
 	)
 }
 
-case class IntIntFilteredMapNode(map: MapNode[Int, Int], filter: BoolNode, keyName: String) extends FilteredMapNode[Int, Int]
+case class IntIntFilteredMapNode(map: MapNode[Int, Int], filter: BoolNode, keyName: String, reqVeq: List[Boolean] =List()) extends FilteredMapNode[Int, Int]
 {
 	override def make(map: MapNode[Int, Int], filter: BoolNode, keyName: String): FilteredMapNode[Int, Int] =
 		IntIntFilteredMapNode(map, filter, keyName)
 	override def updateValues(contexts: Contexts): IntIntFilteredMapNode
 	= copy(map.updateValues(contexts), filter.updateValues(contexts), keyName)
 
-	override def updateChildren(children: Seq[ASTNode]): ASTNode = copy(
+	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(
 		children.head.asInstanceOf[MapNode[Int, Int]],
-		filter, keyName
+		filter, keyName, reqVeq
 	)
 }

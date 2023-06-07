@@ -53,16 +53,17 @@ class InputsValuesManager extends OEValuesManager
 
 class RequiresValuesManager extends InputsValuesManager
 {
+	var flag = false
 	override def isRepresentative(program: ASTNode): Boolean =
 	{
 		try {
-			classValues.add((program.exampleValues).appended(Some(program.requireBit)))
+			classValues.add((program.exampleValues) ++ program.requireBits.map(Some(_)))
 		} catch {
 			case _: Exception => false
 		}
 	}
 
 	override def remove(program: ASTNode): Boolean =
-		this.classValues.remove(program.exampleValues.appended(Some(program.requireBit)))
+		this.classValues.remove(program.exampleValues ++ program.requireBits.map(Some(_)))
 
 }

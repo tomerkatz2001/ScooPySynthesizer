@@ -2,7 +2,7 @@ package edu.ucsd.snippy.utils
 
 import edu.ucsd.snippy.SynthesisTask
 import edu.ucsd.snippy.ast.Types.Types
-import edu.ucsd.snippy.ast.{ASTNode, IntLiteral, ListLiteral, StringLiteral, Types}
+import edu.ucsd.snippy.ast._
 
 object Utils
 {
@@ -87,8 +87,8 @@ object Utils
 	implicit object FuzzyDoubleEq extends spire.algebra.Eq[Double] {
 		def eqv(a:Double, b:Double): Boolean = (a-b).abs < 1e-12
 	}
-	import spire.syntax.all._
 	import spire.std.seq._
+	import spire.syntax.all._
 	@inline def programConnects(tup: (Option[Any], Any)): Boolean = {
 		tup._1 match {
 			case None => false

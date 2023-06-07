@@ -1,0 +1,89 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "40",
+					"l": "[10, 20, 30, 40]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "40"
+				},
+				{
+					"n": "50",
+					"l": "[10, 20, 30, 40]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "100"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"contained"
+			],
+			"commentExamples": [
+				{
+					"n": "40",
+					"l": "[10, 20, 30, 40]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"contained": "True"
+				},
+				{
+					"n": "40",
+					"l": "[20, 50, 70, 20]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"contained": "False"
+				}
+			],
+			"assignments": ["'contained = n in l'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "40",
+					"l": "[10, 20, 30, 40]",
+					"contained": "True",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "40"
+				},
+				{
+					"n": "40",
+					"l": "[20, 50, 70, 20]",
+					"contained": "False",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "80"
+				}
+			],
+			"assignments": ["'rs = n'","'rs = n + n'"],
+			"commentId": 2
+		}
+	}
+}

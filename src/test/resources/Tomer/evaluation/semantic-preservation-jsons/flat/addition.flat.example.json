@@ -1,0 +1,25 @@
+{
+	"scopeTree": {
+		"3": {
+
+		}
+	},
+	"scopes": {
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "27"
+				}
+			],
+			"assignments": [],
+			"commentId": 3
+		}
+	}
+}
