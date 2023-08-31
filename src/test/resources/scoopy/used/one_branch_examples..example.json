@@ -1,7 +1,7 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"0": {
-			"NoBranch": {
+			"NB": {
 				"1": {}
 			},
 			"T": {
@@ -14,7 +14,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "'abhdj'",
 					"#": "",
@@ -31,13 +31,13 @@
 				}
 			],
 			"assignments": [],
-			"commentId": 0
+			"commentId": "0"
 		},
 		"1": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "'mkl'",
 					"#": "",
@@ -47,13 +47,13 @@
 				}
 			],
 			"assignments": ["'rs = len(a)'"],
-			"commentId": 1
+			"commentId": "1"
 		},
 		"2": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "'aabb'",
 					"#": "",
@@ -77,7 +77,8 @@
 				}
 			],
 			"assignments": ["'rs = len(a)//2'"],
-			"commentId": 2
+			"commentId": "2"
 		}
-	}
+	},
+	"solutions": ["if 1 > len(a) % 2:\n\trs = len(a[::2])\nelse:\n\trs = len(a)"]
 }

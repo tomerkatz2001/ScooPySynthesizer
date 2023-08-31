@@ -1,17 +1,17 @@
 {
-	"scopeTree": {
-		"21": {
+	"scopesTree": {
+		"1": {
 			"T": {
-				"22": {}
+				"2": {}
 			}
 		}
 	},
 	"scopes": {
-		"21": {
+		"1": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "['Hello', 'World']",
 					"#": "",
@@ -28,13 +28,13 @@
 				}
 			],
 			"assignments": ["'rs = \"\"-\"\".join([var[0] for var in a])'"],
-			"commentId": 21
+			"commentId": "1"
 		},
-		"22": {
+		"2": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "['Augusta', 'Ada', 'King']",
 					"#": "",
@@ -51,7 +51,8 @@
 				}
 			],
 			"assignments": ["'rs = \"\".\"\".join([var[0] for var in a]).upper()'"],
-			"commentId": 22
+			"commentId": "2"
 		}
-	}
+	},
+	"solutions": ["if len(a) > 2:\n\trs = \".\".join([var[0] for var in a]).upper()\nelse:\n\trs = \"-\".join([var[0] for var in a])"]
 }

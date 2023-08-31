@@ -1,4 +1,5 @@
-import edu.ucsd.snippy.{DebugPrints, Snippy}
+import edu.ucsd.snippy.DebugPrints
+import edu.ucsd.snippy.Snippy.synthesize
 import net.liftweb.json
 import net.liftweb.json.JObject
 
@@ -30,11 +31,11 @@ object Benchmarks extends App
 					val taskStr = fromFile(file).mkString
 					val task = json.parse(taskStr).asInstanceOf[JObject].values
 
-					Snippy.synthesize(taskStr, benchTimeout) match {
-						case (None, time: Int, count: Int) =>
+					synthesize(taskStr, benchTimeout) match {
+						case (None, time: Int, count: Int, _) =>
 							printStr = f"($index%2d) [?] [$name%22s] [${time / 1000.0}%.3f] [$count%8d] Timeout"
 							timeout += 1
-						case (Some(program: String), time: Int, count: Int) =>
+						case (Some(program: String), time: Int, count: Int, _) =>
 							val correct = task.get("solutions") match {
 								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => '+'
 								case Some(_) =>

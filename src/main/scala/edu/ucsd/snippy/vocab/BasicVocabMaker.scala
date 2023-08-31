@@ -29,7 +29,6 @@ trait BasicVocabMaker extends VocabMaker with Iterator[ASTNode]
 		//|| nodeType == classOf[BoolVariable] || nodeType == classOf[IntVariable]) {
 		//ProbUpdate.priors(nodeType, Some(head))
 	//} else {
-		if(head == "scoopy") return 0
 		ProbUpdate.priors(nodeType, None)
 	}
 	//}
@@ -72,7 +71,7 @@ trait BasicVocabMaker extends VocabMaker with Iterator[ASTNode]
 			val childrenCost = costLevel - this.rootCost
 			val children = new NestedChildrenIterator(this.childTypes, childrenCost, new Contexts(contexts), bank, mini)
 			children
-		} else if(this.arity == 0  && this.head == "scoopy") {
+		} else if(this.arity == 0  && this.head == "required") {
 			//this is for manually added makers.
 			// no children needed, but we still return 1 value
 			Iterator.single(Nil)

@@ -1,78 +1,166 @@
-import edu.ucsd.snippy.Snippy.synthesize
-import edu.ucsd.snippy.SynthesisTask
-import edu.ucsd.snippy.SynthesisTask.Context
-import edu.ucsd.snippy.scoopy.{ParsedComment, ScopeSpecification}
+import edu.ucsd.snippy.scoopy.ScopeSpecification
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.scalatestplus.junit.JUnitSuite
 
-class ScopeSpecsTests extends JUnitSuite{
-	@Test def assignSpec(): Unit = {
-		ScopeSpecification.required=0
+class ScopeSpecsTests extends JUnitSuite {
 
-		val code = "'x = 9+4*6'";
-		val contexts:List[Context] = List(Map.empty) ;
-		val spec = ScopeSpecification.assign(code,contexts)
+
+	@Test def assignSpec(): Unit = {
+
+		val code = "x = 9+4*6";
+		val spec = ScopeSpecification.assign(code)
 		assertEquals(Tuple2(List(), List()),
 			spec.partition)
 		assertEquals(List(),
-			spec.scopeExamples)
+			spec.getPrevEnvsAndEnvs()._2)
 		assertEquals(List(),
-			spec.requiredVocabMakers)
-		assertEquals(1,
-			spec.optionalVocabMakers.size)
+			spec.required)
+		assertEquals(Set("x"),
+			spec.outputVarNames)
 	}
+
+	@Test def multiVarAssignSpec(): Unit = {
+		//todo: fix it later
+
+		val code = "x,y = (5,7)";
+		val spec = ScopeSpecification.assign(code)
+		assertEquals(Tuple2(List(), List()),
+			spec.partition)
+		assertEquals(List(),
+			spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(List(),
+			spec.required)
+		assertEquals(Set("x", "y"),
+			spec.outputVarNames)
+	}
+
+	@Test def scopeSpec(): Unit = {
+		val code = "x=y+2"
+		val outputVarNames = Set("x")
+		val examples = List(Map("y" -> 1, "x" -> 3), Map("y" -> 2, "x" -> 4), Map("y" -> 0, "x" -> 2))
+		val assignSpec = ScopeSpecification.assign(code)
+		val spec = ScopeSpecification.scope(assignSpec, examples, outputVarNames)
+		assertEquals(Tuple2(List(), List()), spec.partition)
+		assertEquals(examples, spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(List(), spec.required)
+	}
+
+	@Test def doubleScopeTest(): Unit = {
+		val code = "'x = y+2'";
+		val examples = List(Map("y" -> 2, "x" -> 4), Map("y" -> 2, "x" -> 4))
+		val outputVarNames = Set("x")
+		val spec = ScopeSpecification.assign(code)
+		val scopeSpec = ScopeSpecification.scope(spec, List(examples(0)), outputVarNames)
+		val scopeSpec2 = ScopeSpecification.scope(scopeSpec, List(examples(1)), outputVarNames)
+		assertEquals(examples, scopeSpec2.getPrevEnvsAndEnvs()._2);
+		assertEquals(0, scopeSpec2.required.length);
+		assertEquals((List(), List()), scopeSpec2.partition);
+		assertEquals(Set("x"), scopeSpec2.outputVarNames);
+	}
+
+	@Test def toScopeable(): Unit = {
+		val code = "x=y+2"
+		val outputVarNames = Set("x")
+		val examples = List(Map("y" -> 1, "x" -> 3), Map("y" -> 2, "x" -> 4), Map("y" -> 0, "x" -> 2))
+		val assignSpec = ScopeSpecification.assign(code)
+		val specScope = ScopeSpecification.scope(assignSpec, examples, outputVarNames)
+		val spec = ScopeSpecification.toScopeable(specScope)
+		assertEquals(Tuple2(List(), List()), spec.partition)
+		assertEquals(List(), spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(1, spec.required.length)
+		assertEquals("x = y + 2", spec.solve()._4.get.code())
+		//assertEquals("if (True) y + 2 else x", spec.solve())// without postprocessing
+	}
+
+	@Test def concatScope(): Unit = {
+		val code = "x=y+2"
+		val outputVarNames = Set("x")
+		val examples = List(Map("y" -> 1, "x" -> 3, "z"-> 4), Map("y" -> 2, "x" -> 8, "z" -> 5), Map("y" -> 0, "x" -> 2, "z" -> 3))
+		val assignSpec = ScopeSpecification.assign(code)
+		val code2 = "z = x"
+		val outputVarNames2 = Set("z")
+		val assignSpec2 = ScopeSpecification.assign(code2)
+		val concatSpec = ScopeSpecification.concat(List(assignSpec, assignSpec2))
+		assertEquals(Tuple2(List(), List()), concatSpec.partition)
+		assertEquals(List(), concatSpec.getPrevEnvsAndEnvs()._2)
+		assertEquals(0, concatSpec.required.length)
+		assertEquals(Set("x", "z"), concatSpec.outputVarNames)
+
+	}
+
 
 	@Test def condSpec(): Unit = {
-		ScopeSpecification.required=0
 
-		val code1 = "'x = 9+4*6'";
-		val contexts1:List[Context] = List(Map.empty) ;
-		val spec1 = ScopeSpecification.assign(code1,contexts1)
-		val code2 = "'x = 9+4*6'";
-		val contexts2:List[Context] = List(Map.empty) ;
-		val spec2 = ScopeSpecification.assign(code2,contexts2)
-		val spec = ScopeSpecification.cond(spec1,spec2)
+		val code1 = "x = 9+4*6";
+		val spec1 = ScopeSpecification.assign(code1)
+		val code2 = "x = 9+4*5";
+		val spec2 = ScopeSpecification.assign(code2)
+		val spec = ScopeSpecification.cond(spec1, spec2)
 		assertEquals(Tuple2(List(), List()), spec.partition)
-		assertEquals(List(), spec.scopeExamples)
-		assertEquals(List(), spec.requiredVocabMakers)
-		assertEquals(2, spec.optionalVocabMakers.size)
+		assertEquals(List(), spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(List(), spec.required)
 	}
 
-	@Test def scopeOfCondTest():Unit={
-		ScopeSpecification.required=0
+	@Test def scopeOfCondTest(): Unit = {
+		val code = "x= y+2";
+		val code2 = "x = y+3"
+		val examples = List(Map("y" -> 1, "x" -> 3), Map("y" -> 5, "x" -> 8), Map("y" -> 0, "x" -> 2))
+		val outputVarNames = Set("x")
 
-		val code = "'x= y+2'";
-		val code2 = "'x = y+3'";
-		val examples = List(Map("'y'" -> 1, "'x'" -> 3), Map("'y'" -> 2, "'x'" -> 5), Map("'y'" -> 0, "'x'" -> 2))
+		val spec1 = ScopeSpecification.assign(code)
+		val spec1_scoped = ScopeSpecification.scope(spec1, List(examples(0)), outputVarNames)
+
+		val spec2 = ScopeSpecification.assign(code2)
+		val spec2_scoped = ScopeSpecification.scope(spec2, List(examples(1)), outputVarNames)
+
+		val condSpec = ScopeSpecification.cond(spec1_scoped, spec2_scoped)
+		val scopeSpec = ScopeSpecification.scope(condSpec, List(examples(2)), outputVarNames)
+
+		assertEquals(examples, scopeSpec.getPrevEnvsAndEnvs()._2)
+		assertEquals((List(0), List(1)), scopeSpec.partition)
+		assertEquals(examples, scopeSpec.getPrevEnvsAndEnvs()._2)
+		assertEquals(List(), scopeSpec.required)
+	}
+
+	@Test def concatCond(): Unit = {
+		val thenCode = "x=y+2"
+		val elseCode = "x=y+3"
+		val postCondCode = "z = y"
+		val condOutputVarNames = Set("x")
+		val examples = List(Map("y" -> 1, "x" -> 3, "z" -> 1), Map("y" -> 2, "x" -> 5, "z" -> 2), Map("y" -> 0, "x" -> 2, "z" -> 0))
+		val ThenAssignSpec = ScopeSpecification.assign(thenCode)
+		val ThenScopeSpec = ScopeSpecification.scope(ThenAssignSpec, (examples(0)::examples(2)::Nil), condOutputVarNames)
+		val ElseAssignSpec = ScopeSpecification.assign(elseCode)
+		val ElseScopeSpec = ScopeSpecification.scope(ElseAssignSpec, (examples(1)::Nil), condOutputVarNames)
+
+		val condSpec = ScopeSpecification.cond(ThenScopeSpec, ElseScopeSpec)
+
+		val postCondAssignSpec = ScopeSpecification.assign(postCondCode)
+
+		val concatSpec = ScopeSpecification.concat(List(condSpec, postCondAssignSpec))
+		assertEquals(Tuple2(List(), List()), concatSpec.partition)
+		assertEquals(List(), concatSpec.getPrevEnvsAndEnvs()._2)
+		assertEquals(1, concatSpec.required.length)
+		assertEquals(Set("x", "z"), concatSpec.outputVarNames)
+	}
+	/*
+	@Test def synthSpec():Unit={
+		val code = "'x=y+2'"
 		val outputVarNames = List("'x'")
+		val examples = List(Map("'y'" -> 1, "'x'" -> 3), Map("'y'" -> 2, "'x'" -> 4), Map("'y'" -> 0, "'x'" -> 2))
 		val contexts: List[Context] = examples.map {
 			env => env.filter(entry => !outputVarNames.contains(entry._1))
 		}
-
-		val spec1 = ScopeSpecification.assign(code,contexts)
-		val spec1_2 = ScopeSpecification.scope(spec1,List(examples(0)), outputVarNames)
-		print("done then scope\n")
-
-		val spec2 = ScopeSpecification.assign(code2,contexts)
-		val spec2_2 = ScopeSpecification.scope(spec2,List(examples(1)), outputVarNames)
-		print("done else scope\n")
-
-		val condSpec = ScopeSpecification.cond(spec1_2,spec2_2)
-		val scopeSpec = ScopeSpecification.scope(condSpec,List(examples(2)), outputVarNames)
-		print("done scope of cond\n")
-
-		assertEquals(examples, scopeSpec.scopeExamples)
-		assertEquals((List(0), List(1)), scopeSpec.partition)
-		val synthTask = SynthesisTask.fromSpec(scopeSpec)
-		val solution = synthesize(synthTask, 10);
-		assert(solution._1.isDefined)
-		print(solution._1.get)
-
+		val assignSpec = ScopeSpecification.assign(code, contexts)
+		val specScope = ScopeSpecification.scope(assignSpec, examples, outputVarNames)
+		val spec = ScopeSpecification.toScopeable(specScope)
+		val synthesisTask = spec.required.head.apply(List())
+		assertEquals(List("'x'"), synthesisTask.outputVariables)
 	}
 
+
 	@Test def scopeTest(): Unit= {
-		ScopeSpecification.required=0
 
 		val code = "'x = y+2'";
 		val examples = List(Map("'y'" -> 1, "'x'"->3), Map("'y'" -> 2, "'x'"->4))
@@ -93,26 +181,12 @@ class ScopeSpecsTests extends JUnitSuite{
 
 	}
 
-	@Test def doubleScopeTest():Unit={
-		ScopeSpecification.required=0
 
-		val code = "'x = y+2'";
-		val examples = List(Map("'y'" -> 1, "'x'" -> 3), Map("'y'" -> 2, "'x'" -> 3))
-		val outputVarNames = List("'x'")
-		val contexts: List[Context] = examples.map {
-			env => env.filter(entry => !outputVarNames.contains(entry._1))
-		}
-		val spec = ScopeSpecification.assign(code,contexts)
-		val scopeSpec = ScopeSpecification.scope(spec, List(examples(0)), outputVarNames, false)
-		val scopeSpec2 = ScopeSpecification.scope(scopeSpec, List(examples(1)), outputVarNames, false)
-
-		assertEquals(examples, scopeSpec2.scopeExamples);
-		assertEquals(List(), scopeSpec2.requiredVocabMakers)
 
 	}
-
-
+*/
 }
+/*
 
 class fromSpecToTaskTests extends JUnitSuite{
 
@@ -135,11 +209,50 @@ class fromSpecToTaskTests extends JUnitSuite{
 	}
 
 }
+*/
 
 class fromTreeTests extends  JUnitSuite{
 
+	@Test def simpleTree(): Unit ={
+		val json = """{"scopesTree":{"0":{}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":"9","y":"3"}],"outputVarNames":["x"],"assignments":["x = y * 3"]}}}"""
+		val spec = ScopeSpecification.fromString(json)
+		assertEquals("scope", spec.scopeType)
+		assertEquals(List(Map("x"-> 9, "y"-> 3)), spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(Set("x"), spec.outputVarNames)
+		assertEquals((List(), List()), spec.partition)
+
+	}
+
+	@Test def doubleScope(): Unit = {
+		val json = """{"scopesTree":{"0":{"NB":{"1":{}}}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":"12","y":"3"}],"outputVarNames":["x"],"assignments":[]},"1":{"commentId":"1","commentExamples":[{"x":"12","y":"6"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]}}}"""
+		val spec = ScopeSpecification.fromString(json)
+		assertEquals(List(Map("x" -> 12, "y" -> 6), Map("x" -> 12, "y" -> 3)), spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(0, spec.required.length)
+
+	}
+	@Test def condTest(): Unit = {
+
+		val json = """{"scopesTree":{"0":{"T":{"1":{}},"F":{"2":{}}}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":"9","y":"3"}],"outputVarNames":["x"],"assignments":[]},"1":{"commentId":"1","commentExamples":[{"x":"12","y":"6"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]},"2":{"commentId":"2","commentExamples":[{"x":"3","y":"1"}],"outputVarNames":["x"],"assignments":["'x = 3*y'"]}}}"""
+		val spec = ScopeSpecification.fromString(json)
+		assertEquals(List( Map("x"->12, "y" -> 6), Map("x"->3, "y"->1), Map("x"-> 9, "y"-> 3)), spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(Set("x"), spec.outputVarNames)
+		assertEquals((List(0), List(1)), spec.partition)
+
+	}
+
+
+	@Test def concatOneVarTest(): Unit = {
+		val json = """{"scopesTree":{"0":{"NB":{"1":{}, "2"{}}}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":"12","y":"3"}],"outputVarNames":["x"],"assignments":[]},"1":{"commentId":"1","commentExamples":[{"x":"12","y":"6"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]},"2":{"commentId":"2","commentExamples":[{"x":"2","y":"1"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]}}}"""
+		val spec = ScopeSpecification.fromString(json)
+		assertEquals(List(Map("x"-> 12, "y"-> 3)), spec.getPrevEnvsAndEnvs()._2)
+		assertEquals(2, spec.required.length)
+		print(ScopeSpecification.toScopeable(spec).solve()._4.get.code())
+
+	}
+
+
+	/*
 	@Test def OneDepthTreeTest(): Unit = {
-		ScopeSpecification.required=0
 		val scopeTree = Map("0"->Map.empty)
 		val example = Map("'x'"-> 12, "'y'"-> 6)
 		val ScopesIno = Map("0"->new ParsedComment("0",List(example), List("'x'"), List("'x = y + y'")))
@@ -206,12 +319,7 @@ class parseTests extends  JUnitSuite{
 
 	}
 
-	@Test def condTest():Unit={
-		ScopeSpecification.required=0
 
-		val json = """{"scopesTree":{"0":{"T":{"1":{}},"F":{"2":{}}}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":9,"y":3}],"outputVarNames":["x"],"assignments":[]},"1":{"commentId":"1","commentExamples":[{"x":12,"y":6}],"outputVarNames":["x"],"assignments":["'x = y + y'"]},"2":{"commentId":"2","commentExamples":[{"x":3,"y":1}],"outputVarNames":["x"],"assignments":["'x = 3*y'"]}}}"""
-		val spec = ScopeSpecification.fromString(json)
-		assertEquals(3, spec.scopeExamples.size)
+	 */
 
-	}
 }

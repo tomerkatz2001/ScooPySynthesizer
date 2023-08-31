@@ -1,0 +1,88 @@
+{
+	"varNames": [
+		"max_value"
+	],
+	"envs": [
+		{
+			"num": "8",
+			"#": "",
+			"$": "0",
+			"time": 1,
+			"max_value": "8"
+		},
+		{
+			"num": "14",
+			"#": "",
+			"$": "3",
+			"time": 4,
+			"max_value": "14"
+		},
+		{
+			"num": "67",
+			"#": "",
+			"$": "5",
+			"time": 6,
+			"max_value": "67"
+		},
+		{
+			"num": "99",
+			"#": "",
+			"$": "6",
+			"time": 7,
+			"max_value": "99"
+		},
+		{
+			"num": "108",
+			"#": "",
+			"$": "8",
+			"time": 9,
+			"max_value": "108"
+		},
+		{
+			"num": "3",
+			"#": "",
+			"$": "7",
+			"time": 8,
+			"max_value": "99"
+		},
+		{
+			"num": "0",
+			"#": "",
+			"$": "9",
+			"time": 10,
+			"max_value": "108"
+		},
+		{
+			"num": "10",
+			"#": "",
+			"$": "4",
+			"time": 5,
+			"max_value": "14"
+		},
+		{
+			"num": "8",
+			"#": "",
+			"$": "2",
+			"time": 3,
+			"max_value": "8"
+		},
+		{
+			"num": "5",
+			"#": "",
+			"$": "1",
+			"time": 2,
+			"max_value": "8"
+		}
+
+	],
+	"solutions": ["if num > max_value:\n\tmax_value = num",
+		"max_value = max( max_value, num )"],
+	"previousEnvs": {
+		"1": {
+			"#": "",
+			"$": "",
+			"time": 0,
+			"max_value": "4"
+		}
+	}
+}

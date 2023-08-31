@@ -1,8 +1,10 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"0": {
-			"NoBranch": {
-					"1": {}
+			"NB": {
+					"1": {},
+					"2": {},
+					"3": {}
 			}
 		}
 	},
@@ -11,12 +13,13 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"time": "4",
 					"#": "",
 					"x": "'01/15/2013'",
-					"rs": "'01/2013'"
+					"rs": "'01/2013'",
+					"symbol": "'/'"
 				}
 			],
 			"assignments": [],
@@ -26,17 +29,56 @@
 			"outputVarNames": [
 				"l"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
-					"time": "8",
 					"#": "",
 					"x": "'03/07/2011'",
-					"l": "['03','07','2011']"
+					"l": "['03','07','2011']",
+					"symbol": "'/'"
 
 				}
 			],
 			"assignments": ["'l = x.split(\"\"/\"\")'"],
 			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"day",
+				"year"
+			],
+			"rawCommentExamples": [
+				{
+					"#": "",
+					"x": "'03/07/2011'",
+					"l": "['03','07','2011']",
+					"symbol": "'/'",
+					"day": "'03'",
+					"year": "'2011'"
+				}
+			],
+			"assignments": [
+				"'day, year = l[0], l[-1]'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"#": "",
+					"x": "'03/07/2011'",
+					"l": "['03','07','2011']",
+					"symbol": "'/'",
+					"day": "'03'",
+					"year": "'2011'",
+					"rs" : "'03/2011'"
+
+				}
+			],
+			"assignments": ["'rs = day + symbol + year'"],
+			"commentId": "3"
 		}
 	}
 }

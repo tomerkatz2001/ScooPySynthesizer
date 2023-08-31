@@ -1,5 +1,7 @@
 package edu.ucsd.snippy
 
+import edu.ucsd.snippy.Snippy.synthesize
+import edu.ucsd.snippy.utils.Assignment
 import net.liftweb.json
 import net.liftweb.json.JObject
 
@@ -16,7 +18,7 @@ object BenchmarksCSV extends App
 		val suite = if (dir.getParentFile.getName == "resources") "" else dir.getParentFile.getName
 		val group = dir.getName
 		dir.listFiles()
-			.filter(_.getName.contains(".examples.json"))
+			.filter(_.getName.contains("json"))
 			.filter(!_.getName.contains(".out"))
 			.sorted
 			.zipWithIndex
@@ -36,7 +38,7 @@ object BenchmarksCSV extends App
 					if (pnt) print(s"$suite,$group,$name,$variables,")
 
 					val start = LocalDateTime.now()
-					val callable: Callable[(Option[String], Int, Int)] = () => Snippy.synthesize(taskStr, benchTimeout)
+					val callable: Callable[(Option[String], Int, Int, Option[Assignment])] = () => synthesize(taskStr, benchTimeout)
 					val promise = this.executorService.submit(callable)
 					val rs = try {
 						promise.get(benchTimeout + 10, TimeUnit.SECONDS)
@@ -49,10 +51,10 @@ object BenchmarksCSV extends App
 					}
 
 					rs match {
-						case (Some(program: String), tim: Int, coun: Int) =>
+						case (Some(program: String), tim: Int, coun: Int, _) =>
 							time = tim
 							count = coun
-
+							println(program)
 							correct = task.get("solutions") match {
 								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => "+"
 								case Some(_) => "-"
@@ -72,7 +74,7 @@ object BenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("synthesizer/src/test/resources")
+	val benchmarksDir = new File("synthesizer/src/test/resources/scoopy-flat")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false
@@ -104,7 +106,7 @@ object BenchmarksCSV extends App
 	}
 
 	// First, warm up
-	benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
+	//benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
 
 	// Then actually run
 	benchmarks.foreach(this.runBenchmark(_, timeout))

@@ -1,0 +1,57 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				}
+			],
+			"assignments": ["'rs = \"even\"'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				}
+			],
+			"assignments": ["'rs = \"odd\"'"],
+			"commentId": "2"
+		}
+	},
+	"solutions": ["if 1 > a % 2:\n\trs = options[0]\nelse:\n\trs = options[-1]"]
+}

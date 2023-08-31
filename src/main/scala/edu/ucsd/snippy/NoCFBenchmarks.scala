@@ -1,5 +1,6 @@
 package edu.ucsd.snippy
 
+import edu.ucsd.snippy.Snippy.synthesize
 import edu.ucsd.snippy.SynthesisTask.{Context, cleanupInputs, getStringLiterals}
 import edu.ucsd.snippy.ast.{ASTNode, Types}
 import edu.ucsd.snippy.enumeration.{InputsValuesManager, ProbEnumerator}
@@ -73,10 +74,10 @@ object NoCFBenchmarks extends App
 	{
 		val taskStr = fromFile(file).mkString
 		val task = json.parse(taskStr).asInstanceOf[JObject].values
-		Snippy.synthesize(taskStr, timeout) match {
-			case (None, time: Int, count: Int) =>
+		synthesize(taskStr, timeout) match {
+			case (None, time: Int, count: Int, _) =>
 				f"t,${time / 1000.0}%.3f,$count%d"
-			case (Some(program: String), time: Int, count: Int) =>
+			case (Some(program: String), time: Int, count: Int, _) =>
 				val correct = task.get("solutions") match {
 					case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => '+'
 					case Some(_) =>
@@ -143,17 +144,17 @@ object NoCFBenchmarks extends App
 		val enum = new BasicSolutionEnumerator(predicate, enumerator)
 		val sTask = new SynthesisTask(
 			parameters,
-			outputVarNames,
+			outputVarNames.toSet,
 			vocab,
 			contexts,
 			predicate,
 			oeManager,
 			enum)
 		val name = file.getParentFile.getName + "/" + file.getName
-		Snippy.synthesize(sTask, timeout) match {
-			case (None, time: Int, count: Int) =>
+		synthesize(sTask, timeout) match {
+			case (None, time: Int, count: Int, _) =>
 				f"$name%22s,t,${time / 1000.0}%.3f,$count%d"
-			case (Some(program: String), time: Int, count: Int) =>
+			case (Some(program: String), time: Int, count: Int, _) =>
 				val correct = input.get("solutions") match {
 					case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => '+'
 					case Some(_) =>
@@ -204,7 +205,7 @@ object NoCFBenchmarks extends App
 				for (solution <- se) {
 					solution match {
 						case Some(assignment) =>
-							rs.append((Some(assignment.code), se.programsSeen))
+							rs.append((Some(assignment.code()), se.programsSeen))
 							break
 						case _ => ()
 					}

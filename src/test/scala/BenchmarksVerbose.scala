@@ -1,4 +1,5 @@
-import edu.ucsd.snippy.{DebugPrints, Snippy}
+import edu.ucsd.snippy.DebugPrints
+import edu.ucsd.snippy.Snippy.synthesize
 import net.liftweb.json
 import net.liftweb.json.JObject
 import org.fusesource.jansi.Ansi
@@ -23,9 +24,9 @@ object BenchmarksVerbose extends App
 					// First, get all the data
 					val taskStr = fromFile(file).mkString
 					val task = json.parse(taskStr).asInstanceOf[JObject].values
-					val (program, time, count) = Snippy.synthesize(taskStr, timeout) match {
-						case (None, time: Int, count: Int) => ("Timeout", time, count)
-						case (Some(program: String), time: Int, count: Int) => (program, time, count)
+					val (program, time, count) = synthesize(taskStr, timeout) match {
+						case (None, time: Int, count: Int, _) => ("Timeout", time, count)
+						case (Some(program: String), time: Int, count: Int, _ ) => (program, time, count)
 					}
 					val lines = program.split('\n').map(_.replaceAll("\t", "    "))
 					val lineLength = lines.map(_.length).max

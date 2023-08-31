@@ -1,7 +1,7 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"16": {
-			"F": {
+			"T": {
 				"18": {}
 			}
 		}
@@ -11,7 +11,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "531",
 					"#": "",
@@ -28,13 +28,13 @@
 				}
 			],
 			"assignments": ["'rs = int(str(a)[::-1])'"],
-			"commentId": 16
+			"commentId": "16"
 		},
 		"18": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "-13",
 					"#": "",
@@ -51,7 +51,8 @@
 				}
 			],
 			"assignments": ["'rs = -1 * int(str(a * -1)[::-1])'"],
-			"commentId": 18
+			"commentId": "18"
 		}
-	}
+	},
+	"solutions": ["if a > -1:\n\trs = int(str(a)[::-1])\nelse:\n\trs = -1 * int(str(a * -1)[::-1])"]
 }

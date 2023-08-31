@@ -25,7 +25,7 @@ class PythonParser(contextsList:List[Context]){
 		.filter(!_._2.equals(Types.Unknown))
 		.toSeq: _*
 		)
-	val contexts = new Contexts(contexts)
+	val contexts = new Contexts(contextsList)
 	trait ASTNodeJsonProtocol extends  DefaultJsonProtocol {
 		implicit object ASTNodeJsonFormat extends RootJsonFormat[ASTNode] {
 			def write(node: ASTNode) = node match {

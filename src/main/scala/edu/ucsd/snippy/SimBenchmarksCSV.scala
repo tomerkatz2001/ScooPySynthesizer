@@ -1,5 +1,6 @@
 package edu.ucsd.snippy
 
+import edu.ucsd.snippy.Snippy.synthesize
 import net.liftweb.json
 import net.liftweb.json.JObject
 
@@ -29,8 +30,8 @@ object SimBenchmarksCSV extends App
 					val task = json.parse(taskStr).asInstanceOf[JObject].values
 					variables = task("varNames").asInstanceOf[List[String]].length
 
-					Snippy.synthesize(taskStr, benchTimeout, simAssign = true) match {
-						case (Some(program: String), tim: Int, coun: Int) =>
+					synthesize(taskStr, benchTimeout, simAssign = true) match {
+						case (Some(program: String), tim: Int, coun: Int, _) =>
 							time = tim
 							count = coun
 							println("the program:" + program)
@@ -40,7 +41,7 @@ object SimBenchmarksCSV extends App
 								case Some(_) => "-"
 								case None => "?"
 							}
-						case (None, _, coun: Int) =>
+						case (None, _, coun: Int, _) =>
 							count = coun
 					}
 				} catch {

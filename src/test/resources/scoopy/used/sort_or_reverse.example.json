@@ -1,8 +1,8 @@
 {
-	"scopeTree": {
-		"5": {
+	"scopesTree": {
+		"3": {
 			"T": {
-				"1": {},
+				"1": {}
 			},
 			"F": {
 				"2": {}
@@ -14,7 +14,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"inp": "[1,6,4,3]",
 					"sort": "True",
@@ -25,13 +25,13 @@
 				}
 			],
 			"assignments": ["'rs = sorted(inp)'"],
-			"commentId": 1
+			"commentId": "1"
 		},
 		"2": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"inp": "[1,6,4,3]",
 					"sort": "False",
@@ -42,14 +42,14 @@
 				}
 			],
 			"assignments": ["'rs = inp[::-1]'"],
-			"commentId": 2
+			"commentId": "2"
 		},
 
-		"5": {
+		"3": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"inp": "[1,6,4,3]",
 					"sort": "False",
@@ -68,7 +68,8 @@
 				}
 			],
 			"assignments": [],
-			"commentId": 3
+			"commentId": "3"
 		}
-	}
+	},
+	"solutions": ["if sort:\n\trs = sorted(inp)\nelse:\n\trs = inp[::-1]"]
 }

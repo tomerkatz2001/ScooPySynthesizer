@@ -114,6 +114,7 @@ class ConditionalMegazordSolutionEnumerator(
 
 	var solution: Option[Assignment] = None
 
+
 	override def step(): Unit = {
 		// EUSolver algorithm:
 		// If none of the partitions are complete, just step partitions and we're done
@@ -160,11 +161,13 @@ class ConditionalMegazordSolutionEnumerator(
 	private case class UnaryPartition(enum: SolutionEnumerator) extends Partition {
 		var program: Option[Assignment] = None
 
+
 		override def step(): Boolean = program match {
 			case Some(_) => true
 			case None =>
 				program = enum.next()
 				program.isDefined
+
 		}
 	}
 
@@ -175,11 +178,11 @@ class ConditionalMegazordSolutionEnumerator(
 
 		def step(): Boolean = {
 			if (thenProgram.isEmpty) {
-				this.thenProgram = this.thenEnum.next()
+				this.thenProgram = thenEnum.next()
 			}
 
 			if (elseProgram.isEmpty) {
-				this.elseProgram = this.elseEnum.next()
+				this.elseProgram = elseEnum.next()
 			}
 
 			this.thenProgram.isDefined && this.elseProgram.isDefined

@@ -1,10 +1,11 @@
 package edu.ucsd.snippy
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager, RequiresValuesManager}
+import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager}
 import edu.ucsd.snippy.predicates._
 import edu.ucsd.snippy.scoopy.ScopeSpecification
-import edu.ucsd.snippy.solution.{BasicSolutionEnumerator, ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator, ConditionalSingleEnumMultivarSolutionEnumerator, ConditionalSingleEnumSingleVarSolutionEnumerator, SolutionEnumerator}
+//import edu.ucsd.snippy.scoopy.ScopeSpecification
+import edu.ucsd.snippy.solution._
 import edu.ucsd.snippy.utils._
 import edu.ucsd.snippy.vocab._
 import net.liftweb.json.JsonAST.JObject
@@ -15,7 +16,7 @@ import scala.collection.mutable
 class SynthesisTask(
 	// Problem definition8
 	val parameters: List[(String, ast.Types.Value)],
-	val outputVariables: List[String],
+	val outputVariables: Set[String],
 	val vocab     : VocabFactory,
 	val contexts: List[Map[String, Any]],
 	val predicate: Predicate,
@@ -41,7 +42,7 @@ object SynthesisTask
 
 	def fromString(jsonString: String, simAssign: Boolean = false): SynthesisTask = {
 		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
-		val outputVarNames: List[String] = input("varNames").asInstanceOf[List[String]]
+		val outputVarNames: Set[String] = input("varNames").asInstanceOf[List[String]].toSet
 		val envs: List[Map[String, Any]] = input("envs").asInstanceOf[List[Map[String, Any]]]
 		val previousEnvMap: Map[Int, Map[String, Any]] = input("previousEnvs").asInstanceOf[Map[String, Map[String, Any]]].map(tup => tup._1.toInt -> tup._2)
 
@@ -57,9 +58,9 @@ object SynthesisTask
 		}
 
 		val oeManager = new InputsValuesManager
-		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames)
+		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
 
-		val predicate: Predicate = outputVarNames match {
+		val predicate: Predicate = outputVarNames.toList match {
 			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager)
 			case multiple =>
 				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, justEnvs)
@@ -99,22 +100,38 @@ object SynthesisTask
 			enumerator)
 	}
 
+	def fromSpec(spec:ScopeSpecification): SynthesisTask = {
+		fromString(spec.outputVarNames.last);
+	}
 
-	def fromSpec(flatSpec:ScopeSpecification, simAssign: Boolean = false): SynthesisTask={
-		val outputVarNames: List[String] = flatSpec.outputVarNames
-		val examples: List[Map[String, Any]] = flatSpec.scopeExamples
+	def getContextsFromExamples(examples: List[Map[String, Any]], outVarNames: Set[String]): List[Context] =
+		examples.map {
+			env => env.filter(entry => !outVarNames.contains(entry._1))
+		}
+	def fromSpec(spec:ScopeSpecification, requiredVocabMakers:List[RequiredVocabMaker]=List(), simAssign: Boolean = false): SynthesisTask={
+		val outputVarNames: Set[String] = spec.outputVarNames
+		val (previousEnvMap, envs):(Map[Int, Map[String, Any]], List[Map[String, Any]]) = spec.getPrevEnvsAndEnvs()
 
-		var contexts: List[Context] = examples.map {
-			env => env.filter(entry => !outputVarNames.contains(entry._1))
+
+		val allEnvs: List[(Option[Map[String, Any]], Map[String, Any])] = organizeEnvs(envs, previousEnvMap);
+		val justEnvs = allEnvs.map(_._2)
+
+		var contexts: List[Context] = allEnvs.map {
+			case (Some(prevEnv), env) =>
+				env.filter(entry => !outputVarNames.contains(entry._1)) ++
+					outputVarNames.filter(prevEnv.contains).collect(varName => varName -> prevEnv(varName)).toMap
+			case (None, env) => env.filter(entry => !outputVarNames.contains(entry._1))
 		}
 
-		val oeManager = new RequiresValuesManager
-		val additionalLiterals = getStringLiterals(examples, outputVarNames)
 
-		val predicate: Predicate = outputVarNames match {
-			case single :: Nil => Predicate.getPredicate(single, examples, oeManager)
+
+		val oeManager = new InputsValuesManager
+		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
+
+		val predicate: Predicate = outputVarNames.toList match {
+			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager)
 			case multiple =>
-				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, examples)
+				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, justEnvs)
 				contexts = newContexts
 				pred
 		}
@@ -124,19 +141,19 @@ object SynthesisTask
 			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
 			.filter(!_._2.equals(Types.Unknown))
 			.toList
-		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals,  flatSpec.requiredVocabMakers ++ flatSpec.optionalVocabMakers )
+		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals,  requiredVocabMakers)
 
 
 		val enumerator: SolutionEnumerator = predicate match {
 			case pred: MultilineMultivariablePredicate if simAssign =>
-				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, flatSpec.getPartitionFunc)
+				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
 			case pred: MultilineMultivariablePredicate =>
-				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, flatSpec.getPartitionFunc)
+				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
 			case pred: SingleVariablePredicate =>
 				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 				val enumerator = new enumeration.ProbEnumerator(vocab, oeManager, contexts, false, 0, bank, mini, 100)
-				new ConditionalSingleEnumSingleVarSolutionEnumerator(enumerator, pred.varName, pred.retType, pred.values, contexts, flatSpec.getPartitionFunc)
+				new ConditionalSingleEnumSingleVarSolutionEnumerator(enumerator, pred.varName, pred.retType, pred.values, contexts, spec.getPartitionFunc, requiredVocabMakers.length)
 		}
 
 		new SynthesisTask(
@@ -147,8 +164,6 @@ object SynthesisTask
 			predicate,
 			oeManager,
 			enumerator)
-
-
 	}
 	//build a tuple of (prevEnv, env) for all the envs
 	def organizeEnvs(envs: List[Map[String, Any]], previousEnvMap:Map[Int, Map[String, Any]]): List[(Option[Map[String, Any]], Map[String, Any])] ={
@@ -159,7 +174,8 @@ object SynthesisTask
 			} else {
 				// We need to use the time + iter to see if we can find the previous env in the
 				// other envs
-				val iterStr = env("#").asInstanceOf[String]
+
+				val iterStr =if (env.contains("#"))  env("#").asInstanceOf[String] else "";
 				if (iterStr.isEmpty) {
 					// Not a loop, and no prev env, so no luck :(
 					None -> env
@@ -203,7 +219,7 @@ object SynthesisTask
 				contexts = contexts ++ envs
 				(envs, Range(contexts.length - envs.length, contexts.length).toList)
 			}
-			.map { case (env, indices) => new Node(env, Nil, indices, false) }
+			.map { case (env, indices) => new predicates.Node(env, Nil, indices, false) }
 
 		// We never evaluate in the final env, so can we pop that from context.
 		contexts = contexts.dropRight(1)
@@ -216,7 +232,7 @@ object SynthesisTask
 
 		// Now we need to create the edges and set them in the nodes
 		environments.zipWithIndex.foreach{ case ((thisVars, _), thisIdx) =>
-			val nodeEdges: List[Edge] = Range(thisIdx + 1, environments.length).map(thatIdx => {
+			val nodeEdges: List[predicates.Edge] = Range(thisIdx + 1, environments.length).map(thatIdx => {
 				val thatVars = environments(thatIdx)._1
 				if (thatVars.size > thisVars.size && thisVars.forall(thatVars.contains)) {
 					// We need to create an edge between the two

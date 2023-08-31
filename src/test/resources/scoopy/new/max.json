@@ -1,0 +1,59 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"max_value"
+			],
+			"rawCommentExamples": [],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"max_value"
+			],
+			"rawCommentExamples": [
+				{
+					"max_value_in": "3",
+					"num": "99",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "99"
+				}
+
+			],
+			"assignments": ["'max_value = num'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"max_value"
+			],
+			"rawCommentExamples": [
+				{
+					"max_value_in": "99",
+					"num": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "99"
+				}
+			],
+			"assignments": ["'max_value = max_value'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["if num > max_value:\n\tmax_value = num",
+				"max_value = max( max_value, num )"]
+}

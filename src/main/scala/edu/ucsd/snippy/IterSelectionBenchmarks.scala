@@ -1,12 +1,11 @@
 package edu.ucsd.snippy
-import java.io.File
-import edu.ucsd.snippy.Snippy
+import edu.ucsd.snippy.Snippy.synthesize
+import edu.ucsd.snippy.utils.Assignment
 import net.liftweb.json
 import net.liftweb.json.{DefaultFormats, JObject}
-import net.liftweb.json.JsonAST.JValue
 
+import java.io.File
 import scala.io.Source.fromFile
-import scala.util.Random
 
 object IterSelectionBenchmarks extends App {
 	def runBenchmarks(dir: File,
@@ -31,10 +30,10 @@ object IterSelectionBenchmarks extends App {
 
 					implicit val formats: DefaultFormats.type = net.liftweb.json.DefaultFormats
 					val newTaskStr = json.prettyRender(json.Extraction.decompose(taskCopy))
-					Snippy.synthesize(newTaskStr, timeout) match {
-						case (None, _: Int, _: Int) =>
+					synthesize(newTaskStr, timeout) match {
+						case (None, _: Int, _: Int, _: Option[Assignment]) =>
 							if (print) println(s"$name,$numExamples,$numIters,Timeout")
-						case (Some(program: String), _: Int, _: Int) =>
+						case (Some(program: String), _: Int, _: Int, _ : Option[Assignment]) =>
 							val correct = task.get("solutions") match {
 								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => '+'
 								case Some(_) =>

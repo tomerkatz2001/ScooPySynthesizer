@@ -1,8 +1,9 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"1": {
-			"NoBranch": {
-				"2": {}
+			"NB": {
+				"2": {},
+				"-1": {}
 			}
 		}
 	},
@@ -11,57 +12,58 @@
 			"outputVarNames": [
 				"avg"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "[1, 2, 3, 4, 5]",
 					"#": "",
 					"$": "",
-					"time": "-1",
 					"avg": "3"
 				},
 				{
 					"a": "[2, 3, 0, 2, 3]",
 					"#": "",
 					"$": "",
-					"time": "-1",
 					"avg": "2"
+				},
+				{
+					"a": "[0, 3, 0, 4, 13]",
+					"#": "",
+					"$": "",
+					"avg": "4"
 				}
 			],
-			"assignments": ["'_sum = sum(a)'"],
-			"commentId": 1
+			"assignments": ["'avg = fff'"],
+			"commentId": "1"
 		},
 		"2": {
 			"outputVarNames": [
-				"avg"
+				"_sum"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "[1, 2, 3, 4, 5]",
 					"_sum": "15",
 					"#": "",
-					"$": "",
-					"time": "-1",
-					"avg": "3"
+					"$": ""
+
 				},
 				{
 					"a": "[2, 3, 0, 2, 3]",
 					"_sum": "10",
 					"#": "",
-					"$": "",
-					"time": "-1",
-					"avg": "2"
+					"$": ""
 				},
 				{
 					"a" : "[1000, 5000, 5000, 0, 0]",
 					"_sum" : "11000",
-					 "avg" : "2200",
 					"#": "",
-					"$": "",
-					"time": "-1"
+					"$": ""
+
 				}
 			],
-			"assignments": ["'avg = _sum // len(a)'"],
-			"commentId": 2
+			"assignments": ["'_sum = sum(a)'"],
+			"commentId": "2"
 		}
-	}
+	},
+	"solutions": ["avg = sum(a) // len(a)"]
 }

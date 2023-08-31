@@ -237,11 +237,13 @@ class SynthesisTaskTests extends JUnitSuite
 			  |      "time": 1,
 			  |      "#": "",
 			  |      "x": "'x'",
+			  |      "y": "2"
 			  |    },
 			  |    {
 			  |      "time": 2,
 			  |      "#": "",
 			  |      "x": "'y'",
+			  |      "y": "2"
 			  |    }
 			  |  ]
 			  |}""".stripMargin)

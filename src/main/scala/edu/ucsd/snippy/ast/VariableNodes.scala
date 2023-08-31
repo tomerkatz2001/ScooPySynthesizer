@@ -46,7 +46,6 @@ object VariableNode {
 
 case class StringVariable(name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] = List()) extends VariableNode[String](contexts) with StringNode
 {
-
 	override def updateValues(contexts: Contexts): StringVariable = copy(name, contexts = contexts.contexts)
 
 	override def updateChildren(children: Seq[ASTNode],reqVeq: List[Boolean] = List()): ASTNode = copy(name, contexts, reqVeq)

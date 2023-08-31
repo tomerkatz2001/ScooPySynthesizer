@@ -347,7 +347,7 @@ case class NegateInt(arg: IntNode, reqVeq: List[Boolean] =List()) extends UnaryO
 
 case class MapKeys(arg: MapNode[String, String], reqVeq: List[Boolean] =List()) extends UnaryOpNode[Iterable[String]] with StringListNode
 {
-	override lazy val code: String = arg.code + ".keys()"
+	override lazy val code: String = s"list( ${arg.code}.keys())"
 
 	override def doOp(arg: Any): Option[Iterable[String]] = arg match {
 		case map: Map[String, String] => Some(map.keys.toList)
@@ -398,6 +398,8 @@ case class Sum(arg: ListNode[Int], reqVeq: List[Boolean] =List()) extends UnaryO
 
 	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(arg = children.head.asInstanceOf[ListNode[Int]],reqVeq)
 }
+
+
 
 case class DoublesMax(arg: ListNode[Double], reqVeq: List[Boolean] =List()) extends UnaryOpNode[Double] with DoubleNode
 {

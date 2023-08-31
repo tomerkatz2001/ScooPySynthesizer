@@ -1,7 +1,8 @@
 package edu.ucsd.snippy.scoopy
 
-import edu.ucsd.snippy.Snippy.synthesize
-import edu.ucsd.snippy.SynthesisTask
+import edu.ucsd.snippy.utils.Assignment
+import net.liftweb.json
+import net.liftweb.json.JObject
 
 import java.io.File
 import java.time.{Duration, LocalDateTime}
@@ -11,17 +12,16 @@ import scala.io.Source.fromFile
 object ScoopyBenchmarksRunner extends App{
 	val executorService: ExecutorService = Executors.newCachedThreadPool()
 
-	def runBenchmark(dir: File, benchTimeout: Int = 7, pnt: Boolean = true): Unit = {
+	def runBenchmark(dir: File, benchTimeout: Int = 10, pnt: Boolean = true): Unit = {
 		val suite = if (dir.getParentFile.getName == "resources") "" else dir.getParentFile.getName
 		val group = dir.getName
 		val benchmarks =
 		dir.listFiles()
-			.filter(_.getName.contains(".exampled.json"))
+			.filter(_.getName.contains(".json"))
 			.filter(!_.getName.contains(".out"))
 			.zipWithIndex
 
 		benchmarks.foreach(benchmark => {
-			ScopeSpecification.required=0
 				val file = benchmark._1
 				val name: String = file.getName.substring(0, file.getName.indexOf('.'))
 				var time: Int = -1
@@ -31,15 +31,17 @@ object ScoopyBenchmarksRunner extends App{
 
 				try {
 					val taskStr = fromFile(file).mkString
+					val task = json.parse(taskStr).asInstanceOf[JObject].values
 					val start = LocalDateTime.now()
-					val spec = ScopeSpecification.fromString(taskStr)
-					val task = SynthesisTask.fromSpec(spec)
-					variables = task.outputVariables
+					val spec = (ScopeSpecification.fromString(taskStr))
+					//val task = SynthesisTask.fromSpec(spec, List())
+					variables = spec.outputVarNames.toList
+					//variables = task.outputVariables.toList
 
-					if (pnt) print(s"$suite,$group,$name,$variables, \n")
+					if (pnt) print(s"$suite;$group;$name;$variables; ")
 
 
-					val callable: Callable[(Option[String], Int, Int)] = () => synthesize(task, benchTimeout)
+					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
 					val promise = this.executorService.submit(callable)
 					val rs = try {
 						promise.get(benchTimeout + 10, TimeUnit.SECONDS)
@@ -52,17 +54,18 @@ object ScoopyBenchmarksRunner extends App{
 					}
 
 					rs match {
-						case (Some(program: String), tim: Int, coun: Int) =>
+						case (Some(program: String), tim: Int, coun: Int, _) =>
 							time = Duration.between(start, LocalDateTime.now()).toMillis.toInt
 							count = coun
-							println("the proram is: " + program)
+							//println("\nthe program is: \n" + program)
 
-//							correct = task.get("solutions") match {
-//								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => "+"
-//								case Some(_) => "-"
-//								case None => "?"
-//							}
-						case (None, _, coun: Int) =>
+							correct = task("solutions") match {
+								case solutions if solutions.asInstanceOf[List[String]].contains(program) => "+"
+								case Some(_) => "-"
+								case None => "?"
+								case _ => "-"
+							}
+						case (None, _, coun: Int, _) =>
 							count = coun
 					}
 				} catch {
@@ -71,13 +74,15 @@ object ScoopyBenchmarksRunner extends App{
 					case e: Throwable => correct = e.toString
 				}
 
-				if (pnt) println(s"$time,$count,$correct")
+				if (pnt) {
+					println(s"$time;$count;$correct")
+				}
 				Runtime.getRuntime.gc()
 			})
 	}
 
 
-		val benchmarksDir = new File("synthesizer/src/test/resources/Tomer/evaluation")
+		val benchmarksDir = new File("synthesizer/src/test/resources/scoopy")
 		assert(benchmarksDir.isDirectory)
 
 
@@ -90,7 +95,7 @@ object ScoopyBenchmarksRunner extends App{
 			case _ => 5 * 60
 		}
 
-		println("suite,group,name,variables,time,count,correct")
+		println("suite;group;name;variables;time;count;correct")
 		val benchmarks = if (filterArgs.nonEmpty) {
 			benchmarksDir.listFiles()
 				.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
@@ -105,9 +110,9 @@ object ScoopyBenchmarksRunner extends App{
 				.sortBy(_.getName)(Ordering.String)
 				.toList
 		}
-
+		println(benchmarks)
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, 10, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, 700, pnt = true))
 
 		// Then actually run
 		//benchmarks.foreach(this.runBenchmark(_, timeout))

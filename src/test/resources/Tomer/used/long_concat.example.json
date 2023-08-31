@@ -1,11 +1,10 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"5": {
-			"NoBranch": {
+			"NB": {
 				"1": {},
-				"2": {},
 				"3": {},
-				"4": {},
+				"4": {}
 			}
 		}
 	},
@@ -14,42 +13,23 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"n": "20",
 					"#": "",
 					"$": "",
-					"time": "-1",
-					"rs": "5"
+					"rs": "25"
 				}
 			],
 			"assignments": ["'rs = n + 5'"],
-			"commentId": 1
-		},
-		"2": {
-			"outputVarNames": [
-				"rs"
-			],
-			"commentExamples": [
-				{
-					"n": "20",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"rs_in" : "25",
-					"rs": "30"
-				}
-			],
-			"assignments": ["'rs = rs_in + 5'"],
-			"commentId": 2
+			"commentId": "1"
 		},
 		"3": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
-					"n": "20",
 					"#": "",
 					"$": "",
 					"time": "-1",
@@ -58,15 +38,14 @@
 				}
 			],
 			"assignments": ["'rs = rs_in + 5'"],
-			"commentId": 3
+			"commentId": "3"
 		},
 		"4": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
-					"n": "20",
 					"#": "",
 					"$": "",
 					"time": "-1",
@@ -75,23 +54,23 @@
 				}
 			],
 			"assignments": ["'rs = rs_in + 10'"],
-			"commentId": 4
+			"commentId": "4"
 		},
 		"5": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
-					"n": "20",
+					"n": "10",
 					"#": "",
 					"$": "",
 					"time": "-1",
-					"rs": "45"
+					"rs": "35"
 				}
 			],
 			"assignments": [],
-			"commentId": 3
+			"commentId": "5"
 		}
 	}
 }

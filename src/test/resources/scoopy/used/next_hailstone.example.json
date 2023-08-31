@@ -1,5 +1,5 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"1": {
 			"T": {
 				"2": {}
@@ -14,7 +14,7 @@
 			"outputVarNames": [
 				"out"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "123456",
 					"#": "",
@@ -37,7 +37,7 @@
 			"outputVarNames": [
 				"out"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "123456",
 					"#": "",
@@ -60,7 +60,7 @@
 			"outputVarNames": [
 				"out"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "1234567",
 					"#": "",
@@ -79,5 +79,6 @@
 			"assignments": ["'out = a + a + a + 1'"],
 			"commentId": 3
 		}
-	}
+	},
+	"solutions": ["if 1 > a % 2:\n\tout = a // 2\nelse:\n\tout = a + a + a + 1"]
 }

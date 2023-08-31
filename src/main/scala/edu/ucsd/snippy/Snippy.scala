@@ -1,8 +1,8 @@
 package edu.ucsd.snippy
 
-import edu.ucsd.snippy.ast.{ASTNode, Types}
-import edu.ucsd.snippy.enumeration.Contexts
-import edu.ucsd.snippy.utils.Utils
+import edu.ucsd.snippy.ast.ASTNode
+import edu.ucsd.snippy.scoopy.ScopeSpecification
+import edu.ucsd.snippy.utils.Assignment
 import net.liftweb.json
 import net.liftweb.json.{Formats, JObject}
 
@@ -26,7 +26,7 @@ object Snippy extends App
 		override def compare(that: RankedProgram): Int = this.rank.compare(that.rank)
 	}
 
-	def synthesize(file: JFile, timeout: Int) : (Option[String], Int, Int) =
+	def synthesize(file: JFile, timeout: Int) : (Option[String], Int, Int, Option[Assignment]) =
 	{
 		val buff = fromFile(file)
 		val rs = synthesize(buff.mkString, timeout)
@@ -34,32 +34,32 @@ object Snippy extends App
 		rs
 	}
 
-	def synthesize(taskStr: String, timeout: Int = 7, simAssign: Boolean = false): (Option[String], Int, Int) =
+	def synthesize(taskStr: String, timeout: Int = 7, simAssign: Boolean = false): (Option[String], Int, Int, Option[Assignment]) =
 	{
 		synthesize(SynthesisTask.fromString(taskStr, simAssign), timeout)
 	}
 
-	def synthesize(task: SynthesisTask, timeout: Int) : (Option[String], Int, Int) =
+	def synthesize(task: SynthesisTask, timeout: Int) : (Option[String], Int, Int, Option[Assignment]) =
 	{
 		// If the environment is empty, we might go into an infinite loop :/
 		if (!task.contexts.exists(_.nonEmpty)) {
-			return (Some("None"), 0, 0)
+			return (Some("None"), 0, 0, None)
 		}
 
-		var rs: (Option[String], Int, Int) = (None, -1, 0)
+		var rs: (Option[String], Int, Int, Option[Assignment]) = (None, -1, 0, None)
 		val deadline = timeout.seconds.fromNow
 
 		breakable {
 			for (solution <- task.enumerator) {
 				solution match {
-					case Some(assignment) =>
-						rs = (Some(assignment.code()), timeout * 1000 - deadline.timeLeft.toMillis.toInt, task.enumerator.programsSeen)
+					case (Some(assignment: Assignment)) =>
+						rs = (Some(assignment.code()), timeout * 1000 - deadline.timeLeft.toMillis.toInt, task.enumerator.programsSeen, Some(assignment))
 						break
 					case _ => ()
 				}
 
 				if (!deadline.hasTimeLeft) {
-					rs = (None, timeout * 1000 - deadline.timeLeft.toMillis.toInt, task.enumerator.programsSeen)
+					rs = (None, timeout * 1000 - deadline.timeLeft.toMillis.toInt, task.enumerator.programsSeen, None)
 					break
 				}
 			}
@@ -68,40 +68,6 @@ object Snippy extends App
 		rs
 	}
 
-	def synthesizeAST(task: SynthesisTask, timeout: Int) : Option[ASTNode]={
-		if (!task.contexts.exists(_.nonEmpty)) {
-			return None
-		}
-
-		var rs: Option[ASTNode] = None
-		val deadline = timeout.seconds.fromNow
-
-		breakable {
-			val typesMap_ = task.contexts.flatMap(_.keys)
-				.toSet[String]
-				.map(varName => varName -> Utils.getTypeOfAll(task.contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
-				.filter(!_._2.equals(Types.Unknown))
-				.toMap
-			val typesMap = collection.mutable.Map(typesMap_.toSeq: _*)
-
-			val parser =  new PythonParser(typesMap,new Contexts(task.contexts))
-			for (solution <- task.enumerator) {
-				solution match {
-					case Some(assignment) =>
-						rs = (Some(parser.parse(s"'${assignment.code().replace("\"","\"\"")}'")))
-						break
-					case _ => ()
-				}
-
-				if (!deadline.hasTimeLeft) {
-					rs = None
-					break
-				}
-			}
-		}
-
-		rs
-	}
 
 	def synthesizeIO(timeout: Int = 7): Unit = {
 		val stdout = scala.sys.process.stdout
@@ -121,7 +87,7 @@ object Snippy extends App
 				breakable {
 					for (solution <- task.enumerator) {
 						solution match {
-							case Some(assignment) =>
+							case Some(assignment: Assignment) =>
 								code = Some(assignment.code())
 								break
 							case _ => ()
@@ -133,6 +99,29 @@ object Snippy extends App
 					}
 				}
 			}
+		} catch {
+			case e: Throwable => {stderr.println(e.toString);}
+		}
+
+		val solution = new SynthResult(0, code.isDefined, code)
+		stdout.println(json.Serialization.write(solution)(json.DefaultFormats))
+		stdout.flush()
+		System.gc()
+	}
+
+	def ReSynthesizeIO(timeout: Int = 7): Unit = {
+		val stdout = scala.sys.process.stdout
+		val stdin = scala.sys.process.stdin
+		var code: Option[String] = None
+
+		try {
+			// TODO What is this?
+			implicit val formats: Formats = json.DefaultFormats
+
+			val taskStr = StdIn.readLine()
+			val spec = ScopeSpecification.fromString(taskStr)
+
+			code = Some(ScopeSpecification.toScopeable(spec).solve()._4.get.code(true))
 		} catch {
 			case e: Throwable => stderr.println(e.toString)
 		}
@@ -160,15 +149,19 @@ object Snippy extends App
 
 	if (args.isEmpty) {
 		while (true) synthesizeIO()
-	} else {
+	}
+	else if(args.length==1){
+		while (true) ReSynthesizeIO()
+	}
+	else {
 		val (file, timeout) = args match {
 			case Array(task) => (new JFile(task), 7)
 			case Array(task, timeout) => (new JFile(task), timeout.toInt)
 		}
 
 		val (program, time, count) = synthesize(file, timeout) match {
-			case (None, time, count) => ("None", time, count)
-			case (Some(program), time, count) => (program, time, count)
+			case (None, time, count, _) => ("None", time, count)
+			case (Some(program), time, count, _) => (program, time, count)
 		}
 
 		val writer = new BufferedWriter(new FileWriter(args.head + ".out"))

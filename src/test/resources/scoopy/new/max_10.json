@@ -1,0 +1,122 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"max_value"
+			],
+			"rawCommentExamples": [],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"max_value"
+			],
+			"rawCommentExamples": [
+				{
+					"max_value_in": "4",
+					"num": "8",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "8"
+				},
+				{
+					"max_value_in": "8",
+					"num": "14",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "14"
+				},
+				{
+					"max_value_in": "14",
+					"num": "67",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "67"
+				},
+				{
+					"max_value_in": "67",
+					"num": "99",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "99"
+				},
+				{
+					"max_value_in": "99",
+					"num": "108",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "108"
+				}
+			],
+			"assignments": ["'max_value = num'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"max_value"
+			],
+			"rawCommentExamples": [
+				{
+					"max_value_in": "99",
+					"num": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "99"
+				},
+				{
+					"max_value_in": "108",
+					"num": "0",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "108"
+				},
+				{
+					"max_value_in": "14",
+					"num": "10",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "14"
+				},
+				{
+					"max_value_in": "8",
+					"num": "8",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "8"
+				},
+				{
+					"max_value_in": "8",
+					"num": "5",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "8"
+				}
+			],
+			"assignments": ["'max_value = max_value'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["if num > max_value:\n\tmax_value = num",
+				"max_value = max( max_value, num )"]
+}

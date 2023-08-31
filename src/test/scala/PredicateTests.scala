@@ -1,6 +1,7 @@
+import edu.ucsd.snippy.Snippy.synthesize
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.predicates.{MultiEdge, Node, SingleEdge}
-import edu.ucsd.snippy.{Snippy, SynthesisTask}
+import edu.ucsd.snippy.SynthesisTask
 import org.junit.Assert._
 import org.junit.Test
 import org.scalatestplus.junit.JUnitSuite
@@ -41,7 +42,7 @@ class PredicateTests extends JUnitSuite
 		assertEquals(Some(Types.Int), getField(pred, "retType"))
 		assertEquals(Some(List(1)), getField(pred, "values"))
 
-		val solution = Snippy.synthesize(task, 7)
+		val solution = synthesize(task, 7)
 
 		assert(solution._1.isDefined)
 
@@ -133,7 +134,7 @@ class PredicateTests extends JUnitSuite
 			assertEquals(edge.child, graphEnd)
 		})
 
-		val solution = Snippy.synthesize(task, 7)
+		val solution = synthesize(task, 7)
 
 		assert(solution._1.isDefined)
 
@@ -174,7 +175,7 @@ class PredicateTests extends JUnitSuite
 		assertEquals(graphStart.isEnd, false)
 		assertEquals(List(Map("x" -> 1, "y" -> 1)), graphStart.state)
 
-		val solution = Snippy.synthesize(task, 7)
+		val solution = synthesize(task, 7)
 
 		assert(solution._1.isDefined)
 
@@ -327,7 +328,7 @@ class PredicateTests extends JUnitSuite
 			}
 		}
 
-		val solution = Snippy.synthesize(task, 7)
+		val solution = synthesize(task, 7)
 
 		assert(solution._1.isDefined)
 

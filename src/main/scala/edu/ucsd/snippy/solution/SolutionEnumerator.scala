@@ -14,4 +14,6 @@ trait SolutionEnumerator extends Iterator[Option[Assignment]] {
 		step()
 		solution
 	}
+
 }
+

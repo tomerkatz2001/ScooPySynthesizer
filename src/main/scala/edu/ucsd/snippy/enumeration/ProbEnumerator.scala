@@ -14,7 +14,8 @@ class ProbEnumerator(
 	var initCost: Int,
 	var mainBank: mutable.Map[Int, mutable.ArrayBuffer[ASTNode]],
 	var vars: mutable.Map[Int, mutable.ArrayBuffer[ASTNode]],
-	var endCost: Int) extends Enumerator
+	var endCost: Int,
+	var requiredProgramsBank:List[ASTNode] = List()) extends Enumerator
 {
 	override def toString(): String = "enumeration.Enumerator"
 
@@ -116,8 +117,13 @@ class ProbEnumerator(
 	def updateBank(program: ASTNode): Unit =
 	{ //TODO: Add check to only add non-variable programs,
 		// TODO: aren't only var programs being generated except for arity 0 programs?
-		if (!mainBank.contains(program.cost)) {
+		if(program.cost == -1){ // add the req program to all of the cost levels
+			mainBank.keys.foreach(k=>mainBank(k) += program)
+			requiredProgramsBank = program :: requiredProgramsBank
+		}
+		else if (!mainBank.contains(program.cost)) {
 			mainBank(program.cost) = ArrayBuffer(program)
+			requiredProgramsBank.foreach(p=>mainBank(program.cost) += p)
 		} else {
 			mainBank(program.cost) += program
 		}

@@ -1,26 +1,23 @@
 package edu.ucsd.snippy.scoopy
 
+import edu.ucsd.snippy.ast
 import edu.ucsd.snippy.enumeration.OEValuesManager
 import edu.ucsd.snippy.predicates.Predicate
 import edu.ucsd.snippy.solution.SolutionEnumerator
 import edu.ucsd.snippy.vocab.VocabFactory
-import edu.ucsd.snippy.{SynthesisTask, ast}
 
 class ScopesSynthesisTask(
 	 // Problem definition8
-	 override val parameters: List[(String, ast.Types.Value)],
-	 override val outputVariables: List[String],
-	 override val vocab: VocabFactory,
-	 override val contexts: List[Map[String, Any]],
-	 override val predicate: Predicate,
+	 val parameters: List[(String, ast.Types.Value)],
+	 val outputVariables: List[String],
+	 val vocab: VocabFactory,
+	 val contexts: List[Map[String, Any]],
+	 val predicate: Predicate,
 
 	 // Synthesizer state
-	 override val oeManager: OEValuesManager,
-	 override val enumerator: SolutionEnumerator) extends
-		SynthesisTask(parameters, outputVariables, vocab, contexts, predicate, oeManager, enumerator){
+	 val oeManager: OEValuesManager,
+	 val enumerator: SolutionEnumerator);
 
-
-}
 
 object ScopesSynthesisTask {
 

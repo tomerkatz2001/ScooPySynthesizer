@@ -1,25 +1,26 @@
 package edu.ucsd.snippy.scoopy
 
-import edu.ucsd.snippy.Snippy.synthesizeAST
-import edu.ucsd.snippy.SynthesisTask.Context
+import edu.ucsd.snippy.Snippy.synthesize
+import edu.ucsd.snippy.SynthesisTask
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.enumeration.Contexts
-import edu.ucsd.snippy.utils.Utils
 import edu.ucsd.snippy.utils.Utils.getBinaryPartitions
-import edu.ucsd.snippy.vocab.{BasicVocabMaker, VocabMaker}
-import edu.ucsd.snippy.{PythonParser, SynthesisTask}
+import edu.ucsd.snippy.utils._
+import edu.ucsd.snippy.vocab.RequiredVocabMaker
 import net.liftweb.json.JsonAST.JObject
 import net.liftweb.json.JsonParser
 
 import scala.collection.mutable
 
-class ScopeSpecification(val scopeExamples: List[Map[String, Any]],
+
+
+
+class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
+						 //val contexts: Contexts,
 						 val partition: (List[Int], List[Int]),
-						 val requiredVocabMakers: List[VocabMaker],
-						 val optionalVocabMakers: List[VocabMaker],
-						 val outputVarNames: List[String]=List(),
-						 val auxVariables:List[String] = List(),
+						 val required: List[List[RequiredVocabMaker]=>SynthesisTask],
+						 val outputVarNames: Set[String],
 						 val scopeType:String){
 
 	def getPartitionFunc(): List[Any] => List[(Set[Int], Set[Int])] = {
@@ -27,16 +28,79 @@ class ScopeSpecification(val scopeExamples: List[Map[String, Any]],
 		(indices: List[Any]) => {
 			getBinaryPartitions(indices).filter(part =>
 				(pastPartition._1.subsetOf(part._1) && pastPartition._2.subsetOf(part._1)) || // both in the first
-					(pastPartition._1.subsetOf(part._2) && pastPartition._1.subsetOf(part._2)) || //both in the second
+					(pastPartition._1.subsetOf(part._2) && pastPartition._2.subsetOf(part._2)) || //both in the second
 					(pastPartition._1.subsetOf(part._1) && pastPartition._2.subsetOf(part._2)) || // first in the first, second in the second
 					(pastPartition._1.subsetOf(part._2) && pastPartition._2.subsetOf(part._1))) // first in the second, second in the first
 		}
+	}
+
+	def getPrevEnvsAndEnvs()	 ={
+		var time:BigInt = 0;
+		var prevEnvs:Map[Int, Map[String, Any]] = Map();
+		def splitEnv(env:Map[String, Any]) = {
+			val previousVars = env.keys.filter(k => k.contains("_in")).toList
+			var preEnv = Map[String, Any]()
+			if(previousVars.nonEmpty){
+				preEnv = env.filter(v => !(previousVars.map(k => k.replace("_in", ""))).contains(v._1)).
+					map(v => (v._1.replace("_in", ""), v._2))
+			}
+			val nextEnv = env.filter(v => !previousVars.contains(v._1))
+			time = time + 2
+			if(previousVars.nonEmpty) {
+				prevEnvs = prevEnvs ++ Map(time.toInt -> preEnv);
+			}
+			List(preEnv ++ Map("time" -> (time - 1)), nextEnv ++ Map("time" -> time))
+		}
+		val envs = this.scopeExamples.flatMap(splitEnv).filter(env => env("time").asInstanceOf[BigInt] % 2 == 0) // only the real examples
+		(prevEnvs, envs)
+	}
+	def covertToASTList: (Assignment) => List[ASTNode] = {
+		case SingleAssignment(_, value) => List(value)
+		case BasicMultivariableAssignment(_, values) => values
+		case MultilineMultivariableAssignment(assignments) => assignments.flatMap(covertToASTList)
+		case ConditionalAssignment(condition, ifTrue, ifFalse) =>  {
+			if(condition.code == "True"){
+				covertToASTList(ifTrue)
+			}
+			else if(condition.code == "False"){
+				covertToASTList(ifFalse)
+			}
+			else{
+				covertToASTList(ifTrue) ++ covertToASTList(ifFalse)
+			}
+		}
+		case _ => throw new Exception("Unknown assignment type")
+	};
+	def solve(timeout:Int = 10) ={
+		assert(this.scopeType == "scope")
+		var requiredVocabMakers: List[RequiredVocabMaker] = List()
+		var seenASTs: List[ASTNode] = List()
+		var sol: (Option[String], Int, Int, Option[Assignment]) = (None, 0, 0, None)
+		for ((req, i) <- this.required.zipWithIndex.reverse) {
+			val synthesisTask = req.apply(List())
+			sol = synthesize(synthesisTask, timeout);
+			//println("found solution: " + sol._1)
+			val solutionAssignment: Option[Assignment] = sol._4
+			val newRequiredVocabMakers = covertToASTList(solutionAssignment.get).filter(ast => !seenASTs.exists((saw) => saw.code == ast.code)).zipWithIndex.map { case (ast, i) => {
+				seenASTs = ast :: seenASTs
+				new RequiredVocabMaker(ast, List(), requiredVocabMakers.length + i, new Contexts(synthesisTask.contexts))
+			}
+			};
+			requiredVocabMakers = requiredVocabMakers ++ newRequiredVocabMakers
+		}
+		val tmpTask = SynthesisTask.fromSpec(this, List())
+		requiredVocabMakers = seenASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List(), x._2, new Contexts(tmpTask.contexts)))
+		val finalTask = SynthesisTask.fromSpec(this, requiredVocabMakers)
+		sol = synthesize(finalTask, timeout);
+		sol //._4.get.code(disablePostProcess=true);
+
+
 	}
 }
 
 
 object ScopeSpecification {
-	var required = 0
+	//var required = 0
 
 	def ASTVarsVisitor(root: ASTNode, goodVars: List[String] = List(), hole: ASTNode, contexts: Contexts): ASTNode = {
 		val newAst = root match {
@@ -69,184 +133,196 @@ object ScopeSpecification {
 		}
 	}
 
-	def assign(code: String, contexts: List[Context], inputVars:List[String]): ScopeSpecification = {
-		val typesMap_ = contexts.flatMap(_.keys)
-			.toSet[String]
-			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
-			.filter(!_._2.equals(Types.Unknown))
-			.toMap
-		val typesMap = collection.mutable.Map(typesMap_.toSeq: _*)
-
-		val varName = code.split("=")(0).trim
-		val assignment = s"'${code.split("=").last.trim}"
-		val parser = new PythonParser(contexts)
-		val ast = parser.parse(assignment)
-		ast.manuallyInserted = true
-		//TODO: what if the code has variable in it?
-
-		val goodVars = ASTGetGoodVars(ast) ++ inputVars
-
-		val vocabMaker = new BasicVocabMaker {
-			override val returnType: Types = ast.nodeType
-
-			override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode = children.length match{
-				case 0 => ast.updateValues(new Contexts(contexts))
-				case 1 => ASTVarsVisitor(ast, goodVars, children.head, new Contexts(contexts))
-				case _ => throw new Exception("ScopeSpecification: unexpected number of children")
-
-			}
-
-			override val arity: Int = ASTVarsCounter(ast, goodVars)
-			override val childTypes: List[Types] = ASTGetVarType(ast, goodVars, typesMap)
-			override val nodeType: Class[_ <: ASTNode] = ast.getClass
-			override val head: String = "scoopy"
-		}
-		new ScopeSpecification(List(), Tuple2(List(), List()), List(), List(vocabMaker), auxVariables = List(varName),scopeType = "assign")
+	def assign(code: String): ScopeSpecification = {
+		val varNames = code.split("=")(0).replace("\'","").split(",").map(_.trim).toSet
+		new ScopeSpecification(List(), Tuple2(List(), List()), List(),varNames,scopeType = "assign")
 	}
 
 	def cond(scopeSpecification1: ScopeSpecification, scopeSpecification2: ScopeSpecification): ScopeSpecification ={
 		val jointExamples = scopeSpecification1.scopeExamples ++ scopeSpecification2.scopeExamples;
+//		val jointContexts = new Contexts(scopeSpecification1.contexts.contexts ++ scopeSpecification2.contexts.contexts)
 		val partition = Tuple2(Range(0, scopeSpecification1.scopeExamples.size).toList,
 			Range(scopeSpecification1.scopeExamples.size, jointExamples.size).toList);
-		val requiredVocabMakers = scopeSpecification1.requiredVocabMakers ++ scopeSpecification2.requiredVocabMakers;
-		val optionalVocabMakers = scopeSpecification1.optionalVocabMakers ++ scopeSpecification2.optionalVocabMakers;
-		val auxVariables = scopeSpecification1.auxVariables ++ scopeSpecification2.auxVariables;
-		new ScopeSpecification(jointExamples, partition, requiredVocabMakers, optionalVocabMakers, auxVariables = auxVariables, scopeType = "cond")
+		val required = scopeSpecification1.required ++ scopeSpecification2.required;
+		val varNames = scopeSpecification1.outputVarNames ++ scopeSpecification2.outputVarNames;
+		new ScopeSpecification(jointExamples, partition, required, varNames, scopeType = "cond")
 	}
 
 	def concat(scopeSpecifications: List[ScopeSpecification]): ScopeSpecification ={
 		val jointExamples = List();
+//		val jointContexts:Contexts = new Contexts(List())// no examples so no need of contexts
 		val partition = Tuple2(List(), List());
-		val requiredVocabMakers = scopeSpecifications.flatMap(_.requiredVocabMakers);
-		val optionalVocabMakers = scopeSpecifications.flatMap(_.optionalVocabMakers);
-		val auxVariables = scopeSpecifications.flatMap(_.auxVariables);
-		new ScopeSpecification(jointExamples, partition, requiredVocabMakers, optionalVocabMakers, auxVariables = auxVariables, scopeType = "concat")
+		val fixed_scopeSpecifications = scopeSpecifications.map((spec)=>if (spec.scopeExamples.size > 0) toScopeable(spec) else spec);
+		val jointOutputVarNames = fixed_scopeSpecifications.map(_.outputVarNames).flatten.toSet;
+		val required = fixed_scopeSpecifications.flatMap(_.required);
+		new ScopeSpecification(jointExamples, partition, required, jointOutputVarNames, scopeType = "concat")
 	}
 
-	def scope(scopeSpecification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames:List[String], synth:Boolean=true): ScopeSpecification ={
-		val jointExamples = scopeSpecification.scopeExamples.filter(map=>outputVarNames.forall(name=>map.keys.exists(key=>key==name))) ++ examples;
-		val partition = scopeSpecification.partition;
-		val requiredVocabMakers = scopeSpecification.requiredVocabMakers;
-		val optionalVocabMakers = scopeSpecification.optionalVocabMakers;
-		val auxVariables = scopeSpecification.auxVariables.filter(!outputVarNames.contains(_));
-		val inputVars:List[String] = examples.map(_.keys).flatten.filter(!outputVarNames.contains(_));
-		val tmpScope = new ScopeSpecification(jointExamples, partition, List(), List(), outputVarNames, auxVariables, scopeType ="scopeAux");
-		if(synth) {
-			println("inner synth")
-			val typesMap_ = examples.flatMap(_.keys)
-				.toSet[String]
-				.map(varName => varName -> Utils.getTypeOfAll(examples.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
-				.filter(!_._2.equals(Types.Unknown))
-				.toMap
-			val typesMap = collection.mutable.Map(typesMap_.toSeq: _*)
-			val synthTask = SynthesisTask.fromSpec(tmpScope)
-			val solution = synthesizeAST(synthTask, 5);
-			if (solution.isDefined) {
-				val ast = solution.get
-				val newReqMakers = ast match {
-					case _:SemiCondNode =>{
-						List()
-					}
-					case _=>{
-						val goodVars = ASTGetGoodVars(ast) ++ inputVars
-						val vocabMaker = new BasicVocabMaker {
-							override val returnType: Types = ast.nodeType
-							val vec = List.fill(required + 1)(false).updated(required, true)
+	def scope(specification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames: Set[String]):ScopeSpecification ={
+		val jointExamples = specification.scopeExamples ++ examples; //TODO: check if the examples are disjoint
+//		val contexts = getContextsFromExamples(jointExamples, outputVarNames);
+		val jointOutputVarNames = (specification.outputVarNames ++ outputVarNames).filter(jointExamples.head.contains);
+		new ScopeSpecification(jointExamples, specification.partition, specification.required, jointOutputVarNames, scopeType = "scope")
+	}
 
-							override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode = children.length match {
-								case 0 => val x = ast.updateValues(new Contexts(contexts))
-									x.updateChildren(x.children.toSeq, vec)
-									x
-								case 1 => val x = ASTVarsVisitor(ast, goodVars, children.head, new Contexts(contexts))
-									x.updateChildren(x.children.toSeq, vec)
-									x
-								case _ => throw new Exception("ScopeSpecification: unexpected number of children")
+	def toScopeable(specification: ScopeSpecification): ScopeSpecification ={
+		specification.required
+		val required = (vocabMakers:List[RequiredVocabMaker])=>SynthesisTask.fromSpec(specification, vocabMakers);
+		new ScopeSpecification(List(), (List(), List()), required::specification.required, specification.outputVarNames, scopeType = "scopeable")
+	}
+//	def scope_(scopeSpecification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames:List[String], synth:Boolean=true): ScopeSpecification ={
+//		val jointExamples = scopeSpecification.scopeExamples.filter(map=>outputVarNames.forall(name=>map.keys.exists(key=>key==name))) ++ examples;
+//		val partition = scopeSpecification.partition;
+//		val requiredVocabMakers = scopeSpecification.requiredVocabMakers;
+//		val auxVariables = scopeSpecification.auxVariables.filter(!outputVarNames.contains(_));
+//		val inputVars:List[String] = examples.map(_.keys).flatten.filter(!outputVarNames.contains(_));
+//		val tmpScope = new ScopeSpecification(jointExamples, partition, List(), outputVarNames, auxVariables, scopeType ="scopeAux");
+//		if(synth) {
+//			println("inner synth")
+//			val typesMap_ = examples.flatMap(_.keys)
+//				.toSet[String]
+//				.map(varName => varName -> Utils.getTypeOfAll(examples.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
+//				.filter(!_._2.equals(Types.Unknown))
+//				.toMap
+//			val typesMap = collection.mutable.Map(typesMap_.toSeq: _*)
+//			val synthTask = SynthesisTask.fromSpec(tmpScope)
+//			val solution = synthesizeAST(synthTask, 5);
+//			if (solution.isDefined) {
+//				val ast = solution.get
+//				val newReqMakers = ast match {
+//					case _:SemiCondNode =>{
+//						List()
+//					}
+//					case _=>{
+//						val goodVars = ASTGetGoodVars(ast) ++ inputVars
+//						val vocabMaker = new BasicVocabMaker {
+//							override val returnType: Types = ast.nodeType
+//							val vec = List.fill(required + 1)(false).updated(required, true)
+//
+//							override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode = children.length match {
+//								case 0 => val x = ast.updateValues(new Contexts(contexts))
+//									x.updateChildren(x.children.toSeq, vec)
+//									x
+//								case 1 => val x = ASTVarsVisitor(ast, goodVars, children.head, new Contexts(contexts))
+//									x.updateChildren(x.children.toSeq, vec)
+//									x
+//								case _ => throw new Exception("ScopeSpecification: unexpected number of children")
+//
+//							}
+//
+//							override val arity: Int = ASTVarsCounter(ast, goodVars)
+//							override val childTypes: List[Types] = ASTGetVarType(ast, goodVars, typesMap)
+//							override val nodeType: Class[_ <: ASTNode] = ast.getClass
+//							override val head: String = "scoopy"
+//						}
+//						required = required + 1
+//						List(vocabMaker)
+//					}
+//				}
+//
+//				val newRequiredVocabMakers = requiredVocabMakers ++ newReqMakers
+//
+//				return new ScopeSpecification(jointExamples, partition, newRequiredVocabMakers, outputVarNames, auxVariables, scopeType = "scope with synth")
+//			}
+//			else{
+//				// synth failed but let say we fond a solution
+//				new ScopeSpecification(jointExamples, partition, requiredVocabMakers, outputVarNames, scopeType = "scope without synth")
+//			}
+//		}
+//
+//		new ScopeSpecification(jointExamples, partition, requiredVocabMakers, outputVarNames, scopeType = "scope without synth")
+//	}
 
-							}
+	class ScopeTree(val scopeInfo: ParsedComment, val falseSons:List[ScopeTree], val trueSons:List[ScopeTree], val nonBranchSons:List[ScopeTree] ){
+		val isLeaf = falseSons.isEmpty && trueSons.isEmpty && nonBranchSons.isEmpty;
+	}
+	object ScopeTree{
 
-							override val arity: Int = ASTVarsCounter(ast, goodVars)
-							override val childTypes: List[Types] = ASTGetVarType(ast, goodVars, typesMap)
-							override val nodeType: Class[_ <: ASTNode] = ast.getClass
-							override val head: String = "scoopy"
-						}
-						required = required + 1
-						List(vocabMaker)
-					}
-				}
-
-				val newRequiredVocabMakers = requiredVocabMakers ++ newReqMakers
-
-				return new ScopeSpecification(jointExamples, partition, newRequiredVocabMakers, optionalVocabMakers, outputVarNames, auxVariables, scopeType = "scope with synth")
-			}
-			else{
-				// synth failed but let say we fond a solution
-				new ScopeSpecification(jointExamples, partition, requiredVocabMakers, optionalVocabMakers, outputVarNames, scopeType = "scope without synth")
-			}
+		def getSons(bodyJson: Map[String, Any], scopeExamplesMap:Map[String, ParsedComment]):(List[ScopeTree],List[ScopeTree],List[ScopeTree])={
+			val falseSon = apply(bodyJson.get("F").asInstanceOf[Option[Map[String, Any]]], scopeExamplesMap);
+			val trueSon = apply(bodyJson.get("T").asInstanceOf[Option[Map[String, Any]]], scopeExamplesMap);
+			val nonBranchSon = apply(bodyJson.get("NB").asInstanceOf[Option[Map[String, Any]]], scopeExamplesMap);
+			(falseSon,trueSon,nonBranchSon);
 		}
-
-		new ScopeSpecification(jointExamples, partition, requiredVocabMakers, optionalVocabMakers, outputVarNames, scopeType = "scope without synth")
+		def apply(treeJson: Option[Map[String, Any]], scopeExamplesMap:Map[String, ParsedComment]):List[ScopeTree]={
+			if (treeJson.isEmpty || treeJson.get.isEmpty) {
+				return List();
+			}
+			treeJson.get.map {
+				case ("-1", _) => new ScopeTree(new ParsedComment("-1", List(),List("tmp"), List("tmp = something")), List(), List(), List())
+				case (num:String, json) => {
+					val (falseSon,trueSon,nonBranchSon) = getSons(json.asInstanceOf[Map[String, Any]], scopeExamplesMap);
+					new ScopeTree(scopeExamplesMap(num),falseSon,trueSon,nonBranchSon);
+				}
+			}.toList
+		}
 	}
-
 	def fromString(jsonString: String): ScopeSpecification ={
 		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
-		val scopesTree: Map[String, Any] = input("scopeTree").asInstanceOf[Map[String, Any]]
+		val scopesTree: Map[String, Any] = input("scopesTree").asInstanceOf[Map[String, Any]]
 		val scopeInfoString  = input("scopes").asInstanceOf[Map[String, Map[String, Any]]]
-		val scopeInfo:Map[String, ParsedComment] = scopeInfoString map {case (k,v) => k -> ParsedComment.fromMap(v)}
-		val rootId = scopesTree.keys.head
-		val inputVars = scopeInfo(rootId).inputVarNames()
-		val spec = this.fromTree(scopesTree, scopeInfo,inputVars, false)
+		val scopeInfo:Map[String, ParsedComment] = scopeInfoString map {case (k,v) => k -> ParsedComment(v)}
+		val realTree = ScopeTree(Some(scopesTree), scopeInfo);
 
-		return spec
+
+		assert(realTree.length == 1)
+		val spec = this.fromTree(realTree(0))
+
+		spec
 	}
 
-	def fromTree(scopesTree: Map[String, Any], scopesInfo:Map[String, ParsedComment], inputVars:List[String], synth:Boolean=true): ScopeSpecification ={
-		val roots = scopesTree.keys.toList
-		var holes:List[String]=List()
-		val rootsSpecs  = roots map(id => {
-			val currentScope = scopesInfo(id)
-			val sons = scopesTree(id).asInstanceOf[Map[String, Any]]
-			val sonsIds = sons.values.toList.map(_.asInstanceOf[Map[String, Any]].keys.toList).flatten
-			sonsIds.zipWithIndex.foreach(x => sonsIds.slice(0,x._2).foreach(y=>scopesInfo(y).getOutputVarNames().foreach(out=>scopesInfo(x._1).siblingsVars.appended(out))))
-
-			val sonsSpecs: Map[String, ScopeSpecification] = sons map {
-				case("NoBranch", sonTree) => "NoBranch" ->this.fromTree(sonTree.asInstanceOf[Map[String, Any]], scopesInfo,currentScope.inputVarNames(), !(sons("NoBranch").asInstanceOf[Map[String, Any]].size==1 && scopesInfo(id).getAssigns().length==0)) // no branch and no other assigns, i.e scope in scope
-				case (sonBranch, sonTree) => sonBranch -> this.fromTree(sonTree.asInstanceOf[Map[String, Any]], scopesInfo, currentScope.inputVarNames())
+	def fromTree(scopesTree: ScopeTree): ScopeSpecification = {
+		var innerScope: Option[ScopeSpecification] = None;
+		if(scopesTree.isLeaf){
+			val assignSpec = ScopeSpecification.assign(scopesTree.scopeInfo.assignments.head)
+			innerScope = Some(assignSpec);
+		}
+		val trueSpecs = scopesTree.trueSons.map(fromTree);
+		val falseSpecs = scopesTree.falseSons.map(fromTree);
+		val nonBranchSpecs = scopesTree.nonBranchSons.map(fromTree);
+		if(trueSpecs.nonEmpty && falseSpecs.nonEmpty && nonBranchSpecs.isEmpty){ // if - else
+			var innerTrueSpec = trueSpecs(0);
+			var innerFalseSpec = falseSpecs(0);
+			if (trueSpecs.length > 1) {
+				//TODO: make all scope spec to scpoabel before concating
+				innerTrueSpec = ScopeSpecification.concat(trueSpecs);
 			}
-			val thenScope = sonsSpecs.get("T")
-			val elseScope = sonsSpecs.get("F")
-			val neitherScope = sonsSpecs.get("NoBranch")
-			var condScope:Option[ScopeSpecification] = Option.empty;
-			val assignsOutputs = currentScope.getAssigns().map(_.split("=")(0).replace("'","").trim)
-			holes ++= assignsOutputs
-			val assignmentsScope = if(currentScope.getAssigns().length!=0) {
-				if(currentScope.getAssigns().length==1 ) {Option(ScopeSpecification.assign(currentScope.getAssigns().head, currentScope.getContext(),inputVars))}
-				else{Option(ScopeSpecification.concat(currentScope.getAssigns().map(assign=>ScopeSpecification.assign(assign, currentScope.getContext(),inputVars++assignsOutputs))))}
-			} else Option(new ScopeSpecification(List(), Tuple2(List(), List()), List(), List(),scopeType = "empty"))
-			if (elseScope.isDefined || thenScope.isDefined){
-				val oneBranch = if (thenScope.isDefined) thenScope.get else new ScopeSpecification(List(), Tuple2(List(), List()), List(), List(),scopeType = "empty")
-				val secondBranch = if (elseScope.isDefined) elseScope.get else new ScopeSpecification(List(), Tuple2(List(), List()), List(), List(), scopeType = "empty")
-				 condScope = Option(ScopeSpecification.cond(oneBranch, secondBranch))
+			if(falseSpecs.length > 1){
+				innerFalseSpec = ScopeSpecification.concat(falseSpecs);
 			}
-			var inside:ScopeSpecification =null
-			// if more than one scope is defined we need to concat them
-			if ((List(condScope, assignmentsScope, neitherScope).filter(_.isDefined).length > 1)
-				&&((assignmentsScope.isDefined && assignmentsScope.get.scopeType=="assign") || !assignmentsScope.isDefined)) {
-					inside = ScopeSpecification.concat(List(condScope, assignmentsScope, neitherScope).filter(_.isDefined).map(_.get))
-
-			}else {
-				 inside = List(condScope, assignmentsScope, neitherScope).filter(_.isDefined).head.get
+			innerScope = Some(ScopeSpecification.cond(innerTrueSpec, innerFalseSpec))
+		}
+		if(trueSpecs.nonEmpty && falseSpecs.isEmpty && nonBranchSpecs.isEmpty) { // only if
+			var innerTrueSpec = trueSpecs(0);
+			if (trueSpecs.length > 1) {
+				//TODO: make all scope spec to scpoabel before concating
+				innerTrueSpec = ScopeSpecification.concat(trueSpecs);
 			}
-			ScopeSpecification.scope(inside, currentScope.getExamples(), currentScope.getOutputVarNames(), synth)
-
-		})
-
-		var resultScope:ScopeSpecification=null;
-		if(rootsSpecs.length == 1)
-			resultScope = rootsSpecs.head
-		else
-			resultScope = ScopeSpecification.concat(rootsSpecs)
-		resultScope
-
+			val variables = innerTrueSpec.outputVarNames.mkString(",")
+			innerScope = Some(ScopeSpecification.cond(innerTrueSpec, ScopeSpecification.assign(s"${variables} = dont care")))
+		}
+		if (trueSpecs.isEmpty && falseSpecs.isEmpty && nonBranchSpecs.nonEmpty) { // normal concat
+			var innerNonBranchSpec = nonBranchSpecs(0);
+			if (nonBranchSpecs.length > 1) {
+				innerNonBranchSpec = ScopeSpecification.concat(nonBranchSpecs);
+			}
+			innerScope = Some(innerNonBranchSpec)
+		}
+		if(trueSpecs.nonEmpty && falseSpecs.isEmpty && nonBranchSpecs.nonEmpty) { // concat of if and something else
+			var innerTrueSpec = trueSpecs(0);
+			var innerNonBranchSpec = nonBranchSpecs(0);
+			if (trueSpecs.length > 1) {
+				innerTrueSpec = ScopeSpecification.concat(trueSpecs);
+			}
+			if (nonBranchSpecs.length > 1) {
+				innerNonBranchSpec = ScopeSpecification.concat(nonBranchSpecs);
+			}
+			innerScope = Some(ScopeSpecification.concat(List(innerTrueSpec, innerNonBranchSpec)))
+		}
+		if(scopesTree.scopeInfo.commentId == "-1"){ // this is assign without scope
+			return innerScope.get;
+		}
+		ScopeSpecification.scope(innerScope.get, scopesTree.scopeInfo.rawCommentExamples,scopesTree.scopeInfo.outputVarNames.toSet)
 	}
 
 }

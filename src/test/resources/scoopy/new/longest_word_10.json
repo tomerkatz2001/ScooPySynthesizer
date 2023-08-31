@@ -1,0 +1,129 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"longest_word"
+			],
+			"rawCommentExamples": [],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"longest_word"
+			],
+			"rawCommentExamples": [
+				{
+					"longest_word_in": "''",
+					"word": "'The'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'The'"
+				},
+				{
+					"longest_word_in": "'The'",
+					"word": "'quick'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'quick'"
+				},
+				{
+					"longest_word_in": "'quick'",
+					"word": "'jumped'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'jumped'"
+				},
+				{
+					"longest_word_in": "'jumped'",
+					"word": "'together'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'together'"
+				},
+				{
+					"longest_word_in": "'together'",
+					"word": "'longerwordddd'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'longerwordddd'"
+				}
+			],
+			"assignments": ["'longest_word = ffffff'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"longest_word"
+			],
+			"rawCommentExamples": [
+				{
+					"longest_word_in": "'quick'",
+					"word": "'brown'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'quick'"
+				},
+				{
+					"longest_word_in": "'quick'",
+					"word": "'fox'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'quick'"
+				},
+				{
+					"longest_word_in": "'jumped'",
+					"word": "'over'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'jumped'"
+				},
+				{
+					"longest_word_in": "'jumped'",
+					"word": "'the'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'jumped'"
+				},
+				{
+					"longest_word_in": "'jumped'",
+					"word": "'lazy'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'jumped'"
+				},
+				{
+					"longest_word_in": "'jumped'",
+					"word": "'dog'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"longest_word": "'jumped'"
+				}
+			],
+			"assignments": ["'longest_word = ffffffff'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["if len(word) > len(longest_word):\n\tlongest_word = word"]
+}

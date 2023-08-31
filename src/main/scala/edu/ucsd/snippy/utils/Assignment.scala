@@ -3,11 +3,12 @@ import edu.ucsd.snippy.PostProcessor
 import edu.ucsd.snippy.ast.{ASTNode, BoolNode, NegateBool, VariableNode}
 
 sealed abstract class Assignment {
-	def code(): String
+	def code(disablePostProcess:Boolean = false): String
+
 }
 
 case class SingleAssignment(name: String, var program: ASTNode) extends Assignment {
-	def code(): String = {
+	def code(disablePostProcess:Boolean = false): String = {
 		var rs = f"$name = ${PostProcessor.clean(program).code}"
 		val selfAssign = s"$name = $name + "
 		if (rs.startsWith(selfAssign)) {
@@ -19,7 +20,7 @@ case class SingleAssignment(name: String, var program: ASTNode) extends Assignme
 
 case class BasicMultivariableAssignment(names: List[String], programs: List[ASTNode]) extends Assignment
 {
-	override def code(): String = {
+	override def code(disablePostProcess:Boolean = false): String = {
 		// See if we can break it up into multiple lines
 		val singleLine = names.zipWithIndex.exists {
 			case (name, i) => programs.zipWithIndex.exists {
@@ -41,7 +42,7 @@ case class BasicMultivariableAssignment(names: List[String], programs: List[ASTN
 
 case class MultilineMultivariableAssignment(assignments: List[Assignment]) extends Assignment
 {
-	override def code(): String = assignments.map(_.code()).mkString("\n")
+	override def code(disablePostProcess:Boolean = false): String = assignments.map(_.code()).mkString("\n")
 }
 
 case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, var elseCase: Assignment) extends Assignment
@@ -58,7 +59,7 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 			cond = cleanCond.asInstanceOf[BoolNode]
 	}
 
-	override def code(): String = {
+	override def code(disablePostProcess:Boolean = false): String = {
 		// Cleanup!
 
 		// First check if the condition is all true or false
@@ -75,73 +76,72 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 			var thenCode: List[Assignment] = this.flatten(thenCase) //can this change too somehow? Does it need to go in the loop?
 			var elseCode: List[Assignment] = this.flatten(elseCase)
 			var postCondition: List[Assignment] = List()
-			while (preStrs != preCondition.map(_.code()) || thenStrs != thenCode.map(_.code()) || elseStrs != elseCode.map(_.code()) || postStrs != postCondition.map(_.code())) {
-				//changed, update the prev state:
-				preStrs = preCondition.map(_.code())
-				thenStrs = thenCode.map(_.code())
-				elseStrs = elseCode.map(_.code())
-				postStrs = postCondition.map(_.code())
-			// Now take out common prefixes,...
-			while (thenCode.nonEmpty && elseCode.nonEmpty && thenCode.head.code() == elseCode.head.code()) {
-				preCondition = preCondition :+ thenCode.head
-				thenCode = thenCode.tail
-				elseCode = elseCode.tail
-			}
+			if(!disablePostProcess) {
+				while (preStrs != preCondition.map(_.code()) || thenStrs != thenCode.map(_.code()) || elseStrs != elseCode.map(_.code()) || postStrs != postCondition.map(_.code())) {
+					//changed, update the prev state:
+					preStrs = preCondition.map(_.code())
+					thenStrs = thenCode.map(_.code())
+					elseStrs = elseCode.map(_.code())
+					postStrs = postCondition.map(_.code())
+					// Now take out common prefixes,...
+					while (thenCode.nonEmpty && elseCode.nonEmpty && thenCode.head.code() == elseCode.head.code()) {
+						preCondition = preCondition :+ thenCode.head
+						thenCode = thenCode.tail
+						elseCode = elseCode.tail
+					}
 
-			// ...Lines sandwiched b/w other assignments,...
-			var i = 0
-			while(i < thenCode.length) {
-				// TODO This can/should? be part of the loop above. But this whole code is hacky
-				//  spaghetti, so ¯\_('')_/¯
-				thenCode(i) match {
-					case SingleAssignment(name, thenProgram) =>
-						elseCode.zipWithIndex.find(a => a._1.isInstanceOf[SingleAssignment] && a._1.asInstanceOf[SingleAssignment].name == name) match {
-							case Some((SingleAssignment(_, elseProgram), j)) if elseProgram.code == thenProgram.code =>
-								val thenVarsAssignedBefore = this.varsAssigned(thenCode.slice(0, i))
-								val elseVarsAssignedBefore = this.varsAssigned(elseCode.slice(0, j))
-								val thenVarsAssignedAfter = this.varsAssigned(thenCode.slice(i + 1, thenCode.length))
-								val elseVarsAssignedAfter = this.varsAssigned(elseCode.slice(j + 1, elseCode.length))
+					// ...Lines sandwiched b/w other assignments,...
+					var i = 0
+					while (i < thenCode.length) {
+						// TODO This can/should? be part of the loop above. But this whole code is hacky
+						//  spaghetti, so ¯\_('')_/¯
+						thenCode(i) match {
+							case SingleAssignment(name, thenProgram) =>
+								elseCode.zipWithIndex.find(a => a._1.isInstanceOf[SingleAssignment] && a._1.asInstanceOf[SingleAssignment].name == name) match {
+									case Some((SingleAssignment(_, elseProgram), j)) if elseProgram.code == thenProgram.code =>
+										val thenVarsAssignedBefore = this.varsAssigned(thenCode.slice(0, i))
+										val elseVarsAssignedBefore = this.varsAssigned(elseCode.slice(0, j))
+										val thenVarsAssignedAfter = this.varsAssigned(thenCode.slice(i + 1, thenCode.length))
+										val elseVarsAssignedAfter = this.varsAssigned(elseCode.slice(j + 1, elseCode.length))
 
-								if (!(thenVarsAssignedBefore.exists(thenProgram.includes) ||
-									  elseVarsAssignedBefore.exists(elseProgram.includes)) &&
-									!(anyInclude(thenCode.slice(0, i), name) ||
-									  anyInclude(elseCode.slice(0, j), name)))
-								{
-									preCondition = preCondition :+ thenCode(i)
-									thenCode = thenCode.slice(0, i) ++ thenCode.slice(i + 1, thenCode.length)
-									elseCode = elseCode.slice(0, j) ++ elseCode.slice(j + 1, elseCode.length)
-								}
-								else if (!(thenVarsAssignedAfter.exists(thenProgram.includes) ||
-										   elseVarsAssignedAfter.exists(elseProgram.includes)) &&
-										 !(this.anyInclude(thenCode.slice(i + 1, thenCode.length), name) ||
-										   this.anyInclude(elseCode.slice(j + 1, elseCode.length), name)))
-								{
-									postCondition = postCondition :+ thenCode(i)
-									thenCode = thenCode.slice(0, i) ++ thenCode.slice(i + 1, thenCode.length)
-									elseCode = elseCode.slice(0, j) ++ elseCode.slice(j + 1, elseCode.length)
-								} else {
-									i += 1
+										if (!(thenVarsAssignedBefore.exists(thenProgram.includes) ||
+											elseVarsAssignedBefore.exists(elseProgram.includes)) &&
+											!(anyInclude(thenCode.slice(0, i), name) ||
+												anyInclude(elseCode.slice(0, j), name))) {
+											preCondition = preCondition :+ thenCode(i)
+											thenCode = thenCode.slice(0, i) ++ thenCode.slice(i + 1, thenCode.length)
+											elseCode = elseCode.slice(0, j) ++ elseCode.slice(j + 1, elseCode.length)
+										}
+										else if (!(thenVarsAssignedAfter.exists(thenProgram.includes) ||
+											elseVarsAssignedAfter.exists(elseProgram.includes)) &&
+											!(this.anyInclude(thenCode.slice(i + 1, thenCode.length), name) ||
+												this.anyInclude(elseCode.slice(j + 1, elseCode.length), name))) {
+											postCondition = postCondition :+ thenCode(i)
+											thenCode = thenCode.slice(0, i) ++ thenCode.slice(i + 1, thenCode.length)
+											elseCode = elseCode.slice(0, j) ++ elseCode.slice(j + 1, elseCode.length)
+										} else {
+											i += 1
+										}
+									case _ => i += 1
 								}
 							case _ => i += 1
 						}
-					case _ => i += 1
-				}
+					}
+
+					// ...and postfixes.
+					while (thenCode.nonEmpty && elseCode.nonEmpty && thenCode.last.code() == elseCode.last.code()) {
+						postCondition = thenCode.last :: postCondition
+						thenCode = thenCode.slice(0, thenCode.length - 1)
+						elseCode = elseCode.slice(0, elseCode.length - 1)
+					}
+
+					preCondition = preCondition.filter(deadCodeFilter)
+					thenCode = thenCode.filter(deadCodeFilter)
+					elseCode = elseCode.filter(deadCodeFilter)
+					postCondition = postCondition.filter(deadCodeFilter)
+
+				} //end while changed
 			}
-
-			// ...and postfixes.
-			while (thenCode.nonEmpty && elseCode.nonEmpty && thenCode.last.code() == elseCode.last.code()) {
-				postCondition = thenCode.last :: postCondition
-				thenCode = thenCode.slice(0, thenCode.length - 1)
-				elseCode = elseCode.slice(0, elseCode.length - 1)
-			}
-
-			preCondition = preCondition.filter(deadCodeFilter)
-			thenCode = thenCode.filter(deadCodeFilter)
-			elseCode = elseCode.filter(deadCodeFilter)
-			postCondition = postCondition.filter(deadCodeFilter)
-
-			}//end while changed
-
 			val preCondString = preCondition.map(_.code()).mkString("\n")
 			val postCondString = postCondition.map(_.code()).mkString("\n")
 

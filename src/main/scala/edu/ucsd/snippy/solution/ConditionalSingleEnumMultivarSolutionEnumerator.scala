@@ -78,6 +78,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 
 		}
 	}
+	var solutionAST : Option[ASTNode] = None
 
 	override def programsSeen: Int = this.graph.programsSeen
 }
@@ -219,7 +220,6 @@ case class Node(
 
 		if (!done && this.enum.hasNext) {
 			val program = this.enum.next()
-
 			this.onStep(program)
 
 			for (edge <- this.edges) {

@@ -1,7 +1,7 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"3": {
-			"NoBranch": {
+			"NB": {
 				"1": {},
 				"2": {}
 			}
@@ -12,50 +12,48 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"n": "20",
 					"#": "",
 					"$": "",
-					"time": "-1",
 					"rs": "25"
 				}
 			],
 			"assignments": ["'rs = n + 5'"],
-			"commentId": 1
+			"commentId": "1"
 		},
 		"2": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"n": "20",
 					"#": "",
 					"$": "",
-					"time": "-1",
 					"rs_in" : "25",
 					"rs": "27"
 				}
 			],
 			"assignments": ["'rs = rs_in + 2'"],
-			"commentId": 2
+			"commentId": "2"
 		},
 		"3": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"n": "20",
 					"#": "",
 					"$": "",
-					"time": "-1",
 					"rs": "27"
 				}
 			],
-			"assignments": [],
-			"commentId": 3
+			"assignments": ["rs = 44444"],
+			"commentId": "3"
 		}
-	}
+	},
+	"solutions": ["rs = n + 7", "rs = n + 2 + 5", "rs = n + 5 + 2"]
 }

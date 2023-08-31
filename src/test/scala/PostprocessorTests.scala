@@ -1,6 +1,4 @@
-import java.io.File
-
-import edu.ucsd.snippy.{PostProcessor, Snippy}
+import edu.ucsd.snippy.PostProcessor
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.utils.{ConditionalAssignment, MultilineMultivariableAssignment, SingleAssignment}
 import org.junit.Assert._

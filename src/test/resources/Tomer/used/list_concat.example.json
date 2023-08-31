@@ -1,9 +1,9 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"0": {
-			"NoBranch": {
-				"11": {},
-				"12": {}
+			"NB": {
+				"1": {},
+				"2": {}
 			}
 		}
 	},
@@ -12,7 +12,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "['a', 'b']",
 					"b": "['c', 'd']",
@@ -24,13 +24,13 @@
 				}
 			],
 			"assignments": [],
-			"commentId": 0
+			"commentId": "0"
 		},
-		"11": {
+		"1": {
 			"outputVarNames": [
 				"first"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "['a', 'b']",
 					"b": "['c', 'd']",
@@ -42,13 +42,13 @@
 				}
 			],
 			"assignments": ["'first = a + b'"],
-			"commentId": 11
+			"commentId": "1"
 		},
-		"12": {
+		"2": {
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "['a', 'b']",
 					"b": "['c', 'd']",
@@ -61,7 +61,7 @@
 				}
 			],
 			"assignments": ["'rs = first + c'"],
-			"commentId": 12
+			"commentId": "2"
 		}
 	}
 }

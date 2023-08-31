@@ -5,7 +5,7 @@ import edu.ucsd.snippy.predicates.SingleVariablePredicate
 import edu.ucsd.snippy.solution.ConditionalSingleEnumSingleVarSolutionEnumerator
 import edu.ucsd.snippy.utils.Utils
 import edu.ucsd.snippy.utils.Utils.getBinaryPartitions
-import edu.ucsd.snippy.vocab.{BasicVocabMaker, VocabMaker}
+import edu.ucsd.snippy.vocab.{BasicVocabMaker, RequiredVocabMaker, VocabFactory, VocabMaker}
 import edu.ucsd.snippy.{InputParser, SynthesisTask}
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -19,7 +19,7 @@ import scala.util.control.Breaks.{break, breakable}
 
 class main extends JUnitSuite {
 
-	// we assume that the new examples have higher indices than the old ones. so the past indices are the same as the new ones
+	// we assume that the new examples are appended after the old ones. so the past indices are the same as the new ones
 	def knownPartitioning(pastPartition:(Set[Int],Set[Int])):List[Any]=>List[(Set[Int], Set[Int])] = {
 		(indices:List[Any]) => {
 			getBinaryPartitions(indices).filter(part =>
@@ -90,7 +90,7 @@ class main extends JUnitSuite {
 		.filter(!_._2.equals(Types.Unknown))
 		.toList
 	//val enum :ConditionalSingleEnumMultivarSolutionEnumerator = new ConditionalSingleEnumMultivarSolutionEnumerator(pred, variables, List(),part)
-	val enum2 :ConditionalSingleEnumSingleVarSolutionEnumerator = new ConditionalSingleEnumSingleVarSolutionEnumerator(probEnumerator, pred2.varName,pred2.retType,pred2.values,task.contexts,part)
+	val enum2 :ConditionalSingleEnumSingleVarSolutionEnumerator = new ConditionalSingleEnumSingleVarSolutionEnumerator(probEnumerator, pred2.varName,pred2.retType,pred2.values,task.contexts,part, 0)
 	//enum.graph.do_print((node)=>node.toString, (edge)=>edge.toString)
 	val t1 = System.nanoTime
 	for (solution <- enum2) {
@@ -118,7 +118,7 @@ class requireEnumeratorTests extends JUnitSuite {
 
 
 	@Test def testRequiredEnumerator(): Unit = {
-		val wordsAST: ASTNode = UnarySplit(StringVariable("s", Map("s"-> "hello, world") :: Nil));
+		val wordsAST: ASTNode = UnarySplit(StringVariable("s", Map("s"-> "hello, world")::Map( "s"->"hello, __world__") :: Nil));
 		val index: IntLiteral =  IntLiteral(-1, 2);
 		val list: ListLiteral[String] = ListLiteral[String](Types.String, List("hello, world", "hello, __world__"), 2)
 		val p2AST: StringListLookup = StringListLookup(list,index);
@@ -150,38 +150,59 @@ class requireEnumeratorTests extends JUnitSuite {
 //		val parser = new ExpressionParser(Map("s" -> Types.Int), new Contexts(task.contexts))
 //		val ast = parser.parse("s*2*2")
 //		print(ast)
+
 		val oeManager = new RequiresValuesManager();
 		val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 		val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
-		val enumerator = task.enumerator//new ProbEnumerator(task.vocab, oeManager, task.contexts, false, 0, bank, mini, 100);
+
+		val requiredVocabMaker = new RequiredVocabMaker(wordsAST, List(), 0, new Contexts(task.contexts));
+		val pred: SingleVariablePredicate= task.predicate.asInstanceOf[SingleVariablePredicate];
+
+		val parameters = task.contexts.flatMap(_.keys)
+			.toSet[String]
+			.map(varName => varName -> Utils.getTypeOfAll(task.contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
+			.filter(!_._2.equals(Types.Unknown))
+			.toList
+		val vocab: VocabFactory = VocabFactory(parameters, List(), List(requiredVocabMaker));
+
+		val enumerator = new ProbEnumerator(vocab, oeManager, task.contexts, false, 0, bank, mini, 100);
+		val enum = new ConditionalSingleEnumSingleVarSolutionEnumerator(enumerator, pred.varName, pred.retType, pred.values, task.contexts)
+
 		var counter= 0;
 		var flag = false
 		breakable {
-			while (enumerator.hasNext) {
-				val node = enumerator.next();
+			while (enum.hasNext) {
+				val node = enum.next();
 				if (flag) counter += 1;
-				node match{
-					case Some(assignment)=>
-						print(assignment.code())
-						if (flag) break() else flag = true
+				node match {
+					case Some(assgin) =>
+
+						if (flag) {
+							println(assgin.code());
+							break()
+						} else {
+							flag = true
+						}
 
 					case _ => ()
 
 				}
-//				print(node.code());
-//				print("....")
-//				print(node.exampleValues)
-//				print("\n");
-//				if (node.code === resultAST.code) {
-//					if (flag) {
-//						println("Found the node again after " + counter + " programs from last time");
-//						break;
-//					}
-//					println("Found the node!");
-//					flag = true;
-//				}
+				//				print(node.code());
+				//				print("....")
+				//				print(node.exampleValues)
+				//				print("\n");
+				//				if (node.code === resultAST.code) {
+
+				//					println("Found the node!");
+				//					flag = true;
+				//				}
 			}
 		}
+		if (flag) {
+			println("Found the node again after " + counter + " programs from last time");
+			break;
+		}
+
 		assertEquals("1","1");
 	}
 }

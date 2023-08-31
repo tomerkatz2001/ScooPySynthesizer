@@ -1,5 +1,5 @@
 {
-	"scopeTree": {
+	"scopesTree": {
 		"1": {
 			"T": {
 				"2": {}
@@ -14,7 +14,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "7",
 					"#": "",
@@ -30,7 +30,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "4",
 					"#": "",
@@ -60,7 +60,7 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"commentExamples": [
+			"rawCommentExamples": [
 				{
 					"a": "3",
 					"#": "",
@@ -86,6 +86,6 @@
 			"assignments": ["'rs = a + a'"],
 			"commentId": "2"
 		}
-
-	}
+	},
+	"solutions": ["if a > 3:\n\trs = a * a\nelse:\n\trs = a + a"]
 }

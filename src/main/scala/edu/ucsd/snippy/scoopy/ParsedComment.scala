@@ -1,38 +1,31 @@
 package edu.ucsd.snippy.scoopy
 
-import edu.ucsd.snippy.SynthesisTask.{Context, reserved_names}
+import edu.ucsd.snippy.SynthesisTask.reserved_names
 import edu.ucsd.snippy.{DebugPrints, InputParser}
 
-class ParsedComment (commentId:String, commentExamples: List[Map[String, Any]], outputVarNames:List[String], assignments:List[String]){
-	var siblingsVars = List();
-	def getOutputVarNames(): List[String] = outputVarNames
+class ParsedComment (val commentId:String, val rawCommentExamples: List[Map[String, Any]],val outputVarNames:List[String], val assignments:List[String]){
 
-	def getAssigns():List[String] = assignments
 
-	def getContext():List[Context]={
-		commentExamples.map {
-			env => env.filter(entry => !outputVarNames.contains(entry._1))
-		}
-	}
+//	def getContexts():Contexts= new Contexts(getContextsFromExamples(commentExamples, outputVarNames.toSet))
 
-	def inputVarNames():List[String]={
-		commentExamples.map {
-			env => env.filter(entry => !outputVarNames.contains(entry._1))
-		}.flatMap(_.keys).toSet.toList ++ siblingsVars
-	}
+//	def inputVarNames():List[String]={
+//		commentExamples.map {
+//			env => env.filter(entry => !outputVarNames.contains(entry._1))
+//		}.flatMap(_.keys).toSet.toList
+//	}
 
-	def getExamples():List[Map[String, Any]]=commentExamples
+
 
 }
 
 object ParsedComment{
-	def fromMap(input:Map[String, Any]):ParsedComment={
+	def apply(input:Map[String, Any]):ParsedComment={
 		val commentId = input("commentId").toString
-		val commentExamplesTmp = input("commentExamples").asInstanceOf[List[Map[String, Any]]]
-		val commentExamples = commentExamplesTmp.map(cleanupInputs(_))
+		val commentExamplesTmp = input("rawCommentExamples").asInstanceOf[List[Map[String, Any]]]
+		//val commentExamples = commentExamplesTmp.map(cleanupInputs(_))
 		val outputVarNames = input("outputVarNames").asInstanceOf[List[String]]
 		val assignments = input("assignments").asInstanceOf[List[String]]
-		new ParsedComment(commentId, commentExamples, outputVarNames, assignments)
+		new ParsedComment(commentId, commentExamplesTmp, outputVarNames, assignments)
 	}
 
 	def cleanupInputs(input: Map[String, Any]): Map[String, Any] = {

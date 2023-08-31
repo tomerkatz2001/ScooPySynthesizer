@@ -11,7 +11,7 @@ trait ASTNode
 
 	def exampleValues: List[Option[Any]] = _values
 
-	val requireBits: List[Boolean] =List(false,true);
+	val requireBits: List[Boolean] =List();
 	var manuallyInserted: Boolean = false
 	val code: String
 	val height: Int
@@ -28,6 +28,10 @@ trait ASTNode
 
 	def cost: Int =
 	{
+		if(requireBits.contains(true)){
+			_cost = Some(-1)
+			return -1
+		}
 		if (_cost.isEmpty) renewCost()
 		_cost.get
 	}
