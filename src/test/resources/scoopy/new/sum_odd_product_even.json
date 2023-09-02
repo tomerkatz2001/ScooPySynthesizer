@@ -47,13 +47,13 @@
 			"rawCommentExamples": [
 				{
 					"product_of_even_in": "6",
-					"sum_of_odd_in": "21",
+					"sum_of_odd_in": "0",
 					"num": "10",
 					"#": "",
 					"$": "",
 					"time": "-1",
 					"product_of_even": "60",
-					"sum_of_odd": "21"
+					"sum_of_odd": "0"
 				}
 			],
 			"assignments": ["'product_of_even = product_of_even * num'"],
@@ -66,23 +66,23 @@
 			"rawCommentExamples": [
 				{
 					"product_of_even_in": "60",
-					"sum_of_odd_in": "18",
+					"sum_of_odd_in": "0",
 					"num": "9",
 					"#": "",
 					"$": "",
 					"time": "-1",
 					"product_of_even": "60",
-					"sum_of_odd": "27"
+					"sum_of_odd": "9"
 				},
 				{
 					"product_of_even_in": "60",
-					"sum_of_odd_in": "27",
+					"sum_of_odd_in": "9",
 					"num": "1",
 					"#": "",
 					"$": "",
 					"time": "-1",
 					"product_of_even": "60",
-					"sum_of_odd": "28"
+					"sum_of_odd": "10"
 				}
 			],
 			"assignments": ["'sum_of_odd = sum_of_odd + num'"],

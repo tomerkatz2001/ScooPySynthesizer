@@ -1,0 +1,115 @@
+{
+	"varNames": [
+		"product_of_even",
+		"sum_of_odd"
+	],
+	"envs": [
+		{
+			"num": "6",
+			"#": "0",
+			"$": "",
+			"time": 1,
+			"product_of_even": "6",
+			"sum_of_odd": "0"
+		},
+		{
+			"num": "9",
+			"#": "1",
+			"$": "",
+			"time": 2,
+			"product_of_even": "6",
+			"sum_of_odd": "9"
+		},
+		{
+			"num": "9",
+			"#": "2",
+			"$": "",
+			"time": 3,
+			"product_of_even": "6",
+			"sum_of_odd": "18"
+		},
+		{
+			"num": "10",
+			"#": "3",
+			"$": "",
+			"time": 4,
+			"product_of_even": "60",
+			"sum_of_odd": "18"
+		},
+		{
+			"num": "9",
+			"#": "4",
+			"$": "",
+			"time": 5,
+			"product_of_even": "60",
+			"sum_of_odd": "27"
+		},
+		{
+			"num": "1",
+			"#": "5",
+			"$": "",
+			"time": 6,
+			"product_of_even": "60",
+			"sum_of_odd": "28"
+		},
+		{
+			"num": "21",
+			"#": "6",
+			"$": "",
+			"time": 7,
+			"product_of_even": "60",
+			"sum_of_odd": "49"
+		},
+		{
+			"num": "1",
+			"#": "7",
+			"$": "",
+			"time": 8,
+			"product_of_even": "60",
+			"sum_of_odd": "50"
+		},
+		{
+			"num": "17",
+			"#": "8",
+			"$": "",
+			"time": 9,
+			"product_of_even": "60",
+			"sum_of_odd": "67"
+		},
+		{
+			"num": "2",
+			"#": "9",
+			"$": "",
+			"time": 10,
+			"product_of_even": "120",
+			"sum_of_odd": "67"
+		},
+		{
+			"num": "10",
+			"#": "10",
+			"$": "",
+			"time": 11,
+			"product_of_even": "1200",
+			"sum_of_odd": "67"
+		},
+		{
+			"num": "2",
+			"#": "11",
+			"$": "",
+			"time": 12,
+			"product_of_even": "2400",
+			"sum_of_odd": "67"
+		}
+	],
+	"solutions": ["if a % 2 == 0 :\n\tproduct_of_even *= num \n\telse\n\tsum_of_odd += num",
+		"if 1 > num % 2:\n\tproduct_of_even = product_of_even * num\nelse:\n\tsum_of_odd = num + sum_of_odd"],
+	"previousEnvs": {
+		"1": {
+			"product_of_even": "1",
+			"sum_of_odd": "0",
+			"#": "",
+			"$": "",
+			"time": 0
+		}
+	}
+}

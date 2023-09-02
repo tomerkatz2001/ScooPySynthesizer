@@ -1,0 +1,107 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "7",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		},
+		{
+			"a": "10",
+			"#": "",
+			"$": "",
+			"time": 2,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "4",
+			"#": "",
+			"$": "",
+			"time": 3,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "6",
+			"#": "",
+			"$": "",
+			"time": 4,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "12",
+			"#": "",
+			"$": "",
+			"time": 5,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "24",
+			"#": "",
+			"$": "",
+			"time": 6,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "100",
+			"#": "",
+			"$": "",
+			"time": 7,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "3",
+			"#": "",
+			"$": "",
+			"time": 8,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		},
+		{
+			"a": "1",
+			"#": "",
+			"$": "",
+			"time": 9,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		},
+		{
+			"a": "11",
+			"#": "",
+			"$": "",
+			"time": 10,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		},
+		{
+			"a": "111",
+			"#": "",
+			"$": "",
+			"time": 11,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		},
+		{
+			"a": "123",
+			"#": "",
+			"$": "",
+			"time": 12,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		}
+
+	],
+	"solutions": ["if 1 > a % 2:\n\trs = options[0]\nelse:\n\trs = options[-1]"],
+	"previousEnvs": {
+	}
+}

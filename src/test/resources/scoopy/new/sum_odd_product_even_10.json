@@ -17,14 +17,14 @@
 			],
 			"rawCommentExamples": [
 				{
-					"product_of_even_in": "1",
+					"product_of_even_in": "6",
 					"sum_of_odd_in": "0",
-					"num": "6",
+					"num": "9",
 					"#": "",
 					"$": "",
-					"time": "-1",
+					"time": "2",
 					"product_of_even": "6",
-					"sum_of_odd": "0"
+					"sum_of_odd": "9"
 				},
 				{
 					"product_of_even_in": "6",
@@ -110,7 +110,7 @@
 					"num": "9",
 					"#": "",
 					"$": "",
-					"time": "-1",
+					"time": "4",
 					"product_of_even": "60",
 					"sum_of_odd": "27"
 				},
