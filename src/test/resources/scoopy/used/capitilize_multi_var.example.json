@@ -42,5 +42,6 @@
 			"commentId": "2"
 		}
 	},
-	"solutions": ["caps = a.upper().split()\nwords = a.split()"]
+	"solutions": ["caps = a.upper().split()\nwords = a.split()",
+		"words = a.split()\ncaps = a.upper().split()"]
 }

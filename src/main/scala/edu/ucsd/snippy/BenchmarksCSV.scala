@@ -54,7 +54,7 @@ object BenchmarksCSV extends App
 						case (Some(program: String), tim: Int, coun: Int, _) =>
 							time = tim
 							count = coun
-							println(program)
+							print(program)
 							correct = task.get("solutions") match {
 								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => "+"
 								case Some(_) => "-"
@@ -74,7 +74,7 @@ object BenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("synthesizer/src/test/resources/scoopy-flat")
+	val benchmarksDir = new File("synthesizer/src/test/resources/test")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false

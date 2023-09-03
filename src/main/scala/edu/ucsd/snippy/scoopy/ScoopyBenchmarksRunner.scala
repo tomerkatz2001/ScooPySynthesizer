@@ -36,9 +36,10 @@ object ScoopyBenchmarksRunner extends App{
 					val spec = (ScopeSpecification.fromString(taskStr))
 					//val task = SynthesisTask.fromSpec(spec, List())
 					variables = spec.outputVarNames.toList
+					val topLevelExamples = spec.getPrevEnvsAndEnvs()._2.length
 					//variables = task.outputVariables.toList
 
-					if (pnt) print(s"$suite;$group;$name;$variables; ")
+					if (pnt) print(s"$suite;$group;$name;$variables;$topLevelExamples; ")
 
 
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
@@ -61,7 +62,7 @@ object ScoopyBenchmarksRunner extends App{
 
 							correct = task("solutions") match {
 								case solutions if solutions.asInstanceOf[List[String]].contains(program) => "+"
-								case Some(_) => "-"
+								case Some(_) => "-";
 								case None => "?"
 								case _ => "-"
 							}
@@ -95,7 +96,7 @@ object ScoopyBenchmarksRunner extends App{
 			case _ => 5 * 60
 		}
 
-		println("suite;group;name;variables;time;count;correct")
+		println("suite;group;name;variables;top_level_examples;time;count;correct")
 		val benchmarks = if (filterArgs.nonEmpty) {
 			benchmarksDir.listFiles()
 				.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
