@@ -40,7 +40,8 @@ object Utils
 
 	def getTypeOfAll(values: List[Any]): Types =
 	{
-		val (empty, nonempty) = values.partition(v => v.isInstanceOf[Iterable[_]] && v.asInstanceOf[Iterable[_]].isEmpty)
+		val (empty, nonempty_) = values.partition(v => v.isInstanceOf[Iterable[_]] && v.asInstanceOf[Iterable[_]].isEmpty)
+		val nonempty = nonempty_.filter(_!=None);
 		val neType = if (nonempty.isEmpty) Types.Unknown else nonempty.map(v => Types.typeof(v)).reduce((acc, t) => if (acc == t) t else Types.Unknown)
 		if (empty.nonEmpty) {
 			if (nonempty.isEmpty) {
@@ -90,6 +91,9 @@ object Utils
 	import spire.std.seq._
 	import spire.syntax.all._
 	@inline def programConnects(tup: (Option[Any], Any)): Boolean = {
+		if (tup._2 == None){ // the variable is __bot__
+			return true
+		}
 		tup._1 match {
 			case None => false
 			case Some(a:Double) => a === tup._2.asInstanceOf[Double]
@@ -99,7 +103,7 @@ object Utils
 					x.asInstanceOf[List[Double]] === tup._2.asInstanceOf[List[Double]]
 				case _ => tup._1.get == tup._2
 			}
-			case _ => tup._1.isDefined && tup._1.get == tup._2
+			case _ => tup._1.isDefined && (tup._1.get == tup._2)
 		}
 	}
 }

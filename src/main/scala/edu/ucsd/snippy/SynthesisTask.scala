@@ -275,7 +275,8 @@ object SynthesisTask
 			.map(variable => parser.parse(variable._2.asInstanceOf[String]) match {
 				case None =>
 					DebugPrints.eprintln(s"Input not recognized: $variable")
-					(variable._1, null)
+					(variable._1, null) ;
+				case Some("__BOT__")=> (variable._1, None)
 				case Some(v) =>
 					(variable._1, v)
 			})

@@ -130,6 +130,7 @@ object Types extends Enumeration
 	def typeof(x: Any): Types.Value =
 	{
 		x match {
+			case None => Void
 			case _: String => String
 			case _: Int => Int
 			case _: Boolean => Bool
