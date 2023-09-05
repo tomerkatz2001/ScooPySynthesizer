@@ -39,9 +39,11 @@ object BenchmarksCSV extends App
 
 					val start = LocalDateTime.now()
 					val callable: Callable[(Option[String], Int, Int, Option[Assignment])] = () => synthesize(taskStr, benchTimeout)
+
 					val promise = this.executorService.submit(callable)
 					val rs = try {
-						promise.get(benchTimeout + 10, TimeUnit.SECONDS)
+
+						promise.get(benchTimeout, TimeUnit.SECONDS)
 					} catch {
 						case _: TimeoutException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1)
 						case _: InterruptedException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1)
@@ -54,7 +56,6 @@ object BenchmarksCSV extends App
 						case (Some(program: String), tim: Int, coun: Int, _) =>
 							time = tim
 							count = coun
-							print(program)
 							correct = task.get("solutions") match {
 								case Some(solutions) if solutions.asInstanceOf[List[String]].contains(program) => "+"
 								case Some(_) => "-"
@@ -74,7 +75,7 @@ object BenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("synthesizer/src/test/resources/test")
+	val benchmarksDir = new File("synthesizer/src/test/resources/scoopy-flat")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false
@@ -86,7 +87,7 @@ object BenchmarksCSV extends App
 			filterArgs = args.dropRight(1)
 			t
 		}
-		case _ => 5 * 60
+		case _ => 10//5 * 60
 	}
 
 	println("suite,group,name,variables,time,count,correct")

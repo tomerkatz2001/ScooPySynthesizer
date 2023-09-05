@@ -60,8 +60,9 @@
 					"rs": "['a','b','c','d','e','f']"
 				}
 			],
-			"assignments": ["'rs = first + c'"],
+			"assignments": ["'rs = rs + c'"],
 			"commentId": "2"
 		}
-	}
+	},
+	"solutions": ["rs = a + b + c", "rs = a + (b + c)", "rs = (a + b) + c"]
 }

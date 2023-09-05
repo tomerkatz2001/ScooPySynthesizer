@@ -47,6 +47,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 	override def step(): Unit = {
 		val program = enumerator.next()
 		//print(program.code+" .... "+program.exampleValues+" .... "+program.height + "\n")
+
 		val paths = for (((thenPart, elsePart), store) <- stores) yield {
 			var updated = false
 
@@ -83,7 +84,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 			}
 
 			if (program.nodeType == this.retType) {
-				if ((store.thenCase.isEmpty || (!store.thenCase.get.requireBits.exists(p=>p) && program.requireBits.exists(p=>p))) && //empty or t requires program was found
+				if ((store.thenCase.isEmpty || store.thenCase.get.requireBits.count(p=>p) < program.requireBits.count(p=>p)) && //empty or program with more requirements was found
 					filterByIndices(program.exampleValues, thenPart)
 						.zip(store.thenVals)
 						.forall(Utils.programConnects)) {
@@ -94,8 +95,8 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 						enumerator.oeManager.remove(program)
 					}
 				}
-				if(retType == Types.Bool){//in case of Bools the program can be the right opposite
-					if ((store.thenCase.isEmpty || (!store.thenCase.get.requireBits.exists(p => p) && program.requireBits.exists(p => p))) && //empty or t requires program was found
+				if(retType == Types.Bool){//in case of Bools, the program can be the opposite of the solution
+					if ((store.thenCase.isEmpty || (store.thenCase.get.requireBits.count(p=>p) < program.requireBits.count(p=>p))) && //empty or t requires program was found
 						filterByIndices(program.exampleValues.map((x)=> if(x.isDefined) Some(!x.get.asInstanceOf[Boolean]) else x), thenPart)
 							.zip(store.thenVals)
 							.forall(Utils.programConnects)) {
@@ -108,7 +109,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 					}
 				}
 
-				if ((store.elseCase.isEmpty ||(!store.elseCase.get.requireBits.exists(p=>p) && program.requireBits.exists(p=>p))) &&
+				if ((store.elseCase.isEmpty ||(store.elseCase.get.requireBits.count(p=>p) < program.requireBits.count(p=>p))) &&
 					filterByIndices(program.exampleValues, elsePart)
 						.zip(store.elseVals)
 						.forall(Utils.programConnects)) {

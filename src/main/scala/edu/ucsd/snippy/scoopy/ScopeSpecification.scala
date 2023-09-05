@@ -74,14 +74,16 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 	def solve(timeout:Int = 10) ={
 		assert(this.scopeType == "scope")
 		var requiredVocabMakers: List[RequiredVocabMaker] = List()
+		var requiredVarNames: Set[String] = Set();
 		var seenASTs: List[ASTNode] = List()
 		var sol: (Option[String], Int, Int, Option[Assignment]) = (None, 0, 0, None)
 		for ((req, i) <- this.required.zipWithIndex.reverse) {
 			val synthesisTask = req.apply(List())
 			sol = synthesize(synthesisTask, timeout);
-			//println("found solution: " + sol._1)
+			//println("found solution: " + sol._4.get.code(true))
 			val solutionAssignment: Option[Assignment] = sol._4
-			val newRequiredVocabMakers = covertToASTList(solutionAssignment.get).filter(ast => !seenASTs.exists((saw) => saw.code == ast.code)).zipWithIndex.map { case (ast, i) => {
+			//requiredVarNames = solutionAssignment.get.getAssignedVars() + requiredVarNames;
+			val newRequiredVocabMakers = covertToASTList(solutionAssignment.get).filter(ast => !seenASTs.exists((saw) => saw == ast)).zipWithIndex.map { case (ast, i) => {
 				seenASTs = ast :: seenASTs
 				new RequiredVocabMaker(ast, List(), requiredVocabMakers.length + i, new Contexts(synthesisTask.contexts))
 			}
@@ -89,7 +91,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 			requiredVocabMakers = requiredVocabMakers ++ newRequiredVocabMakers
 		}
 		val tmpTask = SynthesisTask.fromSpec(this, List())
-		requiredVocabMakers = seenASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List(), x._2, new Contexts(tmpTask.contexts)))
+		requiredVocabMakers = seenASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List(), x._2, new Contexts(tmpTask.contexts))) // makes the contexts good
 		val finalTask = SynthesisTask.fromSpec(this, requiredVocabMakers)
 		sol = synthesize(finalTask, timeout);
 		sol //._4.get.code(disablePostProcess=true);

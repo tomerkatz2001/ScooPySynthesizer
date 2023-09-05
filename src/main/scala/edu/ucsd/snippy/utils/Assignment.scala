@@ -4,6 +4,7 @@ import edu.ucsd.snippy.ast.{ASTNode, BoolNode, NegateBool, VariableNode}
 
 sealed abstract class Assignment {
 	def code(disablePostProcess:Boolean = false): String
+	def getAssignedVars(): Set[String]
 
 }
 
@@ -16,6 +17,8 @@ case class SingleAssignment(name: String, var program: ASTNode) extends Assignme
 		}
 		rs
 	}
+
+	override def getAssignedVars(): Set[String] = Set(name)
 }
 
 case class BasicMultivariableAssignment(names: List[String], programs: List[ASTNode]) extends Assignment
@@ -38,11 +41,15 @@ case class BasicMultivariableAssignment(names: List[String], programs: List[ASTN
 			}.mkString("\n")
 		}
 	}
+
+	override  def getAssignedVars(): Set[String] = names.toSet
 }
 
 case class MultilineMultivariableAssignment(assignments: List[Assignment]) extends Assignment
 {
 	override def code(disablePostProcess:Boolean = false): String = assignments.map(_.code()).mkString("\n")
+
+	override def getAssignedVars(): Set[String] = assignments.flatMap(_.getAssignedVars()).toSet
 }
 
 case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, var elseCase: Assignment) extends Assignment
@@ -198,4 +205,6 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 		case SingleAssignment(name, v: VariableNode[_]) => name != v.name
 		case _ => true
 	}
+
+	override def getAssignedVars(): Set[String] = this.varsAssigned(List(this.thenCase)) | this.varsAssigned(List(this.elseCase))
 }

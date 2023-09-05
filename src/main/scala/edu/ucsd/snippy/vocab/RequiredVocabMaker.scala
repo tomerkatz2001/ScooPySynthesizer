@@ -52,7 +52,7 @@ class RequiredVocabMaker(program: ASTNode, assignedVars: List[String], idx:Int, 
 			val childVec = child.requireBits
 			val newVec =  vec.zipAll(childVec,false, false).map{case (a,b) => a || b}
 			newProgram.updateValues(new Contexts(contexts))
-			newProgram = ASTVisitor(newProgram,child, newVec)
+			newProgram  = ASTVisitor(newProgram,child, newVec)._1
 			//println("newProgram: " + newProgram.code)
 		}
 		newProgram.updateValues(new Contexts(contexts))
@@ -60,11 +60,25 @@ class RequiredVocabMaker(program: ASTNode, assignedVars: List[String], idx:Int, 
 	}
 
 	// I hope that because this is the same tree visiting pattern as the ASTHolesMakerVisitor, the first hole found will be the correct one
-	def ASTVisitor(root: ASTNode, replacement: ASTNode, reqVec:List[Boolean]): ASTNode = {
+	def ASTVisitor(root: ASTNode, replacement: ASTNode, reqVec:List[Boolean]): (ASTNode, Boolean) = {
 		root match {
-			case _ : HoleNode[_] => replacement
-			case _ => root.updateChildren(root.children.map(child => ASTVisitor(child, replacement, reqVec)).toSeq, reqVec)
-		}
+			case _ : HoleNode[_] => (replacement, true)
+			case _ => {
+				var newChildren: List[ASTNode] = List();
+				var found = false;
+				for (child <- root.children){
+					if(!found){
+						val (newChild, found_now) = ASTVisitor(child, replacement, reqVec)
+						found = found || found_now
+						newChildren = (newChild :: newChildren).reverse
+					}
+					else {
+						newChildren = (child :: newChildren).reverse
+					}
+				}
+				(root.updateChildren(newChildren, reqVec), found)
+
+			}}
 	}
 
 

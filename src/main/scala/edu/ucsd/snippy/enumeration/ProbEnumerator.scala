@@ -1,10 +1,11 @@
 package edu.ucsd.snippy.enumeration
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.vocab.{VocabFactory, VocabMaker}
+import edu.ucsd.snippy.vocab.{VocabFactory, VocabMaker, RequiredVocabMaker}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+
 
 class ProbEnumerator(
 	override val vocab: VocabFactory,

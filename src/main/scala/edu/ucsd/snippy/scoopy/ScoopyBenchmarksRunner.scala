@@ -45,10 +45,10 @@ object ScoopyBenchmarksRunner extends App{
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
 					val promise = this.executorService.submit(callable)
 					val rs = try {
-						promise.get(benchTimeout + 10, TimeUnit.SECONDS)
+						promise.get(benchTimeout, TimeUnit.SECONDS)
 					} catch {
-						case _: TimeoutException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1)
-						case _: InterruptedException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1)
+						case _: TimeoutException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1, None)
+						case _: InterruptedException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1, None)
 						case e: ExecutionException => throw e.getCause
 					} finally {
 						promise.cancel(true)
@@ -93,7 +93,7 @@ object ScoopyBenchmarksRunner extends App{
 				filterArgs = args.dropRight(1)
 				t
 			}
-			case _ => 5 * 60
+			case _ => 10 * 60
 		}
 
 		println("suite;group;name;variables;top_level_examples;time;count;correct")
@@ -111,9 +111,8 @@ object ScoopyBenchmarksRunner extends App{
 				.sortBy(_.getName)(Ordering.String)
 				.toList
 		}
-		println(benchmarks)
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, 700, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, timeout, pnt = true))
 
 		// Then actually run
 		//benchmarks.foreach(this.runBenchmark(_, timeout))

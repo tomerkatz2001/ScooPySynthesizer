@@ -60,7 +60,7 @@
 					"rs": "['a','b','c','d','e','f']"
 				}
 			],
-			"assignments": ["'rs = first + c'"],
+			"assignments": ["'rs = rs + c'"],
 			"commentId": "2"
 		}
 	}

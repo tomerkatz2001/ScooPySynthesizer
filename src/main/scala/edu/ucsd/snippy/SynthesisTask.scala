@@ -1,7 +1,7 @@
 package edu.ucsd.snippy
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager}
+import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager, RequiresValuesManager}
 import edu.ucsd.snippy.predicates._
 import edu.ucsd.snippy.scoopy.ScopeSpecification
 //import edu.ucsd.snippy.scoopy.ScopeSpecification
@@ -100,9 +100,6 @@ object SynthesisTask
 			enumerator)
 	}
 
-	def fromSpec(spec:ScopeSpecification): SynthesisTask = {
-		fromString(spec.outputVarNames.last);
-	}
 
 	def getContextsFromExamples(examples: List[Map[String, Any]], outVarNames: Set[String]): List[Context] =
 		examples.map {
@@ -125,7 +122,7 @@ object SynthesisTask
 
 
 
-		val oeManager = new InputsValuesManager
+		val oeManager = new RequiresValuesManager
 		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
 
 		val predicate: Predicate = outputVarNames.toList match {
