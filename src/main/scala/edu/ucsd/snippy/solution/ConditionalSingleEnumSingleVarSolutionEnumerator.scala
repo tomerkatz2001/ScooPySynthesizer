@@ -1,5 +1,4 @@
 package edu.ucsd.snippy.solution
-import edu.ucsd.snippy.PostProcessor
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.enumeration.Enumerator
@@ -31,7 +30,6 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 			part -> store
 		}
 	var solution: Option[Assignment] = None
-	var solutionAST : Option[ASTNode] = None
 
 	/*default constructor if the partitioning is not known*/
 	def this(
@@ -129,10 +127,6 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 					store.cond.get,
 					SingleAssignment(varName, store.thenCase.get),
 					SingleAssignment(varName, store.elseCase.get)))
-				this.solutionAST = Some(SemiCondNode(
-					PostProcessor.clean(store.cond.get).asInstanceOf[BoolNode],
-					PostProcessor.clean(store.thenCase.get),
-					PostProcessor.clean(store.elseCase.get)))
 				return
 			}
 

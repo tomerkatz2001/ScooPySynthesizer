@@ -67,7 +67,7 @@ object BenchmarksCSV extends App
 				} catch {
 					case e: AssertionError => throw e
 					case _: java.lang.OutOfMemoryError => correct = "OutOfMemory"
-					case _: Throwable => correct = "Error" //sys.process.stderr.println(e)
+					case e: Throwable => correct = s"Error ${e}" //sys.process.stderr.println(e)
 				}
 
 				if (pnt) println(s"$time,$count,$correct")
@@ -75,7 +75,7 @@ object BenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("synthesizer/src/test/resources/scoopy-flat")
+	val benchmarksDir = new File("synthesizer/src/test/resources/test")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false
@@ -87,7 +87,7 @@ object BenchmarksCSV extends App
 			filterArgs = args.dropRight(1)
 			t
 		}
-		case _ => 10//5 * 60
+		case _ => 10 * 60
 	}
 
 	println("suite,group,name,variables,time,count,correct")

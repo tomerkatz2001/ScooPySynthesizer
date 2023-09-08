@@ -75,7 +75,8 @@ class Node(
 	val state: List[Map[String, Any]],
 	var edges: List[Edge],
 	val valueIndices: List[Int],
-	var isEnd: Boolean)
+	var isEnd: Boolean,
+	val assignedBeforeMe: List[String])
 {
 	def allNodes: List[Node] =
 	{

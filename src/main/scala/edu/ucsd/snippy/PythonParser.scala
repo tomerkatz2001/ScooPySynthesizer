@@ -228,14 +228,6 @@ class PythonParser(contextsList:List[Context]){
 							obj.getFields("value") match {
 								case Seq(value) =>value.convertTo[ASTNode]
 							}
-						case Seq(JsString("If")) =>
-							obj.getFields("body", "orelse", "test") match {
-								case Seq(body, orelse, test) =>
-									val bodyNode = body.asInstanceOf[JsArray].elements.head.convertTo[ASTNode]
-									val orelseNode = orelse.asInstanceOf[JsArray].elements.head.convertTo[ASTNode]
-									val testNode: BoolNode = test.asInstanceOf[JsObject].convertTo[ASTNode].asInstanceOf[BoolNode]
-									SemiCondNode(testNode, bodyNode, orelseNode)
-							}
 						case _ => throw new DeserializationException(s"bad _type. ")
 					}
 				case objList: JsArray =>

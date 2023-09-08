@@ -1,0 +1,101 @@
+{
+	"scopesTree": {
+		"0": {
+			"NB": {
+				"1": {}
+			},
+			"T": {
+				"2":{}
+			},
+			"F": {
+				"3": {}
+			}
+			}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs", "aux"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "'abcd'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"aux": "4",
+					"rs": "5"
+				},
+				{
+					"a": "'abcde'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"aux": "5",
+					"rs": "10"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"aux"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "'mkl'",
+					"#": "",
+					"$": "",
+					"time": "9",
+					"aux": "3"
+				}
+			],
+			"assignments": ["'aux = len(a)'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "'aa'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"aux": "2",
+					"rs": "3"
+				},
+				{
+					"a": "'aaaaaa'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"aux": "6",
+					"rs": "7"
+				}
+			],
+			"assignments": ["'rs = aux + 1'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "'aaaaa'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"aux": "5",
+					"rs": "10"
+				}
+			],
+			"assignments": ["'rs = aux + aux'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["aux = len(a) if 1 > aux % 2:\n\trs = aux + 1\nelse:\n\trs = aux + aux"]
+}

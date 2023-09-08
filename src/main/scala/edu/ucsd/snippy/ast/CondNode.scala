@@ -3,27 +3,139 @@ package edu.ucsd.snippy.ast
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.enumeration.Contexts
 
-case class SemiCondNode(cond: BoolNode, thenCase: ASTNode, elseCase: ASTNode) extends ASTNode {
+abstract class AbsCondNode(cond: BoolNode, thenCase: ASTNode, elseCase: ASTNode, contexts: Contexts) extends ASTNode{
 
-	def make(cond: BoolNode, thenCase: ASTNode, elseCase: ASTNode): SemiCondNode = {
-		SemiCondNode(cond, thenCase, elseCase)
-	}
+//	def make(cond: BoolNode, thenCase: ASTNode, elseCase: ASTNode): SemiCondNode = {
+//		SemiCondNode(cond, thenCase, elseCase)
+//	}
 
-	def doOp(l: Any, r: Any): Option[Boolean] = None
 
-	override val _values: List[Option[Any]] = List();
+
+	override val _values: List[Option[Any]] = {
+		val condValues = cond.exampleValues
+		val thenValues = thenCase.exampleValues
+		val elseValues = elseCase.exampleValues
+
+		condValues.zip(thenValues).zip(elseValues).map {
+			case ((Some(c), Some(t)), Some(e)) => Some(if (c) t else e)
+			case _ => None
+		}
+	};
 
 	def includes(varName: String): Boolean = cond.includes(varName) || thenCase.includes(varName) || elseCase.includes(varName)
 
-	override val nodeType: Types = Types.Unknown
-	override val code: String = "if (" + cond.code + ") " + thenCase.code + " else " + elseCase.code
+	override val code: String = thenCase.code +" if (" + cond.code + ")" + " else " + elseCase.code
 	override val height: Int = 1 + Math.max(cond.height, Math.max(thenCase.height, elseCase.height))
 	override val terms: Int = cond.terms + thenCase.terms + elseCase.terms
 	override val children: Iterable[ASTNode] = List(cond, thenCase, elseCase)
 	override val usesVariables: Boolean = cond.usesVariables || thenCase.usesVariables || elseCase.usesVariables
 	override protected val parenless: Boolean = false
 
-	override def updateValues(contexts: Contexts): ASTNode = ???
+
+}
+
+case class IntCondNode(cond: BoolNode, thenCase: IntNode, elseCase: IntNode, contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with IntNode {
+
+	override val nodeType: Types = Types.Int
+	override val _values: List[Option[Int]] = {
+		val condValues = cond.exampleValues
+		val thenValues = thenCase.exampleValues
+		val elseValues = elseCase.exampleValues
+
+		condValues.zip(thenValues).zip(elseValues).map {
+			case ((Some(c), Some(t)), Some(e)) => Some(if (c) t else e)
+			case _ => None
+		}
+	};
+	override def updateValues(contexts: Contexts): IntNode = copy(
+		cond = cond.updateValues(contexts),
+		thenCase = thenCase.updateValues(contexts),
+		elseCase = elseCase.updateValues(contexts)
+	)
+
+	override def updateChildren(children: Seq[ASTNode], requiredVec: List[Boolean]): ASTNode = copy(
+		cond = children.head.asInstanceOf[BoolNode],
+		thenCase = children(1).asInstanceOf[IntNode],
+		elseCase = children(2).asInstanceOf[IntNode]
+	)
+}
+
+case class StringCondNode(cond: BoolNode, thenCase: StringNode, elseCase: StringNode, contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with StringNode {
+
+	override val nodeType: Types = Types.String
+	override val _values: List[Option[String]] = {
+		val condValues = cond.exampleValues
+		val thenValues = thenCase.exampleValues
+		val elseValues = elseCase.exampleValues
+
+		condValues.zip(thenValues).zip(elseValues).map {
+			case ((Some(c), Some(t)), Some(e)) => Some(if (c) t else e)
+			case _ => None
+		}
+	};
+	override def updateValues(contexts: Contexts): StringNode = copy(
+		cond = cond.updateValues(contexts),
+		thenCase = thenCase.updateValues(contexts),
+		elseCase = elseCase.updateValues(contexts)
+	)
+
+	override def updateChildren(children: Seq[ASTNode], requiredVec: List[Boolean]): ASTNode = copy(
+		cond = children.head.asInstanceOf[BoolNode],
+		thenCase = children(1).asInstanceOf[StringNode],
+		elseCase = children(2).asInstanceOf[StringNode]
+	)
+}
+
+case class DoubleCondNode(cond: BoolNode, thenCase: DoubleNode, elseCase: DoubleNode, contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with DoubleNode {
+
+	override val nodeType: Types = Types.Double
+	override val _values: List[Option[Double]] = {
+		val condValues = cond.exampleValues
+		val thenValues = thenCase.exampleValues
+		val elseValues = elseCase.exampleValues
+
+		condValues.zip(thenValues).zip(elseValues).map {
+			case ((Some(c), Some(t)), Some(e)) => Some(if (c) t else e)
+			case _ => None
+		}
+	};
+	override def updateValues(contexts: Contexts): DoubleNode = copy(
+		cond = cond.updateValues(contexts),
+		thenCase = thenCase.updateValues(contexts),
+		elseCase = elseCase.updateValues(contexts)
+	)
+
+	override def updateChildren(children: Seq[ASTNode], requiredVec: List[Boolean]): ASTNode = copy(
+		cond = children.head.asInstanceOf[BoolNode],
+		thenCase = children(1).asInstanceOf[DoubleNode],
+		elseCase = children(2).asInstanceOf[DoubleNode]
+	)
+}
+
+case class IntListCondNode(cond: BoolNode, thenCase: IntListNode, elseCase: IntListNode, contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with IntListNode {
+
+	lazy override val nodeType: Types = Types.IntList
+	override val _values: List[Option[Iterable[Int]]] = {
+		val condValues = cond.exampleValues
+		val thenValues = thenCase.exampleValues
+		val elseValues = elseCase.exampleValues
+
+		condValues.zip(thenValues).zip(elseValues).map {
+			case ((Some(c), Some(t)), Some(e)) => Some(if (c) t else e)
+			case _ => None
+		}
+	};
+	override def updateValues(contexts: Contexts): IntListNode = copy(
+		cond = cond.updateValues(contexts),
+		thenCase = thenCase.updateValues(contexts),
+		elseCase = elseCase.updateValues(contexts)
+	)
+
+	override def updateChildren(children: Seq[ASTNode], requiredVec: List[Boolean]): ASTNode = copy(
+		cond = children.head.asInstanceOf[BoolNode],
+		thenCase = children(1).asInstanceOf[IntListNode],
+		elseCase = children(2).asInstanceOf[IntListNode]
+	)
 }
 
 abstract class HoleNode[T](contexts: List[Map[String, Any]]) extends VariableNode[T](contexts){

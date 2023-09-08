@@ -24,7 +24,8 @@ class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 			predicate.graphStart.state,
 			List(predicate.graphStart.edges.filter(_.child.isEnd).head),
 			predicate.graphStart.valueIndices,
-			predicate.graphStart.isEnd),
+			predicate.graphStart.isEnd,
+			Nil),
 		partitions,
 		variables,
 		literals)

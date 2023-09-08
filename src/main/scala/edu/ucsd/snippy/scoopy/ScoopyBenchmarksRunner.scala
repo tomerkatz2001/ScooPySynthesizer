@@ -34,12 +34,13 @@ object ScoopyBenchmarksRunner extends App{
 					val task = json.parse(taskStr).asInstanceOf[JObject].values
 					val start = LocalDateTime.now()
 					val spec = (ScopeSpecification.fromString(taskStr))
+					val operators = spec.appliedOperators
 					//val task = SynthesisTask.fromSpec(spec, List())
 					variables = spec.outputVarNames.toList
 					val topLevelExamples = spec.getPrevEnvsAndEnvs()._2.length
 					//variables = task.outputVariables.toList
 
-					if (pnt) print(s"$suite;$group;$name;$variables;$topLevelExamples; ")
+					if (pnt) print(s"$suite;$group;$name;$variables;$topLevelExamples;$operators; ")
 
 
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
@@ -96,7 +97,7 @@ object ScoopyBenchmarksRunner extends App{
 			case _ => 10 * 60
 		}
 
-		println("suite;group;name;variables;top_level_examples;time;count;correct")
+		println("suite;group;name;variables;top_level_examples;operators;time;count;correct")
 		val benchmarks = if (filterArgs.nonEmpty) {
 			benchmarksDir.listFiles()
 				.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
@@ -112,7 +113,7 @@ object ScoopyBenchmarksRunner extends App{
 				.toList
 		}
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, timeout, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, 7, pnt = true))
 
 		// Then actually run
 		//benchmarks.foreach(this.runBenchmark(_, timeout))

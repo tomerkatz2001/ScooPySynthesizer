@@ -75,6 +75,7 @@ trait StringNode extends IterableNode
 {
 	override val _values: List[Option[String]]
 	override val nodeType: Types = Types.String
+	override def exampleValues: List[Option[String]] = _values
 	override def updateValues(contexts: Contexts): StringNode
 }
 
@@ -82,6 +83,7 @@ trait IntNode extends ASTNode
 {
 	override val _values: List[Option[Int]]
 	override val nodeType: Types = Types.Int
+	override def exampleValues: List[Option[Int]] = _values
 	override def updateValues(contexts: Contexts): IntNode
 }
 
@@ -97,6 +99,7 @@ trait DoubleNode extends ASTNode
 {
 	override val _values: List[Option[Double]]
 	override val nodeType: Types = Types.Double
+	override def exampleValues: List[Option[Double]] = _values
 	override def updateValues(contexts: Contexts): DoubleNode
 }
 
@@ -105,6 +108,7 @@ trait ListNode[T] extends IterableNode
 	val childType: Types
 	override val _values: List[Option[Iterable[T]]]
 	override lazy val nodeType: Types = Types.listOf(childType)
+	//override def exampleValues: List[Option[Iterable[T]]] = _values
 	override def updateValues(contexts: Contexts): ListNode[T]
 }
 
@@ -126,6 +130,7 @@ trait StringListNode extends ListNode[String]
 trait IntListNode extends ListNode[Int]
 {
 	override val childType: Types = Types.Int
+	override def exampleValues: List[Option[Iterable[Int]]] = _values
 	override def updateValues(contexts: Contexts): IntListNode
 }
 

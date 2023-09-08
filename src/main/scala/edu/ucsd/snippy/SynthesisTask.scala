@@ -1,7 +1,7 @@
 package edu.ucsd.snippy
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{BasicEnumerator, InputsValuesManager, OEValuesManager, RequiresValuesManager}
+import edu.ucsd.snippy.enumeration.{BasicEnumerator, Contexts, InputsValuesManager, OEValuesManager, RequiresValuesManager}
 import edu.ucsd.snippy.predicates._
 import edu.ucsd.snippy.scoopy.ScopeSpecification
 //import edu.ucsd.snippy.scoopy.ScopeSpecification
@@ -105,7 +105,7 @@ object SynthesisTask
 		examples.map {
 			env => env.filter(entry => !outVarNames.contains(entry._1))
 		}
-	def fromSpec(spec:ScopeSpecification, requiredVocabMakers:List[RequiredVocabMaker]=List(), simAssign: Boolean = false): SynthesisTask={
+	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), simAssign: Boolean = false): SynthesisTask={
 		val outputVarNames: Set[String] = spec.outputVarNames
 		val (previousEnvMap, envs):(Map[Int, Map[String, Any]], List[Map[String, Any]]) = spec.getPrevEnvsAndEnvs()
 
@@ -138,6 +138,8 @@ object SynthesisTask
 			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
 			.filter(!_._2.equals(Types.Unknown))
 			.toList
+		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, outputVarNames.toList, x._2, new Contexts(contexts))) // makes the contexts good in singleVar. in multi var it will be done inside the node
+
 		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals,  requiredVocabMakers)
 
 
@@ -145,7 +147,7 @@ object SynthesisTask
 			case pred: MultilineMultivariablePredicate if simAssign =>
 				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
 			case pred: MultilineMultivariablePredicate =>
-				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
+				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc, requiredASTs)
 			case pred: SingleVariablePredicate =>
 				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
@@ -212,11 +214,11 @@ object SynthesisTask
 		// first graph node.
 
 		val nodes = environments
-			.map { case (_, envs) =>
+			.map { case (preAssigned, envs) =>
 				contexts = contexts ++ envs
-				(envs, Range(contexts.length - envs.length, contexts.length).toList)
+				(envs, Range(contexts.length - envs.length, contexts.length).toList, preAssigned)
 			}
-			.map { case (env, indices) => new predicates.Node(env, Nil, indices, false) }
+			.map { case (env, indices, preAssigned) => new predicates.Node(env, Nil, indices, false, preAssigned.toList) }
 
 		// We never evaluate in the final env, so can we pop that from context.
 		contexts = contexts.dropRight(1)

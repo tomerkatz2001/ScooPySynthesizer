@@ -1,19 +1,20 @@
 package edu.ucsd.snippy.solution
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{Enumerator, InputsValuesManager, ProbEnumerator}
+import edu.ucsd.snippy.enumeration.{Contexts, Enumerator, InputsValuesManager, ProbEnumerator}
 import edu.ucsd.snippy.predicates.MultilineMultivariablePredicate
 import edu.ucsd.snippy.utils.Utils.{falseForIndices, filterByIndices, getBinaryPartitions, trueForIndices}
 import edu.ucsd.snippy.utils._
-import edu.ucsd.snippy.vocab.VocabFactory
+import edu.ucsd.snippy.vocab.{RequiredVocabMaker, VocabFactory}
 
 import scala.collection.mutable
 
 class ConditionalSingleEnumMultivarSolutionEnumerator(
-	predicate: MultilineMultivariablePredicate,
-	variables: List[(String, Types)],
-	literals: Iterable[String],
-	partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
+			 predicate: MultilineMultivariablePredicate,
+			 variables: List[(String, Types)],
+			 literals: Iterable[String],
+			 partitionFunction: List[Any] => List[(Set[Int], Set[Int])],
+			 requiredASTs: List[ASTNode]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
 	val conditionals: List[CondStore] = this.partitions.map(part => {
@@ -23,7 +24,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 		}
 		rs
 	})
-	val graph: Node = Node.convert(predicate.graphStart, partitions, variables, literals)
+	val graph: Node = Node.convert(predicate.graphStart, partitions, variables, literals,requiredASTs=requiredASTs)
 	var solution: Option[Assignment] = None
 
 	// Setup the conditional enum listener
@@ -52,10 +53,10 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 	def this(predicate: MultilineMultivariablePredicate,
 	         variables: List[(String, Types)],
 	         literals: Iterable[String]) {
-		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices))
+		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices), Nil)
 	}
 	def step(): Unit = {
-		if (this.graph.step()) {
+		if (this.graph.step()) { // if graph has changed
 			this.graph.computeShortestPaths()
 			if (this.solution.isEmpty) {
 				val paths = for ((condStore, index) <- this.conditionals.zipWithIndex; if condStore.cond.isDefined) yield {
@@ -78,7 +79,6 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 
 		}
 	}
-	var solutionAST : Option[ASTNode] = None
 
 	override def programsSeen: Int = this.graph.programsSeen
 }
@@ -101,7 +101,7 @@ case class Edge(
 	parent: Node,
 	child: Node,
 	variables: Map[Variable, List[CondProgStore]]) {
-	override def toString: String = "Edge"
+	override def toString: String = s"Edge: {${variables.map((v=>v._1.name)).toString()} from ${parent.edges.length}"
 }
 
 object Node {
@@ -153,11 +153,14 @@ object Node {
 		partitionIndices: List[(Set[Int], Set[Int])],
 		variables: List[(String, Types)],
 		literals: Iterable[String],
-		seen: mutable.Map[edu.ucsd.snippy.predicates.Node,Node] = mutable.Map.empty): Node = {
+		seen: mutable.Map[edu.ucsd.snippy.predicates.Node,Node] = mutable.Map.empty,
+		requiredASTs:List[ASTNode] = Nil): Node = {
 		if (seen.contains(parent)) return seen(parent)
+		val assignedBefore = parent.assignedBeforeMe;
+		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, assignedBefore, x._2, new Contexts(parent.state))) // makes the contexts good in singleVar. in multi var it will be done inside the node
 
 		val enumerator = new ProbEnumerator(
-			VocabFactory(variables, literals),
+			VocabFactory(variables, literals, requiredVocabMakers),
 			new InputsValuesManager,
 			parent.state,
 			false,
@@ -168,7 +171,7 @@ object Node {
 		val n: Node = Node(enumerator, parent.state, Nil, partitionIndices)
 		val edges = parent.edges
 			.map{e =>
-				e -> convert(e.child, partitionIndices, variables, literals, seen)
+				e -> convert(e.child, partitionIndices, variables, literals, seen, requiredASTs)
 			}
 			.map {
 				case (edu.ucsd.snippy.predicates.SingleEdge(_, variable, outputType, _, _), child) =>
@@ -220,6 +223,7 @@ case class Node(
 
 		if (!done && this.enum.hasNext) {
 			val program = this.enum.next()
+			//print(program.code+" .... "+this.edges.map(e=>e.toString)+" .... "+program.exampleValues + "\n")
 			this.onStep(program)
 
 			for (edge <- this.edges) {

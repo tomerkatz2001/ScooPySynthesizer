@@ -19,9 +19,11 @@ import scala.collection.mutable
 class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 						 //val contexts: Contexts,
 						 val partition: (List[Int], List[Int]),
-						 val required: List[List[RequiredVocabMaker]=>SynthesisTask],
+						 val required: List[List[ASTNode]=>SynthesisTask],
 						 val outputVarNames: Set[String],
-						 val scopeType:String){
+						 val scopeType:String,
+						 val appliedOperators: List[String]){
+
 
 	def getPartitionFunc(): List[Any] => List[(Set[Int], Set[Int])] = {
 		val pastPartition = (this.partition._1.toSet, this.partition._2.toSet)
@@ -54,22 +56,35 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 		val envs = this.scopeExamples.flatMap(splitEnv).filter(env => env("time").asInstanceOf[BigInt] % 2 == 0) // only the real examples
 		(prevEnvs, envs)
 	}
-	def covertToASTList: (Assignment) => List[ASTNode] = {
-		case SingleAssignment(_, value) => List(value)
-		case BasicMultivariableAssignment(_, values) => values
-		case MultilineMultivariableAssignment(assignments) => assignments.flatMap(covertToASTList)
-		case ConditionalAssignment(condition, ifTrue, ifFalse) =>  {
-			if(condition.code == "True"){
-				covertToASTList(ifTrue)
-			}
-			else if(condition.code == "False"){
-				covertToASTList(ifFalse)
-			}
-			else{
-				covertToASTList(ifTrue) ++ covertToASTList(ifFalse)
-			}
-		}
-		case _ => throw new Exception("Unknown assignment type")
+	def covertToASTList(assignment :Assignment, contexts: Contexts): List[ASTNode] = {
+			assignment match {
+					case SingleAssignment(_, value) => List(value)
+					case BasicMultivariableAssignment(_, values) => values
+					case MultilineMultivariableAssignment(assignments) => assignments.flatMap(ass=>covertToASTList(ass, contexts))
+					case ConditionalAssignment(condition, ifTrue, ifFalse) => {
+						val ifTrueList = covertToASTList(ifTrue, contexts)
+						val ifFalseList = covertToASTList(ifFalse, contexts)
+						assert(ifTrueList.length == 1)
+						if (condition.exampleValues.forall(_.get)){
+							ifTrueList
+						}
+						else if(condition.exampleValues.forall(!_.get)){
+							ifFalseList
+						}
+						else {
+							ifTrueList.head match {
+								case _: IntNode =>IntCondNode(condition, ifTrueList.head.asInstanceOf[IntNode], ifFalseList.head.asInstanceOf[IntNode], contexts) :: Nil;
+								case _: StringNode => StringCondNode(condition, ifTrueList.head.asInstanceOf[StringNode], ifFalseList.head.asInstanceOf[StringNode], contexts) :: Nil;
+								case _: DoubleNode => DoubleCondNode(condition,ifTrueList.head.asInstanceOf[DoubleNode], ifFalseList.head.asInstanceOf[DoubleNode], contexts) :: Nil;
+								case _: IntListNode => IntListCondNode(condition, ifTrueList.head.asInstanceOf[IntListNode], ifFalseList.head.asInstanceOf[IntListNode], contexts) :: Nil;
+								case _ => println("didnt find type");ifTrueList.head::Nil// error
+							}
+
+						}
+					}
+					case _ => throw new Exception("Unknown assignment type")
+				}
+
 	};
 	def solve(timeout:Int = 10) ={
 		assert(this.scopeType == "scope")
@@ -77,22 +92,23 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 		var requiredVarNames: Set[String] = Set();
 		var seenASTs: List[ASTNode] = List()
 		var sol: (Option[String], Int, Int, Option[Assignment]) = (None, 0, 0, None)
+		val tmpTask = SynthesisTask.fromSpec(this, List())
 		for ((req, i) <- this.required.zipWithIndex.reverse) {
 			val synthesisTask = req.apply(List())
 			sol = synthesize(synthesisTask, timeout);
 			//println("found solution: " + sol._4.get.code(true))
 			val solutionAssignment: Option[Assignment] = sol._4
 			//requiredVarNames = solutionAssignment.get.getAssignedVars() + requiredVarNames;
-			val newRequiredVocabMakers = covertToASTList(solutionAssignment.get).filter(ast => !seenASTs.exists((saw) => saw == ast)).zipWithIndex.map { case (ast, i) => {
+			val newRequiredVocabMakers = covertToASTList(solutionAssignment.get, new Contexts(synthesisTask.contexts)).filter(ast => !seenASTs.exists((saw) => saw == ast)).zipWithIndex.map { case (ast, i) => {
 				seenASTs = ast :: seenASTs
-				new RequiredVocabMaker(ast, List(), requiredVocabMakers.length + i, new Contexts(synthesisTask.contexts))
+				new RequiredVocabMaker(ast, tmpTask.outputVariables.toList, requiredVocabMakers.length + i, new Contexts(synthesisTask.contexts))
 			}
 			};
 			requiredVocabMakers = requiredVocabMakers ++ newRequiredVocabMakers
 		}
-		val tmpTask = SynthesisTask.fromSpec(this, List())
-		requiredVocabMakers = seenASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List(), x._2, new Contexts(tmpTask.contexts))) // makes the contexts good
-		val finalTask = SynthesisTask.fromSpec(this, requiredVocabMakers)
+
+		requiredVocabMakers = seenASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, tmpTask.outputVariables.toList, x._2, new Contexts(tmpTask.contexts))) // makes the contexts good in singleVar. in multi var it will be done inside the node
+		val finalTask = SynthesisTask.fromSpec(this, seenASTs)
 		sol = synthesize(finalTask, timeout);
 		sol //._4.get.code(disablePostProcess=true);
 
@@ -137,7 +153,7 @@ object ScopeSpecification {
 
 	def assign(code: String): ScopeSpecification = {
 		val varNames = code.split("=")(0).replace("\'","").split(",").map(_.trim).toSet
-		new ScopeSpecification(List(), Tuple2(List(), List()), List(),varNames,scopeType = "assign")
+		new ScopeSpecification(List(), Tuple2(List(), List()), List(),varNames,scopeType = "assign", List("assign"))
 	}
 
 	def cond(scopeSpecification1: ScopeSpecification, scopeSpecification2: ScopeSpecification): ScopeSpecification ={
@@ -147,7 +163,8 @@ object ScopeSpecification {
 			Range(scopeSpecification1.scopeExamples.size, jointExamples.size).toList);
 		val required = scopeSpecification1.required ++ scopeSpecification2.required;
 		val varNames = scopeSpecification1.outputVarNames ++ scopeSpecification2.outputVarNames;
-		new ScopeSpecification(jointExamples, partition, required, varNames, scopeType = "cond")
+		var appliedOperators = "cond" :: (scopeSpecification1.appliedOperators ++ scopeSpecification2.appliedOperators)
+		new ScopeSpecification(jointExamples, partition, required, varNames, scopeType = "cond", appliedOperators)
 	}
 
 	def concat(scopeSpecifications: List[ScopeSpecification]): ScopeSpecification ={
@@ -157,20 +174,23 @@ object ScopeSpecification {
 		val fixed_scopeSpecifications = scopeSpecifications.map((spec)=>if (spec.scopeExamples.size > 0) toScopeable(spec) else spec);
 		val jointOutputVarNames = fixed_scopeSpecifications.map(_.outputVarNames).flatten.toSet;
 		val required = fixed_scopeSpecifications.flatMap(_.required);
-		new ScopeSpecification(jointExamples, partition, required, jointOutputVarNames, scopeType = "concat")
+		val appliedOperators = "concat" :: (scopeSpecifications.map(_.appliedOperators).reduce((a,b)=> a++b));
+		new ScopeSpecification(jointExamples, partition, required, jointOutputVarNames, scopeType = "concat", appliedOperators)
 	}
 
 	def scope(specification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames: Set[String]):ScopeSpecification ={
 		val jointExamples = specification.scopeExamples ++ examples; //TODO: check if the examples are disjoint
 //		val contexts = getContextsFromExamples(jointExamples, outputVarNames);
 		val jointOutputVarNames = (specification.outputVarNames ++ outputVarNames).filter(jointExamples.head.contains);
-		new ScopeSpecification(jointExamples, specification.partition, specification.required, jointOutputVarNames, scopeType = "scope")
+		val appliedOperators = "scope" :: specification.appliedOperators;
+		new ScopeSpecification(jointExamples, specification.partition, specification.required, jointOutputVarNames, scopeType = "scope", appliedOperators)
 	}
 
 	def toScopeable(specification: ScopeSpecification): ScopeSpecification ={
 		specification.required
-		val required = (vocabMakers:List[RequiredVocabMaker])=>SynthesisTask.fromSpec(specification, vocabMakers);
-		new ScopeSpecification(List(), (List(), List()), required::specification.required, specification.outputVarNames, scopeType = "scopeable")
+		val required = (requiredASTs:List[ASTNode])=>SynthesisTask.fromSpec(specification, requiredASTs);
+		val appliedOperators = "scopeable" :: specification.appliedOperators;
+		new ScopeSpecification(List(), (List(), List()), required::specification.required, specification.outputVarNames, scopeType = "scopeable", appliedOperators)
 	}
 //	def scope_(scopeSpecification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames:List[String], synth:Boolean=true): ScopeSpecification ={
 //		val jointExamples = scopeSpecification.scopeExamples.filter(map=>outputVarNames.forall(name=>map.keys.exists(key=>key==name))) ++ examples;
@@ -320,6 +340,22 @@ object ScopeSpecification {
 				innerNonBranchSpec = ScopeSpecification.concat(nonBranchSpecs);
 			}
 			innerScope = Some(ScopeSpecification.concat(List(innerTrueSpec, innerNonBranchSpec)))
+		}
+		if (trueSpecs.nonEmpty && falseSpecs.nonEmpty && nonBranchSpecs.nonEmpty){ // cond and cat
+			var innerTrueSpec = trueSpecs(0);
+			var innerFalseSpec = falseSpecs(0);
+			if (trueSpecs.length > 1) {
+				innerTrueSpec = ScopeSpecification.concat(trueSpecs);
+			}
+			if (falseSpecs.length > 1) {
+				innerFalseSpec = ScopeSpecification.concat(falseSpecs);
+			}
+			val condSpec = ScopeSpecification.cond(innerTrueSpec, innerFalseSpec)
+			var innerNonBranchSpec = nonBranchSpecs(0);
+			if (nonBranchSpecs.length > 1) {
+				innerNonBranchSpec = ScopeSpecification.concat(nonBranchSpecs);
+			}
+			innerScope = Some(ScopeSpecification.concat(List(condSpec, innerNonBranchSpec)))
 		}
 		if(scopesTree.scopeInfo.commentId == "-1"){ // this is assign without scope
 			return innerScope.get;

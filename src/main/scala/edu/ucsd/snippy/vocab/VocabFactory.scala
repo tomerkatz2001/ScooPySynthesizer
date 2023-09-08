@@ -1,7 +1,8 @@
 package edu.ucsd.snippy.vocab
 
 import edu.ucsd.snippy.ast.Types.{IntList, IntSet, Types}
-import edu.ucsd.snippy.ast.{ASTNode, BoolVariable, IntVariable, StringVariable, Types, _}
+import edu.ucsd.snippy.ast.{ASTNode, BoolVariable, IntVariable, StringNode, StringVariable, Types, _}
+import edu.ucsd.snippy.enumeration.Contexts
 
 class VocabFactory(
 	val leavesMakers: List[VocabMaker],
@@ -1019,8 +1020,134 @@ object VocabFactory
 						TernarySubList[Double](children.head.asInstanceOf[ListNode[Double]], children(1).asInstanceOf[IntNode], children(2).asInstanceOf[IntNode])
 				},
 
-			)
+			)++ // cond makers
+				List(
+					new BasicVocabMaker {
+						override val arity: Int = 3
+						override val childTypes: List[Types] = List(Types.Bool, Types.Int, Types.Int)
+						override val returnType: Types = Types.Int
+						override val nodeType: Class[_ <: ASTNode] = classOf[IntCondNode]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							IntCondNode(children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[IntNode], children(2).asInstanceOf[IntNode], new Contexts(contexts))
+
+					},
+					new BasicVocabMaker {
+						override val arity: Int = 3
+						override val childTypes: List[Types] = List(Types.Bool, Types.String, Types.String)
+						override val returnType: Types = Types.String
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringCondNode]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							StringCondNode(children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[StringNode], children(2).asInstanceOf[StringNode], new Contexts(contexts))
+
+					},
+					new BasicVocabMaker {
+						override val arity: Int = 3
+						override val childTypes: List[Types] = List(Types.Bool, Types.Double, Types.Double)
+						override val returnType: Types = Types.Double
+						override val nodeType: Class[_ <: ASTNode] = classOf[DoubleCondNode]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							DoubleCondNode(children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[DoubleNode], children(2).asInstanceOf[DoubleNode], new Contexts(contexts))
+
+					},
+					new BasicVocabMaker {
+						override val arity: Int = 3
+						override val childTypes: List[Types] = List(Types.Bool, Types.IntList, Types.IntList)
+						override val returnType: Types = Types.IntList
+						override val nodeType: Class[_ <: ASTNode] = classOf[IntListCondNode]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							IntListCondNode(children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[IntListNode], children(2).asInstanceOf[IntListNode], new Contexts(contexts))
+
+					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.StringList, Types.StringList)
+//						override val returnType: Types = Types.StringList
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[StringListNode]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[StringListNode](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[StringListNode], children(2).asInstanceOf[StringListNode], new Contexts(contexts))
+//
+//					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.DoubleList, Types.DoubleList)
+//						override val returnType: Types = Types.DoubleList
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[DoubleListNode]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[DoubleListNode](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[DoubleListNode], children(2).asInstanceOf[DoubleListNode], new Contexts(contexts))
+//
+//					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.IntIntMap, Types.IntIntMap)
+//						override val returnType: Types = Types.IntIntMap
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[MapNode[IntNode, IntNode]]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[MapNode[IntNode, IntNode]](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[MapNode[IntNode, IntNode]], children(2).asInstanceOf[MapNode[IntNode, IntNode]], new Contexts(contexts))
+//
+//					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.IntStringMap, Types.IntStringMap)
+//						override val returnType: Types = Types.IntStringMap
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[MapNode[IntNode, StringNode]]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[MapNode[IntNode, StringNode]](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[MapNode[IntNode, StringNode]], children(2).asInstanceOf[MapNode[IntNode, StringNode]], new Contexts(contexts))
+//
+//					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.StringIntMap, Types.StringIntMap)
+//						override val returnType: Types = Types.StringIntMap
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[MapNode[IntNode, DoubleNode]]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[MapNode[StringNode, IntNode]](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[MapNode[StringNode, IntNode]], children(2).asInstanceOf[MapNode[StringNode, IntNode]], new Contexts(contexts))
+//
+//					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.StringStringMap, Types.StringStringMap)
+//						override val returnType: Types = Types.StringStringMap
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[MapNode[StringNode, StringNode]]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[MapNode[StringNode, StringNode]](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[MapNode[StringNode, StringNode]], children(2).asInstanceOf[MapNode[StringNode, StringNode]], new Contexts(contexts))
+//
+//					},
+//					new BasicVocabMaker {
+//						override val arity: Int = 3
+//						override val childTypes: List[Types] = List(Types.Bool, Types.BoolList, Types.BoolList)
+//						override val returnType: Types = Types.BoolList
+//						override val nodeType: Class[_ <: ASTNode] = classOf[CondNode[BoolListNode]]
+//						override val head: String = ""
+//
+//						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//							CondNode[BoolListNode](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[BoolListNode], children(2).asInstanceOf[BoolListNode], new Contexts(contexts))
+//
+//					},
+				)
+
+
 		}
+
 
 
 		VocabFactory(vocab,false) // this function is not being called by inner enumarators
