@@ -112,7 +112,7 @@ case class DoubleCondNode(cond: BoolNode, thenCase: DoubleNode, elseCase: Double
 	)
 }
 
-case class IntListCondNode(cond: BoolNode, thenCase: IntListNode, elseCase: IntListNode, contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with IntListNode {
+case class IntListCondNode(cond: BoolNode, thenCase: ListNode[Int], elseCase: ListNode[Int], contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with IntListNode {
 
 	lazy override val nodeType: Types = Types.IntList
 	override val _values: List[Option[Iterable[Int]]] = {
@@ -180,12 +180,12 @@ case class StringHoleNode(name: String, contexts: List[Map[String, Any]], reqVeq
 	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(name, contexts, reqVeq)
 }
 
-case class ListHoleNode(name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] =List()) extends HoleNode[List[Any]](contexts) with ListNode[Any] {
+case class ListHoleNode[T](name: String, contexts: List[Map[String, Any]], reqVeq: List[Boolean] =List()) extends HoleNode[Iterable[T]](contexts) with ListNode[T] {
 	override lazy val nodeType: Types = Types.Unknown
 	override lazy val childType: Types = Types.Unknown
 	lazy override val code: String = "hole"
-	override val _values: List[Option[List[Any]]] = List.fill(contexts.length)(None)
-	override def updateValues(contexts: Contexts): ListHoleNode = copy(name, contexts.contexts)
+	override val _values: List[Option[Iterable[T]]] = List.fill(contexts.length)(None)
+	override def updateValues(contexts: Contexts): ListHoleNode[T] = copy(name, contexts.contexts)
 	override def updateChildren(children: Seq[ASTNode], reqVeq: List[Boolean] =List()): ASTNode = copy(name, contexts, reqVeq)
 }
 

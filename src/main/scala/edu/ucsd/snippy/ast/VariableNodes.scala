@@ -76,7 +76,7 @@ case class DoubleVariable(name: String, contexts: List[Map[String, Any]], reqVeq
 
 }
 
-case class ListVariable[T](name: String, contexts: List[Map[String, Any]], childType: Types, reqVeq: List[Boolean] = List()) extends VariableNode[List[T]](contexts) with ListNode[T]
+case class ListVariable[T](name: String, contexts: List[Map[String, Any]], childType: Types, reqVeq: List[Boolean] = List()) extends VariableNode[Iterable[T]](contexts) with ListNode[T]
 {
 
 	override def updateValues(contexts: Contexts): ListVariable[T] = copy(name, contexts = contexts.contexts)

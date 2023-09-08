@@ -107,6 +107,8 @@ trait ListNode[T] extends IterableNode
 {
 	val childType: Types
 	override val _values: List[Option[Iterable[T]]]
+
+	override def exampleValues: List[Option[Iterable[T]]] = _values
 	override lazy val nodeType: Types = Types.listOf(childType)
 	//override def exampleValues: List[Option[Iterable[T]]] = _values
 	override def updateValues(contexts: Contexts): ListNode[T]

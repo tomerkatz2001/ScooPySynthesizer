@@ -1062,8 +1062,9 @@ object VocabFactory
 						override val nodeType: Class[_ <: ASTNode] = classOf[IntListCondNode]
 						override val head: String = ""
 
-						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-							IntListCondNode(children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[IntListNode], children(2).asInstanceOf[IntListNode], new Contexts(contexts))
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode = {
+							IntListCondNode(children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[ListNode[Int]], children(2).asInstanceOf[ListNode[Int]], new Contexts(contexts))
+						}
 
 					},
 //					new BasicVocabMaker {
