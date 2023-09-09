@@ -58,5 +58,5 @@
 			"commentId": "3"
 		}
 	},
-	"solutions": ["rs = \".\".join(list(s[::2]))"]
+	"solutions": ["rs = \".\".join(list(s[::2]))", "letters = list(s[::2])\nrs = \".\".join(letters)"]
 }

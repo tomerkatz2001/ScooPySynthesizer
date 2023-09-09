@@ -39,5 +39,5 @@
 			"commentId": "3"
 		}
 	},
-	"solutions": ["rs = 2 > len(set(a))"]
+	"solutions": ["rs = 2 > len(set(a))","no_dups = set(a)\nrs = 2 > len(no_dups)"]
 }

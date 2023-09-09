@@ -6,6 +6,6 @@
 		{"a": "[1, 1, 1]", "rs": "True", "time": 1},
 		{"a": "[1, 20, 30]", "rs": "False", "time": 20}
 	],
-	"solutions": ["rs = 2 > len(set(a))"],
+	"solutions": ["rs = 2 > len(set(a))","no_dups = set(a)\nrs = 2 > len(no_dups)"],
 	"previousEnvs": {}
 }
