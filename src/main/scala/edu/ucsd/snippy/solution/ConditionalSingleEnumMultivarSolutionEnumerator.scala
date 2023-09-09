@@ -1,5 +1,5 @@
 package edu.ucsd.snippy.solution
-import edu.ucsd.snippy.ast.Types.Types
+import edu.ucsd.snippy.ast.Types.{Types, typeof}
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.enumeration.{Contexts, Enumerator, InputsValuesManager, ProbEnumerator}
 import edu.ucsd.snippy.predicates.MultilineMultivariablePredicate
@@ -199,14 +199,18 @@ object Node {
 			}
 
 		n.edges = edges
+
 		n.edges.foreach(edge=> if(edge.child.blocked) {
+			val oldVars = edge.child.state.head.filter(x=>x._2!=None).keys
 			for (v <- knownVarsAssignments.keys){
 				if(edge.variables.map(_._1.name).contains(v)){
 					val newVals = knownVarsAssignments(v).updateValues(new Contexts(parent.state)).exampleValues.map(_.get)
 					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
 				}
 			}
-			edge.child.enum = edge.child.enum.copy(edge.child.enum.vocab, edge.child.enum.oeManager, edge.child.state)
+			val useableVars= knownVarsAssignments.keys.filter(x => !oldVars.contains(x))
+			val newVocab = edge.child.enum.vocab.addVars(edge.child.state.head.filter(x=> useableVars.contains(x._1) && x._2 != None).map(x => (x._1, typeof(x._2))).toList)
+			edge.child.enum = edge.child.enum.copy(newVocab, edge.child.enum.oeManager, edge.child.state)
 		})
 		if (n.edges.isEmpty) for (i <- n.distancesToEnd.indices) n.distancesToEnd.update(i,DistancePaths((0,None),(0,None)))
 		seen += parent -> n
