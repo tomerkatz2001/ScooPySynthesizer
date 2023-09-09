@@ -56,7 +56,7 @@ class RequiredVocabMaker(program: ASTNode, assignedVars: List[String], idx:Int, 
 			//println("newProgram: " + newProgram.code)
 		}
 		newProgram.updateValues(new Contexts(contexts))
-		newProgram
+
 	}
 
 	// I hope that because this is the same tree visiting pattern as the ASTHolesMakerVisitor, the first hole found will be the correct one

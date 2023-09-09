@@ -20,7 +20,7 @@ import scala.collection.mutable
 class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 						 //val contexts: Contexts,
 						 val partition: (List[Int], List[Int]),
-						 val required: List[List[ASTNode]=>SynthesisTask],
+						 val required: List[(List[ASTNode], Map[String, ASTNode])=>SynthesisTask],
 						 val outputVarNames: Set[String],
 						 val scopeType:String,
 						 val appliedOperators: List[String]){
@@ -87,36 +87,44 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 				}
 
 	};
+
+	def extractAstOf(v: String, assignment: Assignment, contexts: Contexts): ASTNode = {
+		val vars = assignment.getAssignedVars().toList
+		val index = vars.indexOf(v)
+		assert(index >= 0)
+		covertToASTList(assignment, contexts)(index)
+	}
 	def solve(timeout:Int = 10) ={
 		assert(this.scopeType == "scope")
 		val topLevelVarNames = this.outputVarNames
 		var requiredVocabMakers: List[RequiredVocabMaker] = List()
 		var innerSpecifications: mutable.Map[String, Predicate] = mutable.Map();
+		var requiredAssignments: mutable.Map[String, ASTNode] = mutable.Map();
 		var seenASTs: List[ASTNode] = List()
 		var sol: (Option[String], Int, Int, Option[Assignment]) = (None, 0, 0, None)
 		for ((req, i) <- this.required.zipWithIndex.reverse) {
-			val synthesisTask = req.apply(List())
+			val synthesisTask = req.apply(List(), Map())
 			sol = synthesize(synthesisTask, timeout);
-
-			assert(synthesisTask.outputVariables.forall(v=> !innerSpecifications.contains(v)))
+			assert(synthesisTask.outputVariables.forall(v=> !requiredAssignments.contains(v))) // we dont require top level veriables from inner scopes
+			requiredAssignments ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			innerSpecifications ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> synthesisTask.predicate).toList
 			//println("found solution: " + sol._4.get.code(true))
 			val solutionAssignment: Option[Assignment] = sol._4
 			//requiredVarNames = solutionAssignment.get.getAssignedVars() + requiredVarNames;
-			val newRequiredVocabMakers = covertToASTList(solutionAssignment.get, new Contexts(synthesisTask.contexts)).filter(ast => !seenASTs.exists((saw) => saw == ast)).zipWithIndex.map { case (ast, i) => {
+			 covertToASTList(solutionAssignment.get, new Contexts(synthesisTask.contexts)).filter(ast => !seenASTs.contains(ast)).zipWithIndex.map { case (ast, i) => {
 				seenASTs = ast :: seenASTs
 				new RequiredVocabMaker(ast, topLevelVarNames.toList, requiredVocabMakers.length + i, new Contexts(synthesisTask.contexts))
 			}
 			};
-			requiredVocabMakers = requiredVocabMakers ++ newRequiredVocabMakers
+
 		}
-
-		var fixedExamples = this.scopeExamples
-
-		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(fixedExamples, this.partition, this.required, topLevelVarNames, this.scopeType, this.appliedOperators), seenASTs)
+		val innerVars = innerSpecifications.keys.toList
+		val newVars = (this.outputVarNames.toList ++ innerVars).toSet
+		val extendedExamples = this.scopeExamples.map(env => env ++ innerVars.map(v => v -> "'__BOT__'").toMap)
+		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, this.partition, this.required, newVars, this.scopeType, this.appliedOperators), seenASTs, requiredAssignments.toMap)
 		sol = synthesize(finalTask, timeout);
-		if(sol._4.nonEmpty){
-			sol._4.get.addExamples(innerSpecifications.map(tup=>(tup._1, tup._2.envs)).toMap)
+		if (sol._4.nonEmpty) {
+			sol._4.get.addExamples(innerSpecifications.map(tup => (tup._1, tup._2.envs)).toMap)
 		}
 		sol //._4.get.code(disablePostProcess=true);
 	}
@@ -187,13 +195,13 @@ object ScopeSpecification {
 	def scope(specification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames: Set[String]):ScopeSpecification ={
 		val jointExamples = specification.scopeExamples ++ examples; //TODO: check if the examples are disjoint
 //		val contexts = getContextsFromExamples(jointExamples, outputVarNames);
-		val jointOutputVarNames = (specification.outputVarNames ++ outputVarNames).filter(jointExamples.head.contains);
+		//val jointOutputVarNames = (specification.outputVarNames ++ outputVarNames).filter(jointExamples.head.contains);
 		val appliedOperators = "scope" :: specification.appliedOperators;
-		new ScopeSpecification(jointExamples, specification.partition, specification.required, jointOutputVarNames, scopeType = "scope", appliedOperators)
+		new ScopeSpecification(jointExamples, specification.partition, specification.required, outputVarNames, scopeType = "scope", appliedOperators)
 	}
 
 	def toScopeable(specification: ScopeSpecification): ScopeSpecification ={
-		val required = (requiredASTs:List[ASTNode])=>SynthesisTask.fromSpec(specification, requiredASTs);
+		val required = (requiredASTs:List[ASTNode], requiredAssignments:Map[String, ASTNode])=>SynthesisTask.fromSpec(specification, requiredASTs, requiredAssignments);
 		val appliedOperators = "scopeable" :: specification.appliedOperators;
 		new ScopeSpecification(List(), (List(), List()), required::specification.required, specification.outputVarNames, scopeType = "scopeable", appliedOperators)
 	}

@@ -10,6 +10,14 @@ class BasicEnumerator(
 	override val oeManager: OEValuesManager,
 	override val contexts: List[Map[String, Any]]) extends Enumerator
 {
+
+	def copy(
+		vocab: VocabFactory = this.vocab,
+		oeManager: OEValuesManager = this.oeManager,
+		contexts: List[Map[String, Any]] = this.contexts): BasicEnumerator =
+	{
+		new BasicEnumerator(vocab, oeManager, contexts)
+	}
 	override def toString(): String = "enumeration.Enumerator"
 
 	var nextProgram: Option[ASTNode] = None

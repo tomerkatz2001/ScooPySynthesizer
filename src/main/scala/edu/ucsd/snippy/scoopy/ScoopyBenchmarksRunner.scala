@@ -62,7 +62,7 @@ object ScoopyBenchmarksRunner extends App{
 							time = Duration.between(start, LocalDateTime.now()).toMillis.toInt
 							count = coun
 							//println("\nthe program is: \n" + program)
-
+							print("\nthe program is: \n" + assignment.code())
 							correct = task("solutions") match {
 								case solutions if solutions.asInstanceOf[List[String]].contains(program) => "+"
 								case Some(_) =>  "-";

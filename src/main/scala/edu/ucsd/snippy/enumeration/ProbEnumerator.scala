@@ -18,6 +18,14 @@ class ProbEnumerator(
 	var endCost: Int,
 	var requiredProgramsBank:List[ASTNode] = List()) extends Enumerator
 {
+
+	def copy(
+		vocab: VocabFactory = this.vocab,
+		oeManager: OEValuesManager = this.oeManager,
+		contexts: List[Map[String, Any]] = this.contexts): ProbEnumerator =
+	{
+		new ProbEnumerator(vocab, oeManager, contexts, nested, initCost, mainBank, vars, endCost, requiredProgramsBank)
+	}
 	override def toString(): String = "enumeration.Enumerator"
 
 	// TODO Terrible name :/
@@ -148,6 +156,9 @@ class ProbEnumerator(
 			if (costLevel > endCost) return None
 
 			if (rootMaker.hasNext) {
+//				if(rootMaker.getClass == classOf[RequiredVocabMaker]) {
+//					println("root")
+//				}
 				val program = rootMaker.next
 				if (program.exampleValues.exists(_.isDefined) && oeManager.isRepresentative(program)) {
 					res = Some(program)

@@ -7,6 +7,7 @@ import edu.ucsd.snippy.utils.Utils.{falseForIndices, filterByIndices, getBinaryP
 import edu.ucsd.snippy.utils._
 import edu.ucsd.snippy.vocab.{RequiredVocabMaker, VocabFactory}
 
+import scala.collection.convert.ImplicitConversions.`collection asJava`
 import scala.collection.mutable
 
 class ConditionalSingleEnumMultivarSolutionEnumerator(
@@ -14,6 +15,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 			 variables: List[(String, Types)],
 			 literals: Iterable[String],
 			 partitionFunction: List[Any] => List[(Set[Int], Set[Int])],
+			 knownVarAssignments: Map[String, ASTNode],
 			 requiredASTs: List[ASTNode]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
@@ -24,7 +26,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 		}
 		rs
 	})
-	val graph: Node = Node.convert(predicate.graphStart, partitions, variables, literals,requiredASTs=requiredASTs)
+	val graph: Node = Node.convert(predicate.graphStart, partitions, variables, literals,knownVarsAssignments= knownVarAssignments, requiredASTs=requiredASTs)
 	var solution: Option[Assignment] = None
 
 	// Setup the conditional enum listener
@@ -53,7 +55,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 	def this(predicate: MultilineMultivariablePredicate,
 	         variables: List[(String, Types)],
 	         literals: Iterable[String]) {
-		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices), Nil)
+		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices),Map(), Nil)
 	}
 	def step(): Unit = {
 		if (this.graph.step()) { // if graph has changed
@@ -109,11 +111,18 @@ object Node {
 		prevEnvs: List[Map[String, Any]],
 		envs: List[Map[String, Any]],
 		variable: Variable,
-		partition: (Set[Int], Set[Int])): CondProgStore = {
+		partition: (Set[Int], Set[Int]),
+		knownAssignments:Map[String, ASTNode]): CondProgStore = {
 		val values = envs.map(_(variable.name))
 		val rs = CondProgStore(
 			new ProgStore(partition._1, filterByIndices(values, partition._1)),
 			new ProgStore(partition._2, filterByIndices(values, partition._2)))
+
+		if (knownAssignments.contains(variable.name)) {
+			rs.thenCase.program = Some(knownAssignments(variable.name))
+			rs.elseCase.program = Some(knownAssignments(variable.name))
+			return rs
+		}
 
 		// If the else case is empty, we can set it to any program, and it will be removed in post-
 		// processing
@@ -154,6 +163,7 @@ object Node {
 		variables: List[(String, Types)],
 		literals: Iterable[String],
 		seen: mutable.Map[edu.ucsd.snippy.predicates.Node,Node] = mutable.Map.empty,
+		knownVarsAssignments: Map[String, ASTNode],
 		requiredASTs:List[ASTNode] = Nil): Node = {
 		if (seen.contains(parent)) return seen(parent)
 		val assignedBefore = parent.assignedBeforeMe;
@@ -171,24 +181,33 @@ object Node {
 		val n: Node = Node(enumerator, parent.state, Nil, partitionIndices)
 		val edges = parent.edges
 			.map{e =>
-				e -> convert(e.child, partitionIndices, variables, literals, seen, requiredASTs)
+				e -> convert(e.child, partitionIndices, variables, literals, seen,knownVarsAssignments, requiredASTs)
 			}
 			.map {
 				case (edu.ucsd.snippy.predicates.SingleEdge(_, variable, outputType, _, _), child) =>
 					val newVariable = Variable(variable, outputType)
-					val stores = partitionIndices.map(indices => createProgStore(parent.state, child.state, newVariable, indices))
+					val stores = partitionIndices.map(indices => createProgStore(parent.state, child.state, newVariable, indices, knownVarsAssignments))
 					Edge(n, child, List(newVariable -> stores).toMap)
 				case (edu.ucsd.snippy.predicates.MultiEdge(_, outputTypes, _, _), child) =>
 					val variables = outputTypes.map {
 						case (variable, outputType) =>
 							val newVariable = Variable(variable, outputType)
-							val stores = partitionIndices.map(idxs => createProgStore(parent.state, child.state, newVariable, idxs))
+							val stores = partitionIndices.map(idxs => createProgStore(parent.state, child.state, newVariable, idxs, knownVarsAssignments))
 							newVariable -> stores
 					}
 					Edge(n, child, variables)
 			}
 
 		n.edges = edges
+		n.edges.foreach(edge=> if(edge.child.blocked) {
+			for (v <- knownVarsAssignments.keys){
+				if(edge.variables.map(_._1.name).contains(v)){
+					val newVals = knownVarsAssignments(v).updateValues(new Contexts(parent.state)).exampleValues.map(_.get)
+					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
+				}
+			}
+			edge.child.enum = edge.child.enum.copy(edge.child.enum.vocab, edge.child.enum.oeManager, edge.child.state)
+		})
 		if (n.edges.isEmpty) for (i <- n.distancesToEnd.indices) n.distancesToEnd.update(i,DistancePaths((0,None),(0,None)))
 		seen += parent -> n
 		n
@@ -197,8 +216,8 @@ object Node {
 
 case class DistancePaths(thenPath: (Int,Option[Edge]),elsePath: (Int,Option[Edge]))
 case class Node(
-	enum: Enumerator,
-	state: List[Map[String, Any]],
+	var enum: Enumerator,
+	var state: List[Map[String, Any]],
 	var edges: List[Edge],
 	partitionIndices: List[(Set[Int], Set[Int])],
 	var onStep: ASTNode => Unit = _ => ()) {
@@ -221,7 +240,7 @@ case class Node(
 			seen = true
 			var graphChanged = false
 
-		if (!done && this.enum.hasNext) {
+		if (!done && !this.blocked() && this.enum.hasNext) {
 			val program = this.enum.next()
 			//print(program.code+" .... "+this.edges.map(e=>e.toString).toString()+" .... "+program.exampleValues + "\n")
 			this.onStep(program)
@@ -258,10 +277,11 @@ case class Node(
 				}
 				graphChanged |= edge.child.do_step()
 			}
-			if (edges.forall(edge => edge.variables.forall(v => v._2.forall(store => store.isComplete))))
+			if (edges.forall(edge => edge.variables.forall(v => v._2.forall(store => store.isComplete)))) {
 				done = true
+			}
 		}
-		else if (done) { //don't run this enumerator but still run children.
+		else if (done || this.blocked()) { //don't run this enumerator but still run children.
 			for (edge <- this.edges) {
 				graphChanged |= edge.child.do_step()
 			}
@@ -271,6 +291,9 @@ case class Node(
 		}
 	}
 
+	def blocked():Boolean={ // if some variable is on None, the father Node is not yet finished
+		state.exists(env => env.exists(tup => tup._2 == None))
+	}
 	val distancesToEnd: Array[DistancePaths] = Array.fill(this.partitionIndices.length)(DistancePaths((Int.MaxValue,None),(Int.MaxValue,None)))
 	def computeShortestPaths(): Unit = {
 		reset_seen()

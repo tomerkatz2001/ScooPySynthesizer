@@ -1,8 +1,6 @@
 package edu.ucsd.snippy.enumeration
 
 import edu.ucsd.snippy.ast.ASTNode
-import edu.ucsd.snippy.predicates.Predicate
-import edu.ucsd.snippy.utils.Assignment
 import edu.ucsd.snippy.vocab.VocabFactory
 
 /**
@@ -19,4 +17,10 @@ trait Enumerator extends Iterator[ASTNode]
 	val oeManager: OEValuesManager
 	val contexts: List[Map[String, Any]]
 	def programsSeen: Int
+
+	def copy(
+		vocab: VocabFactory = this.vocab,
+		oeManager: OEValuesManager = this.oeManager,
+		contexts: List[Map[String, Any]] = this.contexts): Enumerator
+
 }

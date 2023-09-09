@@ -28,7 +28,9 @@ class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 			Nil),
 		partitions,
 		variables,
-		literals)
+		literals,
+		knownVarsAssignments = Map.empty
+	)
 	var solution: Option[Assignment] = None
 
 	// Setup the conditional enum listener

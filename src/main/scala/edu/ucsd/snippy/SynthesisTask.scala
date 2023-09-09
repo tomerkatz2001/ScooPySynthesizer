@@ -105,7 +105,7 @@ object SynthesisTask
 		examples.map {
 			env => env.filter(entry => !outVarNames.contains(entry._1))
 		}
-	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), simAssign: Boolean = false): SynthesisTask={
+	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), knownAssignments:Map[String, ASTNode], simAssign: Boolean = false): SynthesisTask={
 		val outputVarNames: Set[String] = spec.outputVarNames
 		val (previousEnvMap, envs):(Map[Int, Map[String, Any]], List[Map[String, Any]]) = spec.getPrevEnvsAndEnvs()
 
@@ -147,7 +147,7 @@ object SynthesisTask
 			case pred: MultilineMultivariablePredicate if simAssign =>
 				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
 			case pred: MultilineMultivariablePredicate =>
-				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc, requiredASTs)
+				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc, knownAssignments, requiredASTs)
 			case pred: SingleVariablePredicate =>
 				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()

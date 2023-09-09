@@ -6,8 +6,10 @@ sealed abstract class Assignment {
 	def code(disablePostProcess:Boolean = false): String
 	def getAssignedVars(): Set[String]
 
-	def addExamples(examples: Map[String, List[Map[String, Any]]]): Unit
-	var examplesWrap = "";
+	def addExamples(examples: Map[String, List[Map[String, Any]]]) ={
+		this.innerSpecs = Some(examples)
+	}
+	var innerSpecs: Option[Map[String, List[Map[String, Any]]]] = None
 	val scopePrefix = "#! Start of specification block:"
 	val ScopeSuffix = "#! End of specification block"
 
@@ -20,8 +22,13 @@ case class SingleAssignment(name: String, var program: ASTNode) extends Assignme
 		if (rs.startsWith(selfAssign)) {
 			rs = rs.replace(selfAssign, s"$name += ")
 		}
-		if (examplesWrap != "") {
-			scopePrefix + "\n" + examplesWrap + rs + "\n" + ScopeSuffix
+
+		val relevantExamples: Option[List[Map[String, Any]]]= if(innerSpecs.nonEmpty) innerSpecs.get.get(name) else None;
+		if(relevantExamples.nonEmpty){
+			val examplesWrap = relevantExamples.get.zipWithIndex.map {
+				case (example, i) => f"#! ${i + 1}) ${example.filter(_._1 != name)} => ${example(name)}"
+			}.mkString("\n")
+			scopePrefix + "\n" + examplesWrap +"\n"+ rs + "\n" + ScopeSuffix
 		}
 		else {
 			rs
@@ -30,12 +37,6 @@ case class SingleAssignment(name: String, var program: ASTNode) extends Assignme
 
 	override def getAssignedVars(): Set[String] = Set(name)
 
-	override def addExamples(innerSpecs: Map[String, List[Map[String, Any]]]): Unit = {
-		val examples:List[Map[String, Any]] = if (innerSpecs.contains(name)) innerSpecs(name) else List();
-		examplesWrap = examples.zipWithIndex.map {
-			case (example, i) => f"#! ${i+1}) ${example.filter(_._1 != name)} => ${example(name)}"
-		}.mkString("\n")
-	}
 }
 
 case class BasicMultivariableAssignment(names: List[String], programs: List[ASTNode]) extends Assignment
@@ -47,30 +48,27 @@ case class BasicMultivariableAssignment(names: List[String], programs: List[ASTN
 				case (program, j) => i != j && program.includes(name)
 			}
 		}
-		val code =
 		if (singleLine) {
 			val lhs = names.mkString(", ")
 			val rhs = programs.map(pred => PostProcessor.clean(pred).code).mkString(", ")
 			f"$lhs = $rhs"
 		} else {
 			names.zip(programs).map {
-				case (name, program) => f"$name = ${PostProcessor.clean(program).code}"
+				case (name, program) => {
+					val rs = f"$name = ${PostProcessor.clean(program).code}"
+					val relevantExamples: Option[List[Map[String, Any]]]= if(innerSpecs.nonEmpty) innerSpecs.get.get(name) else None;
+					if (relevantExamples.nonEmpty) {
+						val examplesWrap = relevantExamples.get.zipWithIndex.map {
+							case (example, i) => f"#! ${i + 1}) ${example.filter(_._1 != name)} => ${example(name)}"
+						}.mkString("\n")
+						scopePrefix + "\n" + examplesWrap +"\n"+  rs + "\n" + ScopeSuffix
+					}
+					else {
+						rs
+					}
+				}
 			}.mkString("\n")
 		}
-
-		if (examplesWrap != "") {
-			scopePrefix + "\n" + examplesWrap + code +"\n"+ ScopeSuffix
-		}
-		else {
-			code
-		}
-	}
-
-	override def addExamples(innerSpecs: Map[String, List[Map[String, Any]]]): Unit = {
-		val examples = innerSpecs.filter(tup=>names.contains(tup._1)).values.flatten.toList
-		examplesWrap = examples.zipWithIndex.map {
-			case (example, i) => f"#! ${i + 1}) ${example.filter(v=> !getAssignedVars().contains(v._1))} => ${example.filter(v=> getAssignedVars().contains(v._1))}"
-		}.mkString("\n")
 	}
 
 	override  def getAssignedVars(): Set[String] = names.toSet
@@ -79,32 +77,21 @@ case class BasicMultivariableAssignment(names: List[String], programs: List[ASTN
 case class MultilineMultivariableAssignment(assignments: List[Assignment]) extends Assignment
 {
 	override def code(disablePostProcess:Boolean = false): String = {
-		val code = assignments.map(_.code()).mkString("\n")
-		if (examplesWrap != "") {
-			scopePrefix + "\n" + examplesWrap + code + "\n" + ScopeSuffix
-		}
-		else {
-			code
-		}
+		assignments.map(_.code()).mkString("\n")
 	}
 
 	override def getAssignedVars(): Set[String] = assignments.flatMap(_.getAssignedVars()).toSet
 
 	override def addExamples(innerSpecs: Map[String, List[Map[String, Any]]]): Unit = {
-		val examples = innerSpecs.filter(tup=>assignments.exists(_.getAssignedVars().contains(tup._1))).values.flatten.toList
-		examplesWrap = examples.zipWithIndex.map {
-			case (example, i) => f"#! ${i + 1}) ${example.filter(v => !getAssignedVars().contains(v._1))} => ${example.filter(v => getAssignedVars().contains(v._1))}"
-		}.mkString("\n")
+		assignments.foreach(_.addExamples(innerSpecs))
 	}
 }
 
 case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, var elseCase: Assignment) extends Assignment
 {
 	override def addExamples(innerSpecs: Map[String, List[Map[String, Any]]]): Unit = {
-		val examples = innerSpecs.filter(tup=>thenCase.getAssignedVars().contains(tup._1) || elseCase.getAssignedVars().contains(tup._1)).values.flatten.toList
-		examplesWrap = examples.zipWithIndex.map {
-			case (example, i) => f"#! ${i + 1}) ${example.filter(v => !getAssignedVars().contains(v._1))} => ${example.filter(v => getAssignedVars().contains(v._1))}"
-		}.mkString("\n")
+		thenCase.addExamples(innerSpecs)
+		elseCase.addExamples(innerSpecs)
 	}
 
 	// PostProcessor handles double negation
@@ -219,7 +206,6 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 						"\nelse:\n" +
 						"\t" + elseCode.map(_.code()).mkString("\n\t")
 			}
-			val code =
 			(preCondString, condString, postCondString) match {
 				case ("", "", "") => "None"
 				case ("", rs, "") => rs
@@ -231,12 +217,6 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 				case (pre, cond, post) => pre + "\n" + cond + "\n" + post
 			}
 
-			if (examplesWrap != "") {
-				scopePrefix + "\n" + examplesWrap + code + "\n" + ScopeSuffix
-			}
-			else {
-				code
-			}
 		}
 	}
 

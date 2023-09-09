@@ -15,7 +15,7 @@
 	"scopes": {
 		"0": {
 			"outputVarNames": [
-				"rs", "aux"
+				"rs"
 			],
 			"rawCommentExamples": [
 				{
@@ -24,7 +24,8 @@
 					"$": "",
 					"time": "-1",
 					"rs": "5",
-					"aux": "4"
+					"aux": "'__BOT__'"
+
 				},
 				{
 					"a": "'abcde'",
@@ -32,7 +33,7 @@
 					"$": "",
 					"time": "-1",
 					"rs": "10",
-					"aux": "5"
+					"aux": "'__BOT__'"
 				}
 			],
 			"assignments": [],
