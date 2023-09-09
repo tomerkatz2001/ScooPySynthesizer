@@ -70,13 +70,13 @@ class RequiredVocabMaker(program: ASTNode, assignedVars: List[String], idx:Int, 
 					if(!found){
 						val (newChild, found_now) = ASTVisitor(child, replacement, reqVec)
 						found = found || found_now
-						newChildren = (newChild :: newChildren).reverse
+						newChildren = (newChild :: newChildren)
 					}
 					else {
-						newChildren = (child :: newChildren).reverse
+						newChildren = (child :: newChildren)
 					}
 				}
-				(root.updateChildren(newChildren, reqVec), found)
+				(root.updateChildren(newChildren.reverse, reqVec), found)
 
 			}}
 	}

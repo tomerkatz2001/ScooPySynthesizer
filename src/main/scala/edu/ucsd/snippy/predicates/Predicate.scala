@@ -11,11 +11,12 @@ object Predicate {
 		oeManager: OEValuesManager): SingleVariablePredicate =
 	{
 		val values = envs.flatMap(map => map.filter(_._1 == varName).values)
-		new SingleVariablePredicate(oeManager, varName, Utils.getTypeOfAll(values), values)
+		new SingleVariablePredicate(oeManager, varName, Utils.getTypeOfAll(values), values, envs)
 	}
 }
 
 trait Predicate
 {
+	val envs:List[Map[String, Any]];
 	def evaluate(program: ASTNode): Option[Assignment]
 }

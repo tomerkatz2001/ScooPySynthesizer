@@ -32,7 +32,8 @@ class ConditionalMegazordSolutionEnumerator(
 								new InputsValuesManager,
 								varName,
 								typ,
-								filterByIndices(outputValues, thenIndices))
+								filterByIndices(outputValues, thenIndices),
+								List())
 							val enum = new ProbEnumerator(
 								VocabFactory.apply(variables, additionalLiterals),
 								predicate.oeManager,
@@ -49,7 +50,8 @@ class ConditionalMegazordSolutionEnumerator(
 								new InputsValuesManager,
 								varName,
 								typ,
-								filterByIndices(outputValues, thenIndices))
+								filterByIndices(outputValues, thenIndices),
+								List())
 							val thenEnum = new ProbEnumerator(
 								VocabFactory.apply(variables, additionalLiterals),
 								thenPredicate.oeManager,
@@ -65,7 +67,8 @@ class ConditionalMegazordSolutionEnumerator(
 								new InputsValuesManager,
 								varName,
 								typ,
-								filterByIndices(outputValues, elseIndices))
+								filterByIndices(outputValues, elseIndices),
+								List())
 							val elseEnum = new ProbEnumerator(
 								VocabFactory.apply(variables, additionalLiterals),
 								elsePredicate.oeManager,

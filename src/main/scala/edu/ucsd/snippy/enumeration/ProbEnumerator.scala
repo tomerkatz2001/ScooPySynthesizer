@@ -1,7 +1,7 @@
 package edu.ucsd.snippy.enumeration
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.vocab.{VocabFactory, VocabMaker}
+import edu.ucsd.snippy.vocab.{RequiredVocabMaker, VocabFactory, VocabMaker}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

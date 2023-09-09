@@ -75,7 +75,7 @@ object BenchmarksCSV extends App
 			})
 	}
 
-	val benchmarksDir = new File("synthesizer/src/test/resources/test")
+	val benchmarksDir = new File("synthesizer/src/test/resources/scoopy-flat")
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false
@@ -110,5 +110,5 @@ object BenchmarksCSV extends App
 	//benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
 
 	// Then actually run
-	benchmarks.foreach(this.runBenchmark(_, timeout))
+	benchmarks.foreach(this.runBenchmark(_, 7))
 }

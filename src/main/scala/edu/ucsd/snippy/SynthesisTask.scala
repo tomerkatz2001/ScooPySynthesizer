@@ -1,7 +1,7 @@
 package edu.ucsd.snippy
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.enumeration.{BasicEnumerator, Contexts, InputsValuesManager, OEValuesManager, RequiresValuesManager}
+import edu.ucsd.snippy.enumeration._
 import edu.ucsd.snippy.predicates._
 import edu.ucsd.snippy.scoopy.ScopeSpecification
 //import edu.ucsd.snippy.scoopy.ScopeSpecification
@@ -138,7 +138,7 @@ object SynthesisTask
 			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
 			.filter(!_._2.equals(Types.Unknown))
 			.toList
-		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, outputVarNames.toList, x._2, new Contexts(contexts))) // makes the contexts good in singleVar. in multi var it will be done inside the node
+		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List(), x._2, new Contexts(contexts))) // makes the contexts good in singleVar. in multi var it will be done inside the node
 
 		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals,  requiredVocabMakers)
 

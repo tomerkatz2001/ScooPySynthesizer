@@ -7,6 +7,7 @@ import edu.ucsd.snippy.utils.{Assignment, BasicMultivariableAssignment, Multilin
 import scala.collection.mutable
 
 class MultilineMultivariablePredicate(val graphStart: Node) extends Predicate {
+	override val envs: List[Map[String, Any]] = graphStart.state
 	override def evaluate (program: ASTNode): Option[MultilineMultivariableAssignment] = {
 		if (!program.usesVariables) return None
 

@@ -38,9 +38,11 @@ object ScoopyBenchmarksRunner extends App{
 					//val task = SynthesisTask.fromSpec(spec, List())
 					variables = spec.outputVarNames.toList
 					val topLevelExamples = spec.getPrevEnvsAndEnvs()._2.length
+					val cond = if(operators.contains("cond")) "+" else "-"
+					val concat = if(operators.contains("concat")) "+" else "-"
 					//variables = task.outputVariables.toList
 
-					if (pnt) print(s"$suite;$group;$name;$variables;$topLevelExamples;$operators; ")
+					if (pnt) print(s"$suite;$group;$name;$variables;$cond;$concat; ")
 
 
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
@@ -56,16 +58,16 @@ object ScoopyBenchmarksRunner extends App{
 					}
 
 					rs match {
-						case (Some(program: String), tim: Int, coun: Int, _) =>
+						case (Some(program: String), tim: Int, coun: Int, Some(assignment: Assignment)) =>
 							time = Duration.between(start, LocalDateTime.now()).toMillis.toInt
 							count = coun
 							//println("\nthe program is: \n" + program)
 
 							correct = task("solutions") match {
 								case solutions if solutions.asInstanceOf[List[String]].contains(program) => "+"
-								case Some(_) => "-";
+								case Some(_) =>  "-";
 								case None => "?"
-								case _ => "-"
+								case _ =>  "-"
 							}
 						case (None, _, coun: Int, _) =>
 							count = coun
@@ -73,7 +75,7 @@ object ScoopyBenchmarksRunner extends App{
 				} catch {
 					case e: AssertionError => throw e
 					case _: java.lang.OutOfMemoryError => correct = "OutOfMemory"
-					case e: Throwable => correct = e.toString
+					case e: Throwable => correct = e.getStackTrace.mkString("\n")
 				}
 
 				if (pnt) {
@@ -97,7 +99,7 @@ object ScoopyBenchmarksRunner extends App{
 			case _ => 10 * 60
 		}
 
-		println("suite;group;name;variables;top_level_examples;operators;time;count;correct")
+		println("suite;group;name;variables;top_level_examples;cond;concat;time;count;correct")
 		val benchmarks = if (filterArgs.nonEmpty) {
 			benchmarksDir.listFiles()
 				.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
@@ -113,7 +115,7 @@ object ScoopyBenchmarksRunner extends App{
 				.toList
 		}
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, 7, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, 700, pnt = true))
 
 		// Then actually run
 		//benchmarks.foreach(this.runBenchmark(_, timeout))

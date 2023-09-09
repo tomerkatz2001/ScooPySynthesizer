@@ -223,7 +223,7 @@ case class Node(
 
 		if (!done && this.enum.hasNext) {
 			val program = this.enum.next()
-			//print(program.code+" .... "+this.edges.map(e=>e.toString)+" .... "+program.exampleValues + "\n")
+			//print(program.code+" .... "+this.edges.map(e=>e.toString).toString()+" .... "+program.exampleValues + "\n")
 			this.onStep(program)
 
 			for (edge <- this.edges) {

@@ -46,6 +46,6 @@
 			"rs": "5"
 		}
 	],
-	"solutions": ["if 1 > len(a) % 2:\n\trs = len(a[::2])\nelse:\n\trs = len(a)"],
+	"solutions": ["aux = len(a)\nrs = aux + 1 if (1 > aux % 2) else aux + aux"],
 	"previousEnvs": {}
 }

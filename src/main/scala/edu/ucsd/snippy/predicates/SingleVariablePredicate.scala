@@ -9,7 +9,8 @@ class SingleVariablePredicate(
 	val oeManager: OEValuesManager,
 	val varName: String,
 	val retType: Types,
-	val values: List[Any]) extends Predicate {
+	val values: List[Any],
+	val envs: List[Map[String, Any]]) extends Predicate {
 
 	override def evaluate(program: ASTNode): Option[SingleAssignment] = {
 		if (program.nodeType != this.retType || program.exampleValues.contains(None)) {
