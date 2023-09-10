@@ -42,7 +42,7 @@ object ScoopyBenchmarksRunner extends App{
 					val concat = if(operators.contains("concat")) "+" else "-"
 					//variables = task.outputVariables.toList
 
-					if (pnt) print(s"$suite;$group;$name;$variables;$cond;$concat; ")
+					if (pnt) print(s"$suite;$group;$name;$variables;$topLevelExamples;$cond;$concat; ")
 
 
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
@@ -115,7 +115,7 @@ object ScoopyBenchmarksRunner extends App{
 				.toList
 		}
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, 700, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, 7, pnt = true))
 
 		// Then actually run
 		//benchmarks.foreach(this.runBenchmark(_, timeout))
