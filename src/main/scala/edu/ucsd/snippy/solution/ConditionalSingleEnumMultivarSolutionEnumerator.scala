@@ -15,7 +15,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 			 variables: List[(String, Types)],
 			 literals: Iterable[String],
 			 partitionFunction: List[Any] => List[(Set[Int], Set[Int])],
-			 knownVarAssignments: Map[String, ASTNode],
+			 knownVarAssignments: Map[String, Map[String, ASTNode]],
 			 requiredASTs: List[ASTNode]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
@@ -112,15 +112,17 @@ object Node {
 		envs: List[Map[String, Any]],
 		variable: Variable,
 		partition: (Set[Int], Set[Int]),
-		knownAssignments:Map[String, ASTNode]): CondProgStore = {
+		knownAssignments:Map[String, Map[String, ASTNode]]): CondProgStore = {
 		val values = envs.map(_(variable.name))
 		val rs = CondProgStore(
 			new ProgStore(partition._1, filterByIndices(values, partition._1)),
 			new ProgStore(partition._2, filterByIndices(values, partition._2)))
 
-		if (knownAssignments.contains(variable.name)) {
-			rs.thenCase.program = Some(knownAssignments(variable.name))
-			rs.elseCase.program = Some(VariableNode.nodeFromType(variable.name, knownAssignments(variable.name).nodeType,List()).get)
+		val knownVars = knownAssignments.flatten(_._2.map({case (v,node)=>(v,node.nodeType)})).toMap
+		if (knownVars.keys.contains(variable.name)) {
+			val defaultNode = VariableNode.nodeFromType(variable.name, knownVars(variable.name),List())
+			rs.thenCase.program = if(knownAssignments.contains("then") && knownAssignments("then").contains(variable.name)) Some(knownAssignments("then")(variable.name)) else defaultNode
+			rs.elseCase.program = if(knownAssignments.contains("else") && knownAssignments("else").contains(variable.name)) Some(knownAssignments("else")(variable.name)) else defaultNode
 			return rs
 		}
 
@@ -163,7 +165,7 @@ object Node {
 		variables: List[(String, Types)],
 		literals: Iterable[String],
 		seen: mutable.Map[edu.ucsd.snippy.predicates.Node,Node] = mutable.Map.empty,
-		knownVarsAssignments: Map[String, ASTNode],
+		knownVarsAssignments: Map[String, Map[String, ASTNode]],
 		requiredASTs:List[ASTNode] = Nil): Node = {
 		if (seen.contains(parent)) return seen(parent)
 		val assignedBefore = parent.assignedBeforeMe;
@@ -202,13 +204,19 @@ object Node {
 
 		n.edges.foreach(edge=> if(edge.child.blocked) {
 			val oldVars = edge.child.state.head.filter(x=>x._2!=None).keys
-			for (v <- knownVarsAssignments.keys){
+			for (v <- knownVarsAssignments("then").keys){
 				if(edge.variables.map(_._1.name).contains(v)){
-					val newVals = knownVarsAssignments(v).updateValues(new Contexts(parent.state)).exampleValues.map(x=> if(x.nonEmpty) x.get else x)
+					val newVals = knownVarsAssignments("then")(v).updateValues(new Contexts(parent.state)).exampleValues.map(x=> if(x.nonEmpty) x.get else x)
 					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
 				}
 			}
-			val useableVars= knownVarsAssignments.keys.filter(x => !oldVars.contains(x))
+			for (v <- knownVarsAssignments("else").keys) {
+				if (edge.variables.map(_._1.name).contains(v)) {
+					val newVals = knownVarsAssignments("else")(v).updateValues(new Contexts(parent.state)).exampleValues.map(x => if (x.nonEmpty) x.get else x)
+					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
+				}
+			}
+			val useableVars= knownVarsAssignments.values.flatten.toMap.keys.filter(x => !oldVars.contains(x))
 			val newVocab = edge.child.enum.vocab.addVars(edge.child.state.head.filter(x=> useableVars.contains(x._1) && x._2 != None).map(x => (x._1, typeof(x._2))).toList)
 			edge.child.enum = edge.child.enum.copy(newVocab, edge.child.enum.oeManager, edge.child.state)
 		})

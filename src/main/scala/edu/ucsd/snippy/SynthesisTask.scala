@@ -101,11 +101,21 @@ object SynthesisTask
 	}
 
 
-	def getContextsFromExamples(examples: List[Map[String, Any]], outVarNames: Set[String]): List[Context] =
+	def getContextsFromExamples(examples: List[Map[String, Any]], outVarNames: Set[String]): List[Context] = {
 		examples.map {
 			env => env.filter(entry => !outVarNames.contains(entry._1))
 		}
-	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), knownAssignments:Map[String, ASTNode], simAssign: Boolean = false): SynthesisTask={
+	}
+
+	/**
+	 * This function is used to create a SynthesisTask from a ScopeSpecification
+	 * @param spec - the ScopeSpecification
+	 * @param requiredASTs asts that must be in the solution
+	 * @param knownAssignments known assignments to variables. its maps from the branch name to to required assignments
+	 * @param simAssign
+	 * @return SynthesisTask
+	 */
+	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), knownAssignments:Map[String, Map[String, ASTNode]], simAssign: Boolean = false): SynthesisTask={
 		val outputVarNames: Set[String] = spec.outputVarNames
 		val (previousEnvMap, envs):(Map[Int, Map[String, Any]], List[Map[String, Any]]) = spec.getPrevEnvsAndEnvs()
 

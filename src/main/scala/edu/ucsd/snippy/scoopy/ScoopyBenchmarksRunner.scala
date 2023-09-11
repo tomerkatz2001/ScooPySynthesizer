@@ -61,7 +61,7 @@ object ScoopyBenchmarksRunner extends App{
 						case (Some(program: String), tim: Int, coun: Int, Some(assignment: Assignment)) =>
 							time = Duration.between(start, LocalDateTime.now()).toMillis.toInt
 							count = coun
-							//println("\nthe program is: \n" + program)
+							println("\nthe program is: \n" + program)
 							//print("\nthe program is: \n" + assignment.code())
 							correct = task("solutions") match {
 								case solutions if solutions.asInstanceOf[List[String]].contains(program) => "+"
@@ -86,7 +86,7 @@ object ScoopyBenchmarksRunner extends App{
 	}
 
 
-		val benchmarksDir = new File("synthesizer/src/test/resources/scoopy")
+		val benchmarksDir = new File("synthesizer/src/test/resources/test")
 		assert(benchmarksDir.isDirectory)
 
 
@@ -115,7 +115,7 @@ object ScoopyBenchmarksRunner extends App{
 				.toList
 		}
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, 7, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, 700, pnt = true))
 
 		// Then actually run
 		//benchmarks.foreach(this.runBenchmark(_, timeout))
