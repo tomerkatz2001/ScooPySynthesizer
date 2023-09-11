@@ -121,7 +121,7 @@ object Snippy extends App
 			val taskStr = StdIn.readLine()
 			val spec = ScopeSpecification.fromString(taskStr)
 
-			code = Some(ScopeSpecification.toScopeable(spec).solve()._4.get.code(true))
+			code = Some(spec.solve()._4.get.code(true))
 		} catch {
 			case e: Throwable => stderr.println(e.toString)
 		}

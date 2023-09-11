@@ -10,8 +10,24 @@ sealed abstract class Assignment {
 		this.innerSpecs = Some(examples)
 	}
 	var innerSpecs: Option[Map[String, List[Map[String, Any]]]] = None
-	val scopePrefix = "#! Start of specification block:"
-	val ScopeSuffix = "#! End of specification block"
+	val scopePrefix = "#! Start of specification scope:"
+	val ScopeSuffix = "#! End of specification scope"
+
+	def exampleToString(example: Map[String, Any], index:Int): String = {
+		val assignedVars= this.getAssignedVars()
+		val inputs = example.map {
+			case (name, value) if(!assignedVars.contains(name))=> f"$name = $value"
+			case _ => ""
+		}.filter(x=>x!="").mkString(", ")
+		val outputs = example.map {
+			case (name, value) if(assignedVars.contains(name))=> f"$name = $value"
+			case _ => ""
+		}.filter(x=>x!="").mkString(", ")
+		f"#! ${index}) $inputs => $outputs"
+
+	}
+
+
 
 }
 
@@ -26,7 +42,7 @@ case class SingleAssignment(name: String, var program: ASTNode) extends Assignme
 		val relevantExamples: Option[List[Map[String, Any]]]= if(innerSpecs.nonEmpty) innerSpecs.get.get(name) else None;
 		if(relevantExamples.nonEmpty){
 			val examplesWrap = relevantExamples.get.zipWithIndex.map {
-				case (example, i) => f"#! ${i + 1}) ${example.filter(_._1 != name)} => ${example(name)}"
+				case (example, i) => this.exampleToString(example, i + 1)
 			}.mkString("\n")
 			scopePrefix + "\n" + examplesWrap +"\n"+ rs + "\n" + ScopeSuffix
 		}
@@ -59,7 +75,7 @@ case class BasicMultivariableAssignment(names: List[String], programs: List[ASTN
 					val relevantExamples: Option[List[Map[String, Any]]]= if(innerSpecs.nonEmpty) innerSpecs.get.get(name) else None;
 					if (relevantExamples.nonEmpty) {
 						val examplesWrap = relevantExamples.get.zipWithIndex.map {
-							case (example, i) => f"#! ${i + 1}) ${example.filter(_._1 != name)} => ${example(name)}"
+							case (example, i) => this.exampleToString(example, i + 1)
 						}.mkString("\n")
 						scopePrefix + "\n" + examplesWrap +"\n"+  rs + "\n" + ScopeSuffix
 					}

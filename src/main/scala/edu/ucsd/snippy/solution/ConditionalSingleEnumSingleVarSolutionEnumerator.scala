@@ -45,7 +45,6 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 	override def step(): Unit = {
 		val program = enumerator.next()
 		//print(program.code+" .... "+program.exampleValues+" .... "+program.height + "\n")
-
 		val paths = for (((thenPart, elsePart), store) <- stores) yield {
 			var updated = false
 

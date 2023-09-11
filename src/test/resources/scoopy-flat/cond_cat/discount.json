@@ -1,0 +1,29 @@
+{
+	"varNames": [
+		"discounted_price"
+	],
+	"envs": [
+		{
+			"original_price": "200.0",
+			"min_price_for_discount": "100.0",
+			"percent": "0.1",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"discounted_price": "180.0"
+		},
+		{
+			"original_price": "90.0",
+			"min_price_for_discount": "100.0",
+			"percent": "0.1",
+			"#": "",
+			"$": "",
+			"time": 2,
+			"discounted_price": "90.0"
+		}
+	],
+	"previousEnvs": {},
+	"solutions": ["discount = percent * original_price if (min_price_for_discount <= original_price) else 0.0\ndiscounted_price = original_price - discount",
+	"if min_price_for_discount <= original_price:\n\tdiscounted_price = original_price - percent * original_price\nelse:\n\tdiscounted_price = original_price"]
+
+}

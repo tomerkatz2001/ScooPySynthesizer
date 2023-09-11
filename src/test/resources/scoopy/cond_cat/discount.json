@@ -1,0 +1,101 @@
+{
+	"scopesTree": {
+		"0": {
+			"T": {
+				"2":{}
+			},
+			"F": {
+				"3": {}
+			},
+			"NB": {
+				"1": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"discounted_price"
+			],
+			"rawCommentExamples": [
+				{
+					"original_price": "200.0",
+					"min_price_for_discount": "100.0",
+					"percent": "0.1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"discounted_price": "180.0"
+				},
+				{
+					"original_price": "90.0",
+					"min_price_for_discount": "100.0",
+					"percent": "0.1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"discounted_price": "90.0"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"discounted_price"
+			],
+			"rawCommentExamples": [
+				{
+					"original_price": "200.0",
+					"min_price_for_discount": "100.0",
+					"percent": "0.1",
+					"discount": "20.0",
+					"#": "",
+					"$": "",
+					"time": "9",
+					"discounted_price": "180.0"
+				}
+			],
+			"assignments": ["'rs = original_price - discount'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"discount"
+			],
+			"rawCommentExamples": [
+				{
+					"original_price": "200.0",
+					"min_price_for_discount": "100.0",
+					"percent": "0.1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"discount": "20.0"
+				}
+			],
+			"assignments": ["'discount = percent * original_price'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"discount"
+			],
+			"rawCommentExamples": [
+				{
+					"original_price": "90.0",
+					"min_price_for_discount": "100.0",
+					"percent": "0.1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"discount": "0.0"
+				}
+			],
+			"assignments": ["'discount = no_discount'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["discount = percent * original_price if (min_price_for_discount <= original_price) else 0.0\ndiscounted_price = original_price - discount",
+	"if min_price_for_discount <= original_price:\n\tdiscounted_price = original_price - percent * original_price\nelse:\n\tdiscounted_price = original_price"]
+}

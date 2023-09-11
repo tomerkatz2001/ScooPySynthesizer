@@ -76,7 +76,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 							ifTrueList.head match {
 								case _: IntNode =>IntCondNode(condition, ifTrueList.head.asInstanceOf[IntNode], ifFalseList.head.asInstanceOf[IntNode], contexts) :: Nil;
 								case _: StringNode => StringCondNode(condition, ifTrueList.head.asInstanceOf[StringNode], ifFalseList.head.asInstanceOf[StringNode], contexts) :: Nil;
-								case _: DoubleNode => DoubleCondNode(condition,ifTrueList.head.asInstanceOf[DoubleNode], ifFalseList.head.asInstanceOf[DoubleNode], contexts) :: Nil;
+								case _: DoubleNode => {DoubleCondNode(condition,ifTrueList.head.asInstanceOf[DoubleNode], ifFalseList.head.asInstanceOf[DoubleNode], contexts) :: Nil};
 								case _: IntListNode => IntListCondNode(condition, ifTrueList.head.asInstanceOf[IntListNode], ifFalseList.head.asInstanceOf[IntListNode], contexts) :: Nil;
 								case _ => println("didnt find type");ifTrueList.head::Nil// error
 							}
@@ -108,7 +108,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 			assert(synthesisTask.outputVariables.forall(v=> !requiredAssignments.contains(v))) // we dont require top level veriables from inner scopes
 			requiredAssignments ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			innerSpecifications ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> synthesisTask.predicate).toList
-			//println("found solution: " + sol._4.get.code(true))
+			println("found solution: " + sol._4.get.code(true))
 			val solutionAssignment: Option[Assignment] = sol._4
 			//requiredVarNames = solutionAssignment.get.getAssignedVars() + requiredVarNames;
 			 covertToASTList(solutionAssignment.get, new Contexts(synthesisTask.contexts)).filter(ast => !seenASTs.contains(ast)).zipWithIndex.map { case (ast, i) => {
@@ -120,11 +120,11 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 		}
 		val innerVars = innerSpecifications.keys.toList
 		val newVars = (this.outputVarNames.toList ++ innerVars).toSet
-		val extendedExamples = this.scopeExamples.map(env => env ++ innerVars.map(v => v -> "'__BOT__'").toMap)
+		val extendedExamples = this.scopeExamples.map(env => env ++ innerVars.filter(v=> !env.keys.exists(_==v)).map(v => v -> "'__BOT__'").toMap)
 		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, this.partition, this.required, newVars, this.scopeType, this.appliedOperators), seenASTs, requiredAssignments.toMap)
 		sol = synthesize(finalTask, timeout);
 		if (sol._4.nonEmpty) {
-			sol._4.get.addExamples(innerSpecifications.map(tup => (tup._1, tup._2.envs)).toMap)
+			sol._4.get.addExamples(innerSpecifications.map(tup => (tup._1, tup._2.envs)).toMap) //TODO: add context to support _in vars
 		}
 		sol //._4.get.code(disablePostProcess=true);
 	}

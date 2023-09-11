@@ -54,6 +54,7 @@ object BenchmarksCSV extends App
 
 					rs match {
 						case (Some(program: String), tim: Int, coun: Int, _) =>
+							//print("the program is: " + program + "\n");
 							time = tim
 							count = coun
 							correct = task.get("solutions") match {

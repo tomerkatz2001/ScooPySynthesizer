@@ -27,8 +27,11 @@ object Utils
 					case Some("") => Some(StringLiteral("", vals.length))
 					case Some(" ") => Some(StringLiteral(" ", vals.length))
 					case Some(-1) => Some(IntLiteral(-1, vals.length))
+					case Some(0.0) if(typ==Types.Double) => Some(DoubleLiteral(0.0, vals.length))
 					case Some(0) => Some(IntLiteral(0, vals.length))
+					case Some(1.0) if(typ==Types.Double) => Some(DoubleLiteral(1.0, vals.length))
 					case Some(1) => Some(IntLiteral(1, vals.length))
+					case Some(1.0) if(typ==Types.Double)=> Some(DoubleLiteral(1.0, vals.length))
 					case Some(List()) if typ == Types.IntList =>
 						Some(ListLiteral[Int](typ, List(), vals.length))
 					case Some(List()) if typ == Types.StringList =>
@@ -96,11 +99,11 @@ object Utils
 		}
 		tup._1 match {
 			case None => false
-			case Some(a:Double) => a === tup._2.asInstanceOf[Double]
+//			case Some(a:Double) => a === tup._2.asInstanceOf[Double]
 			case Some(x: scala.List[_]) if x.nonEmpty => x.head match { //type erasure is bad and gross
-				case _: Double =>
-					//x.length == tup._2.length && x.asInstanceOf[List[Double]].zip(b.asInstanceOf[List[Double]]).forall(t => t._1 === t._2)
-					x.asInstanceOf[List[Double]] === tup._2.asInstanceOf[List[Double]]
+//				case _: Double =>
+//					//x.length == tup._2.length && x.asInstanceOf[List[Double]].zip(b.asInstanceOf[List[Double]]).forall(t => t._1 === t._2)
+//					x.asInstanceOf[List[Double]] === tup._2.asInstanceOf[List[Double]]
 				case _ => tup._1.get == tup._2
 			}
 			case _ => tup._1.isDefined && (tup._1.get == tup._2)

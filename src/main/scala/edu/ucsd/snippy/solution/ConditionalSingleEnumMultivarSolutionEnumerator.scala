@@ -120,7 +120,7 @@ object Node {
 
 		if (knownAssignments.contains(variable.name)) {
 			rs.thenCase.program = Some(knownAssignments(variable.name))
-			rs.elseCase.program = Some(knownAssignments(variable.name))
+			rs.elseCase.program = Some(VariableNode.nodeFromType(variable.name, knownAssignments(variable.name).nodeType,List()).get)
 			return rs
 		}
 
@@ -204,7 +204,7 @@ object Node {
 			val oldVars = edge.child.state.head.filter(x=>x._2!=None).keys
 			for (v <- knownVarsAssignments.keys){
 				if(edge.variables.map(_._1.name).contains(v)){
-					val newVals = knownVarsAssignments(v).updateValues(new Contexts(parent.state)).exampleValues.map(_.get)
+					val newVals = knownVarsAssignments(v).updateValues(new Contexts(parent.state)).exampleValues.map(x=> if(x.nonEmpty) x.get else x)
 					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
 				}
 			}

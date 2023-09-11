@@ -111,6 +111,7 @@ object VocabFactory
 	{
 		val defaultStringLiterals = List(" ")
 		val defaultIntLiterals = List(-1, 0, 1, 2)
+		val defaultDoubleLiterals = List(0.0, 1.0, 2.0)
 		val stringLiterals = (defaultStringLiterals ++ additionalLiterals).distinct
 
 
@@ -223,6 +224,18 @@ object VocabFactory
 						IntLiteral(num, contexts.length)
 				}
 			} ++
+				defaultDoubleLiterals.map { num =>
+					new BasicVocabMaker {
+						override val arity: Int = 0
+						override val childTypes: List[Types] = Nil
+						override val returnType: Types = Types.Double
+						override val nodeType: Class[_ <: ASTNode] = classOf[DoubleLiteral]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							DoubleLiteral(num, contexts.length)
+					}
+				} ++
 				//and then all other combinations
 				List(
 					new BasicVocabMaker {
