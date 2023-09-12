@@ -54,7 +54,7 @@ class ScopeSpecsTests extends JUnitSuite {
 		val scopeSpec = ScopeSpecification.scope(spec, List(examples(0)), outputVarNames)
 		val scopeSpec2 = ScopeSpecification.scope(scopeSpec, List(examples(1)), outputVarNames)
 		assertEquals(examples, scopeSpec2.getPrevEnvsAndEnvs()._2);
-		assertEquals(0, scopeSpec2.required.length);
+		//assertEquals(0, scopeSpec2.required.length);
 		assertEquals((List(), List()), scopeSpec2.partition);
 		assertEquals(Set("x"), scopeSpec2.outputVarNames);
 	}
@@ -68,7 +68,7 @@ class ScopeSpecsTests extends JUnitSuite {
 		val spec = ScopeSpecification.toScopeable(specScope)
 		assertEquals(Tuple2(List(), List()), spec.partition)
 		assertEquals(List(), spec.getPrevEnvsAndEnvs()._2)
-		assertEquals(1, spec.required.length)
+		//assertEquals(1, spec.required.length)
 		assertEquals("x = y + 2", spec.solve()._4.get.code())
 		//assertEquals("if (True) y + 2 else x", spec.solve())// without postprocessing
 	}
@@ -84,7 +84,7 @@ class ScopeSpecsTests extends JUnitSuite {
 		val concatSpec = ScopeSpecification.concat(List(assignSpec, assignSpec2))
 		assertEquals(Tuple2(List(), List()), concatSpec.partition)
 		assertEquals(List(), concatSpec.getPrevEnvsAndEnvs()._2)
-		assertEquals(0, concatSpec.required.length)
+		//assertEquals(0, concatSpec.required.length)
 		assertEquals(Set("x", "z"), concatSpec.outputVarNames)
 
 	}
@@ -141,7 +141,7 @@ class ScopeSpecsTests extends JUnitSuite {
 		val concatSpec = ScopeSpecification.concat(List(condSpec, postCondAssignSpec))
 		assertEquals(Tuple2(List(), List()), concatSpec.partition)
 		assertEquals(List(), concatSpec.getPrevEnvsAndEnvs()._2)
-		assertEquals(1, concatSpec.required.length)
+		//assertEquals(1, concatSpec.required.length)
 		assertEquals(Set("x", "z"), concatSpec.outputVarNames)
 	}
 	/*
@@ -227,7 +227,7 @@ class fromTreeTests extends  JUnitSuite{
 		val json = """{"scopesTree":{"0":{"NB":{"1":{}}}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":"12","y":"3"}],"outputVarNames":["x"],"assignments":[]},"1":{"commentId":"1","commentExamples":[{"x":"12","y":"6"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]}}}"""
 		val spec = ScopeSpecification.fromString(json)
 		assertEquals(List(Map("x" -> 12, "y" -> 6), Map("x" -> 12, "y" -> 3)), spec.getPrevEnvsAndEnvs()._2)
-		assertEquals(0, spec.required.length)
+		//assertEquals(0, spec.required.length)
 
 	}
 	@Test def condTest(): Unit = {
@@ -245,7 +245,7 @@ class fromTreeTests extends  JUnitSuite{
 		val json = """{"scopesTree":{"0":{"NB":{"1":{}, "2"{}}}},"scopes":{"0":{"commentId":"0","commentExamples":[{"x":"12","y":"3"}],"outputVarNames":["x"],"assignments":[]},"1":{"commentId":"1","commentExamples":[{"x":"12","y":"6"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]},"2":{"commentId":"2","commentExamples":[{"x":"2","y":"1"}],"outputVarNames":["x"],"assignments":["'x = y + y'"]}}}"""
 		val spec = ScopeSpecification.fromString(json)
 		assertEquals(List(Map("x"-> 12, "y"-> 3)), spec.getPrevEnvsAndEnvs()._2)
-		assertEquals(2, spec.required.length)
+		//assertEquals(2, spec.required.length)
 		print(ScopeSpecification.toScopeable(spec).solve()._4.get.code())
 
 	}

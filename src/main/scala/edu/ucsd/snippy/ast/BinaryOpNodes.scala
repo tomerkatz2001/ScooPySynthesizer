@@ -414,7 +414,14 @@ case class StringSplit(lhs: StringNode, rhs: StringNode, reqVeq: List[Boolean] =
 
 	override def doOp(l: Any, r: Any): Option[Iterable[String]] = (l, r) match {
 		case (_, "") => None
-		case (l: String, r: String) => Some(l.split(r).toList)
+		case (l: String, r: String) => {
+			try{
+				Some(l.split(r).toList)
+			}
+			catch {
+				case e: Exception => None // probobly cause r is not a valid regex
+			}
+		}
 		case _ => wrongType(l, r)
 	}
 
