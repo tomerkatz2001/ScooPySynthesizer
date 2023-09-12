@@ -168,8 +168,8 @@ object Node {
 		knownVarsAssignments: Map[String, Map[String, ASTNode]],
 		requiredASTs:List[ASTNode] = Nil): Node = {
 		if (seen.contains(parent)) return seen(parent)
-		val assignedBefore = parent.assignedBeforeMe;
-		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, assignedBefore, x._2, new Contexts(parent.state))) // makes the contexts good in singleVar. in multi var it will be done inside the node
+		val assignedVars = parent.assignedBeforeMe;
+		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List("count", "rs"), x._2, new Contexts(parent.state))) // makes the contexts good in singleVar. in multi var it will be done inside the node
 
 		val enumerator = new ProbEnumerator(
 			VocabFactory(variables, literals, requiredVocabMakers),
@@ -207,13 +207,17 @@ object Node {
 			for (v <- knownVarsAssignments("then").keys){
 				if(edge.variables.map(_._1.name).contains(v)){
 					val newVals = knownVarsAssignments("then")(v).updateValues(new Contexts(parent.state)).exampleValues.map(x=> if(x.nonEmpty) x.get else x)
-					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
+					val nodeType = knownVarsAssignments("then")(v).nodeType
+					val newdontChnageVals = VariableNode.nodeFromType(s"${v}_else",nodeType,edge.child.state).get.exampleValues.map(x=> if(x.nonEmpty) x.get else x)
+					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)).updated(s"${v}_else",newdontChnageVals(x._2)))
 				}
 			}
 			for (v <- knownVarsAssignments("else").keys) {
 				if (edge.variables.map(_._1.name).contains(v)) {
 					val newVals = knownVarsAssignments("else")(v).updateValues(new Contexts(parent.state)).exampleValues.map(x => if (x.nonEmpty) x.get else x)
-					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
+					val nodeType = knownVarsAssignments("else")(v).nodeType
+					val newdontChnageVals = VariableNode.nodeFromType(s"${v}then", nodeType, edge.child.state).get.exampleValues.map(x=> if(x.nonEmpty) x.get else x)
+					edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)).updated(s"${v}_then",newdontChnageVals(x._2)))
 				}
 			}
 			val useableVars= knownVarsAssignments.values.flatten.toMap.keys.filter(x => !oldVars.contains(x))
@@ -254,7 +258,7 @@ case class Node(
 
 		if (!done && !this.blocked() && this.enum.hasNext) {
 			val program = this.enum.next()
-			//print(program.code+" .... "+this.edges.map(e=>e.toString).toString()+" .... "+program.exampleValues + "\n")
+			print(program.code+" .... "+this.edges.map(e=>e.toString).toString()+" .... "+program.exampleValues + "\n")
 			this.onStep(program)
 
 			for (edge <- this.edges) {
