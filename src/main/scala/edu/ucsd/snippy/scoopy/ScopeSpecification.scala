@@ -77,6 +77,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 								case _: StringNode => StringCondNode(condition, ifTrueList.head.asInstanceOf[StringNode], ifFalseList.head.asInstanceOf[StringNode], contexts) :: Nil;
 								case _: DoubleNode => {DoubleCondNode(condition,ifTrueList.head.asInstanceOf[DoubleNode], ifFalseList.head.asInstanceOf[DoubleNode], contexts) :: Nil};
 								case _: IntListNode => IntListCondNode(condition, ifTrueList.head.asInstanceOf[IntListNode], ifFalseList.head.asInstanceOf[IntListNode], contexts) :: Nil;
+								case _:ListNode[Int] => IntListCondNode(condition, ifTrueList.head.asInstanceOf[ListNode[Int]], ifFalseList.head.asInstanceOf[ListNode[Int]], contexts) :: Nil;
 								case _ => println("didnt find type");ifTrueList.head::Nil// error
 							}
 
@@ -120,21 +121,21 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 
 		assert(requiredAssignments.contains("then"))
 		assert(requiredAssignments.contains("else"))
-		val copy = requiredAssignments("else")
-		val x= requiredAssignments("then").flatMap(tup => Map(tup._1+"_else" -> tup._2))
-		val y = copy.flatMap(tup=> Map(tup._1+"_then" -> tup._2))
-		requiredAssignments = Map("then" -> (requiredAssignments("then") ++ y), "else" -> (requiredAssignments("else") ++ x))
 
 		//TODO: maybe if all ouput varrs are synthesized from inside ignore the assignments?
 		val innerVars = requiredAssignments.values.flatten.toMap.keys.toList
 		val newVars = (this.outputVarNames.toList ++ innerVars).toSet
 		val extendedExamples = this.scopeExamples.map(env => env ++ innerVars.filter(v=> !env.keys.exists(_==v)).map(v => v -> "'__BOT__'").toMap)
 
-		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, this.partition, this.required, newVars, this.scopeType, this.appliedOperators), seenASTs, requiredAssignments)
-		sol = synthesize(finalTask, timeout);
-//		if (sol._4.nonEmpty) {
-//			sol._4.get.addExamples(innerSpecifications.map(tup => (tup._1, tup._2.envs)).toMap) //TODO: add context to support _in vars
+		var partition = this.partition
+//		if(innerVars.nonEmpty){
+//			partition = (extendedExamples.indices.toList, List())
 //		}
+		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, partition, this.required, newVars, this.scopeType, this.appliedOperators), seenASTs, requiredAssignments.values.flatten.toMap)
+		sol = synthesize(finalTask, timeout);
+		if (sol._4.nonEmpty) {
+			sol._4.get.addExamples(innerSpecifications("then").map(tup => (tup._1, tup._2.envs)).toMap) //TODO: add context to support _in vars
+		}
 		sol //._4.get.code(disablePostProcess=true);
 	}
 	def handelReqs(Reqs: List[(List[ASTNode], Map[String, Map[String, ASTNode]]) => SynthesisTask], timeout:Int, topLevelVarNames:Set[String]) ={
@@ -147,7 +148,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 			assert(synthesisTask.outputVariables.forall(v => !requiredAssignments.contains(v))) // we dont require veriables twice
 			requiredAssignments ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			seenASTs ++= synthesisTask.outputVariables.map(v => extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
-			innerSpecifications ++= synthesisTask.outputVariables.map(v => v -> synthesisTask.predicate).toList
+			innerSpecifications ++= synthesisTask.outputVariables.filter(!topLevelVarNames.contains(_)).map(v => v -> synthesisTask.predicate).toList
 			println("found solution: " + sol._4.get.code(true))
 		}
 
@@ -229,7 +230,7 @@ object ScopeSpecification {
 	}
 
 	def toScopeable(specification: ScopeSpecification): ScopeSpecification ={
-		val required = (requiredASTs:List[ASTNode], requiredAssignments:Map[String, Map[String, ASTNode]])=>SynthesisTask.fromSpec(specification, requiredASTs, requiredAssignments);
+		val required = (requiredASTs:List[ASTNode], requiredAssignments:Map[String, Map[String, ASTNode]])=>SynthesisTask.fromSpec(specification, requiredASTs, requiredAssignments.values.flatten.toMap)
 		val emptyReq = Map("then" -> (required::Nil))
 		val x = specification.required.filter(tup=> tup._2.nonEmpty).map(tup => (tup._1 , required::tup._2))
 		val newRequired = if(x.isEmpty) emptyReq  else x

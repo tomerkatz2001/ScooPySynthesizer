@@ -115,7 +115,7 @@ object SynthesisTask
 	 * @param simAssign
 	 * @return SynthesisTask
 	 */
-	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), knownAssignments:Map[String, Map[String, ASTNode]], simAssign: Boolean = false): SynthesisTask={
+	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), knownAssignments:Map[String, ASTNode], simAssign: Boolean = false): SynthesisTask={
 		val outputVarNames: Set[String] = spec.outputVarNames
 		val (previousEnvMap, envs):(Map[Int, Map[String, Any]], List[Map[String, Any]]) = spec.getPrevEnvsAndEnvs()
 
@@ -157,7 +157,12 @@ object SynthesisTask
 			case pred: MultilineMultivariablePredicate if simAssign =>
 				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
 			case pred: MultilineMultivariablePredicate =>
-				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc, knownAssignments, requiredASTs)
+				if(requiredASTs.nonEmpty){
+					new ConditionalSingleEnumMultivarSolutionEnumeratorInnerVars(pred, parameters, additionalLiterals, spec.getPartitionFunc, knownAssignments, requiredASTs)
+				}
+				else{
+					new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc, knownAssignments, requiredASTs)
+				}
 			case pred: SingleVariablePredicate =>
 				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
 				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
@@ -208,10 +213,13 @@ object SynthesisTask
 		outputEnvs: List[Map[String, Any]]): (List[Context], MultilineMultivariablePredicate) = {
 		var contexts = inputContexts
 
+
+		val dupVarNames = outputVarNames.filter(name=>name.contains("else") || name.contains("then")).map(_.replace("_then", "").replace("_else", "")).toSet
+		val ActualVarName = (outputVarNames.filter(name=> !name.contains("else") && !name.contains("then")) ++ dupVarNames).toSet
 		// We can support multiline assignments, so let's build the graph
 		// We start with enumerating all the possible environments
-		val environments = this.enumerateEnvs(outputVarNames, contexts, outputEnvs)
-
+		val environments_ = this.enumerateEnvs(outputVarNames, contexts, outputEnvs)
+		val environments = environments_.filter(tup => tup._1.count(name => name.contains("_then") || name.contains("_else")) < 2) //no mre than 2 of the same var TODO:what if there is two _then vars. rs_then t_then
 		// enviornments.head := Same as "contexts", the environment with all old values -> The starting node
 		// environment.last := processedEnvs, the environment with all the new values -> The end node
 
@@ -234,7 +242,8 @@ object SynthesisTask
 		contexts = contexts.dropRight(1)
 
 		// Set the final node
-		nodes.last.isEnd = true
+		//nodes.last.isEnd = true
+		nodes.foreach(x=> if(x.nodesVars.length==ActualVarName.size) {x.isEnd=true})
 
 		// Note: There's a dependency here between the order of nodes, and the order of the `environments`, which
 		// we use below to find the nodes that should have a variable in-between.
@@ -315,7 +324,7 @@ object SynthesisTask
 		outputNames: List[String]): Set[String] =
 	{
 		outputNames
-			.filter(name => startingContexts.map(_(name)).exists(Types.typeof(_) == Types.String))
+			.filter(name => if(startingContexts.forall(_.contains(name))) startingContexts.map(_(name)).exists(Types.typeof(_) == Types.String) else false)
 			.flatMap(outputName =>
 			{
 				startingContexts.flatMap {

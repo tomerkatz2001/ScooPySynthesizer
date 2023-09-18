@@ -1,7 +1,7 @@
 package edu.ucsd.snippy.vocab
 
 import edu.ucsd.snippy.ast.Types.{IntList, IntSet, Types}
-import edu.ucsd.snippy.ast.{ASTNode, BoolVariable, IntVariable, StringNode, StringVariable, Types, _}
+import edu.ucsd.snippy.ast.{ASTNode, BoolVariable, IntNode, IntVariable, StringNode, StringVariable, Types, _}
 import edu.ucsd.snippy.enumeration.Contexts
 
 class VocabFactory(
@@ -782,89 +782,6 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						IntToList(children.head.asInstanceOf[IntNode])
 				},
-				new ListCompVocabMaker(Types.String, Types.String) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringToStringListCompNode]
-					override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-						StringToStringListCompNode(
-							lst.asInstanceOf[ListNode[String]],
-							map.asInstanceOf[StringNode],
-							this.varName)
-
-					override val returnType: Types = Types.StringList
-					override val childTypes: List[Types] = List(Types.String)
-					override val head: String = ""
-				},
-				new ListCompVocabMaker(Types.String, Types.Int) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringToIntListCompNode]
-					override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-						StringToIntListCompNode(
-							lst.asInstanceOf[ListNode[String]],
-							map.asInstanceOf[IntNode],
-							this.varName)
-
-					override val returnType: Types = Types.IntList
-					override val childTypes: List[Types] = List(Types.String)
-					override val head: String = ""
-				},
-				new ListCompVocabMaker(Types.Int, Types.String) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[IntToStringListCompNode]
-					override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-						IntToStringListCompNode(
-							lst.asInstanceOf[ListNode[Int]],
-							map.asInstanceOf[StringNode],
-							this.varName)
-
-					override val returnType: Types = Types.StringList
-					override val childTypes: List[Types] = List(Types.Int)
-					override val head: String = ""
-				},
-				new ListCompVocabMaker(Types.Int, Types.Int) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[IntToIntListCompNode]
-					override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-						IntToIntListCompNode(
-							lst.asInstanceOf[ListNode[Int]],
-							map.asInstanceOf[IntNode],
-							this.varName)
-
-					override val returnType: Types = Types.IntList
-					override val childTypes: List[Types] = List(Types.Int)
-					override val head: String = ""
-				},
-				new MapCompVocabMaker(Types.String, Types.String) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringStringMapCompNode]
-					override def makeNode(lst: ASTNode, key: ASTNode, value: ASTNode): ASTNode =
-						StringStringMapCompNode(lst.asInstanceOf[StringNode], key.asInstanceOf[StringNode], value.asInstanceOf[StringNode], this.varName)
-
-					override val returnType: Types = Types.Unknown
-					override val childTypes: List[Types] = List(Types.Unknown)
-					override val head: String = ""
-				},
-				new MapCompVocabMaker(Types.String, Types.Int) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringIntMapCompNode]
-					override def makeNode(lst: ASTNode, key: ASTNode, value: ASTNode): ASTNode =
-						StringIntMapCompNode(lst.asInstanceOf[StringNode], key.asInstanceOf[StringNode], value.asInstanceOf[IntNode], this.varName)
-
-					override val returnType: Types = Types.Unknown
-					override val childTypes: List[Types] = List(Types.Unknown)
-					override val head: String = ""
-				},
-				new FilteredMapVocabMaker(Types.String, Types.String) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringStringFilteredMapNode]
-					override def makeNode(map: ASTNode, filter: BoolNode) : ASTNode =
-						StringStringFilteredMapNode(map.asInstanceOf[MapNode[String, String]], filter, this.keyName)
-
-					override val returnType: Types = Types.Unknown
-					override val childTypes: List[Types] = List(Types.Unknown)
-					override val head: String = ""
-				},
-				new FilteredMapVocabMaker(Types.String, Types.Int) {
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringIntFilteredMapNode]
-					override def makeNode(map: ASTNode, filter: BoolNode) : ASTNode =
-						StringIntFilteredMapNode(map.asInstanceOf[MapNode[String, Int]], filter, this.keyName)
-					override val returnType: Types = Types.StringList
-					override val childTypes: List[Types] = List(Types.Unknown)
-					override val head: String = ""
-				},
 				new BasicVocabMaker
 				{
 					override val arity: Int = 2
@@ -1235,6 +1152,100 @@ object VocabFactory
 //							CondNode[BoolListNode](children.head.asInstanceOf[BoolNode], children(1).asInstanceOf[BoolListNode], children(2).asInstanceOf[BoolListNode], new Contexts(contexts))
 //
 //					},
+				) ++ //compMakers
+				List(
+					new ListCompVocabMaker(Types.String, Types.String) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringToStringListCompNode]
+
+						override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
+							StringToStringListCompNode(
+								lst.asInstanceOf[ListNode[String]],
+								map.asInstanceOf[StringNode],
+								this.varName)
+
+						override val returnType: Types = Types.StringList
+						override val childTypes: List[Types] = List(Types.String)
+						override val head: String = ""
+					},
+					new ListCompVocabMaker(Types.String, Types.Int) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringToIntListCompNode]
+
+						override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
+							StringToIntListCompNode(
+								lst.asInstanceOf[ListNode[String]],
+								map.asInstanceOf[IntNode],
+								this.varName)
+
+						override val returnType: Types = Types.IntList
+						override val childTypes: List[Types] = List(Types.String)
+						override val head: String = ""
+					},
+					new ListCompVocabMaker(Types.Int, Types.String) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[IntToStringListCompNode]
+
+						override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
+							IntToStringListCompNode(
+								lst.asInstanceOf[ListNode[Int]],
+								map.asInstanceOf[StringNode],
+								this.varName)
+
+						override val returnType: Types = Types.StringList
+						override val childTypes: List[Types] = List(Types.Int)
+						override val head: String = ""
+					},
+					new ListCompVocabMaker(Types.Int, Types.Int) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[IntToIntListCompNode]
+
+						override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
+							IntToIntListCompNode(
+								lst.asInstanceOf[ListNode[Int]],
+								map.asInstanceOf[IntNode],
+								this.varName)
+
+						override val returnType: Types = Types.IntList
+						override val childTypes: List[Types] = List(Types.Int)
+						override val head: String = ""
+					},
+					new MapCompVocabMaker(Types.String, Types.String) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringStringMapCompNode]
+
+						override def makeNode(lst: ASTNode, key: ASTNode, value: ASTNode): ASTNode =
+							StringStringMapCompNode(lst.asInstanceOf[StringNode], key.asInstanceOf[StringNode], value.asInstanceOf[StringNode], this.varName)
+
+						override val returnType: Types = Types.Unknown
+						override val childTypes: List[Types] = List(Types.Unknown)
+						override val head: String = ""
+					},
+					new MapCompVocabMaker(Types.String, Types.Int) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringIntMapCompNode]
+
+						override def makeNode(lst: ASTNode, key: ASTNode, value: ASTNode): ASTNode =
+							StringIntMapCompNode(lst.asInstanceOf[StringNode], key.asInstanceOf[StringNode], value.asInstanceOf[IntNode], this.varName)
+
+						override val returnType: Types = Types.Unknown
+						override val childTypes: List[Types] = List(Types.Unknown)
+						override val head: String = ""
+					},
+					new FilteredMapVocabMaker(Types.String, Types.String) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringStringFilteredMapNode]
+
+						override def makeNode(map: ASTNode, filter: BoolNode): ASTNode =
+							StringStringFilteredMapNode(map.asInstanceOf[MapNode[String, String]], filter, this.keyName)
+
+						override val returnType: Types = Types.Unknown
+						override val childTypes: List[Types] = List(Types.Unknown)
+						override val head: String = ""
+					},
+					new FilteredMapVocabMaker(Types.String, Types.Int) {
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringIntFilteredMapNode]
+
+						override def makeNode(map: ASTNode, filter: BoolNode): ASTNode =
+							StringIntFilteredMapNode(map.asInstanceOf[MapNode[String, Int]], filter, this.keyName)
+
+						override val returnType: Types = Types.StringList
+						override val childTypes: List[Types] = List(Types.Unknown)
+						override val head: String = ""
+					},
 				)
 
 

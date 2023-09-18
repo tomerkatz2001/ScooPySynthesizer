@@ -118,7 +118,7 @@ case class DoubleCondNode(override  val cond: BoolNode, override  val thenCase: 
 	)
 }
 
-case class IntListCondNode(override  val cond: BoolNode, override val thenCase: ListNode[Int], override  val elseCase: ListNode[Int], override  val contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with IntListNode {
+case class IntListCondNode(override  val cond: BoolNode, override val thenCase: ListNode[Int], override  val elseCase: ListNode[Int], override  val contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with IntListNode with ListNode[Int] {
 
 	lazy override val nodeType: Types = Types.IntList
 	override val _values: List[Option[Iterable[Int]]] = {
@@ -140,8 +140,8 @@ case class IntListCondNode(override  val cond: BoolNode, override val thenCase: 
 
 	override def updateChildren(children: Seq[ASTNode], requiredVec: List[Boolean]): ASTNode = copy(
 		cond = children.head.asInstanceOf[BoolNode],
-		thenCase = children(1).asInstanceOf[IntListNode],
-		elseCase = children(2).asInstanceOf[IntListNode],
+		thenCase = children(1).asInstanceOf[ListNode[Int]],
+		elseCase = children(2).asInstanceOf[ListNode[Int]],
 		contexts
 	)
 }

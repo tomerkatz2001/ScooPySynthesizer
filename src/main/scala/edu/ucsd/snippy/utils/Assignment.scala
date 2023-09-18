@@ -218,9 +218,9 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 						"\t" + elseCode.map(_.code()).mkString("\n\t")
 				case (thenCode, elseCode) =>
 					f"if ${PostProcessor.clean(cond).code}:\n" +
-						"\t" + thenCode.map(_.code()).mkString("\n\t") +
+						"\t" + thenCode.flatMap(_.code().split("\n")).mkString("\n\t") +
 						"\nelse:\n" +
-						"\t" + elseCode.map(_.code()).mkString("\n\t")
+						"\t" + elseCode.flatMap(_.code().split("\n")).mkString("\n\t")
 			}
 			(preCondString, condString, postCondString) match {
 				case ("", "", "") => "None"
