@@ -2,11 +2,12 @@ package edu.ucsd.snippy.predicates
 
 import edu.ucsd.snippy.ast.ASTNode
 import edu.ucsd.snippy.ast.Types.Types
+import edu.ucsd.snippy.enumeration.Contexts
 import edu.ucsd.snippy.utils.{Assignment, BasicMultivariableAssignment, MultilineMultivariableAssignment, SingleAssignment}
 
 import scala.collection.mutable
 
-class MultilineMultivariablePredicate(val graphStart: Node) extends Predicate {
+class MultilineMultivariablePredicate(val graphStart: Node, val contexts: Contexts) extends Predicate {
 	override val envs: List[Map[String, Any]] = graphStart.state
 	override def evaluate (program: ASTNode): Option[MultilineMultivariableAssignment] = {
 		if (!program.usesVariables) return None

@@ -3,7 +3,7 @@ package edu.ucsd.snippy
 import edu.ucsd.snippy.Snippy.synthesize
 import edu.ucsd.snippy.SynthesisTask.{Context, cleanupInputs, getStringLiterals}
 import edu.ucsd.snippy.ast.{ASTNode, Types}
-import edu.ucsd.snippy.enumeration.{InputsValuesManager, ProbEnumerator}
+import edu.ucsd.snippy.enumeration.{Contexts, InputsValuesManager, ProbEnumerator}
 import edu.ucsd.snippy.parser.Python3Lexer
 import edu.ucsd.snippy.predicates.Predicate
 import edu.ucsd.snippy.solution.{BasicSolutionEnumerator, ConditionalSingleEnumMultivarSolutionEnumerator, Node}
@@ -129,7 +129,7 @@ object NoCFBenchmarks extends App
 			case (None, env) => env.filter(entry => !outputVarNames.contains(entry._1))
 		}
 		val oeManager = new InputsValuesManager
-		val predicate = Predicate.getPredicate(outputVarNames.head, justEnvs, oeManager)
+		val predicate = Predicate.getPredicate(outputVarNames.head, justEnvs, oeManager, new Contexts(contexts))
 		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames)
 		val parameters = contexts.flatMap(_.keys)
 			.toSet[String]
@@ -191,7 +191,7 @@ object NoCFBenchmarks extends App
 			node
 		}.toList
 		val solutionEnumerators = pathNodes.sliding(2).zip(orderedVars).map { case (n1 :: n2 :: Nil, v) =>
-			val pred = Predicate.getPredicate(v, n2.state, n1.enum.oeManager)
+			val pred = Predicate.getPredicate(v, n2.state, n1.enum.oeManager, new Contexts(origSynthesisTask.contexts))
 			new BasicSolutionEnumerator(pred, n1.enum)
 		}
 		val deadline = timeout.seconds.fromNow

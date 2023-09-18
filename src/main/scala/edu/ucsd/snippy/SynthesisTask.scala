@@ -61,7 +61,7 @@ object SynthesisTask
 		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
 
 		val predicate: Predicate = outputVarNames.toList match {
-			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager)
+			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager, new Contexts(contexts))
 			case multiple =>
 				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, justEnvs)
 				contexts = newContexts
@@ -136,7 +136,7 @@ object SynthesisTask
 		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
 
 		val predicate: Predicate = outputVarNames.toList match {
-			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager)
+			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager, new Contexts(contexts))
 			case multiple =>
 				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, justEnvs)
 				contexts = newContexts
@@ -280,7 +280,7 @@ object SynthesisTask
 			nodes(thisIdx).edges = nodeEdges
 		}
 
-		(contexts, new MultilineMultivariablePredicate(nodes.head))
+		(contexts, new MultilineMultivariablePredicate(nodes.head, new Contexts(contexts)))
 	}
 
 	def cleanupInputs(input: Map[String, Any]): Map[String, Any] =

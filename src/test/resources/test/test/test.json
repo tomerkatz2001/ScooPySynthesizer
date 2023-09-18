@@ -36,7 +36,7 @@
 					"count": "1",
 					"rs": "[2,4,3,4]",
 					"time": -1
-				},
+				}
 
 			],
 			"assignments": [
@@ -128,5 +128,5 @@
 			"commentId": 4
 		}
 	},
-	"solutions": []
+	"solutions": ["if num == 2:\n\trs = rs[:count] + [num + count + count] + rs[count:]\n\tcount += 1\nelse:\n\trs += [num]"]
 }

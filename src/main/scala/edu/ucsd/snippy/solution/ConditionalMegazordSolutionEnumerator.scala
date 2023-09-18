@@ -3,7 +3,7 @@ package edu.ucsd.snippy.solution
 import edu.ucsd.snippy.SynthesisTask
 import edu.ucsd.snippy.SynthesisTask.Context
 import edu.ucsd.snippy.ast.{ASTNode, BoolNode, Types}
-import edu.ucsd.snippy.enumeration.{InputsValuesManager, ProbEnumerator}
+import edu.ucsd.snippy.enumeration.{Contexts, InputsValuesManager, ProbEnumerator}
 import edu.ucsd.snippy.predicates.SingleVariablePredicate
 import edu.ucsd.snippy.utils.Utils.{filterByIndices, getBinaryPartitions}
 import edu.ucsd.snippy.utils.{Assignment, ConditionalAssignment}
@@ -33,7 +33,8 @@ class ConditionalMegazordSolutionEnumerator(
 								varName,
 								typ,
 								filterByIndices(outputValues, thenIndices),
-								List())
+								List(),
+								new Contexts(List()))
 							val enum = new ProbEnumerator(
 								VocabFactory.apply(variables, additionalLiterals),
 								predicate.oeManager,
@@ -51,7 +52,8 @@ class ConditionalMegazordSolutionEnumerator(
 								varName,
 								typ,
 								filterByIndices(outputValues, thenIndices),
-								List())
+								List(),
+								new Contexts(List()))
 							val thenEnum = new ProbEnumerator(
 								VocabFactory.apply(variables, additionalLiterals),
 								thenPredicate.oeManager,
@@ -68,7 +70,8 @@ class ConditionalMegazordSolutionEnumerator(
 								varName,
 								typ,
 								filterByIndices(outputValues, elseIndices),
-								List())
+								List(),
+								new Contexts(List()))
 							val elseEnum = new ProbEnumerator(
 								VocabFactory.apply(variables, additionalLiterals),
 								elsePredicate.oeManager,
