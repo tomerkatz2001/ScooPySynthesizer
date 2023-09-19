@@ -67,7 +67,7 @@ class main extends JUnitSuite {
 		else:
 			rs = rs + [-i]
 	 */
-	val path = "C:\\Users\\tomerkatz\\Desktop\\LooPy\\synthesizer\\src\\test\\resources\\Tomer\\test.json"
+	val path = "C:\\Users\\tomerkatz\\Desktop\\LooPy\\synthesizer\\src\\test\\resources\\Tomer\\move2.json"
 	val file = new File(path)
 	val taskStr = fromFile(file).mkString
 	val task = SynthesisTask.fromString(taskStr)

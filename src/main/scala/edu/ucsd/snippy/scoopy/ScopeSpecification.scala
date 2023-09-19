@@ -133,7 +133,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 //		}
 		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, partition, this.required, newVars, this.scopeType, this.appliedOperators), seenASTs, requiredAssignments.values.flatten.toMap)
 		sol = synthesize(finalTask, timeout);
-		if (sol._4.nonEmpty) {
+		if (sol._4.nonEmpty && innerSpecifications.contains("then")) {
 			sol._4.get.addExamples(innerSpecifications("then").map(tup => (tup._1, tup._2.getEnvs())).toMap) //TODO: add context to support _in vars
 		}
 		sol //._4.get.code(disablePostProcess=true);

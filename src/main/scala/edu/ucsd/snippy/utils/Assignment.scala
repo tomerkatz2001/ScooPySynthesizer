@@ -13,14 +13,25 @@ sealed abstract class Assignment {
 	val scopePrefix = "#! Start of specification scope:"
 	val ScopeSuffix = "#! End of specification scope"
 
+	def asPythonString(value: Any):String={
+		value match {
+			case value: Number => value.toString
+			case value: String => s"'$value'"
+			case value: List[_]=> s"[${value.map(asPythonString).mkString(",")}]"
+			case value: Set[_] => s"{${value.map(asPythonString).mkString(",")}}"
+			case value => value.toString
+		}
+	}
 	def exampleToString(example: Map[String, Any], index:Int): String = {
 		val assignedVars= this.getAssignedVars()
-		val inputs = example.map {
-			case (name, value) if(!assignedVars.contains(name))=> f"$name = $value"
+		val inputs = example.filter {
+			case (name, value) => !name.contains("_in") || assignedVars.contains(name.replace("_in",""))
+		}.map {
+			case (name, value) if(!assignedVars.contains(name))=> f"$name = ${asPythonString(value)}"
 			case _ => ""
 		}.filter(x=>x!="").mkString(", ")
 		val outputs = example.map {
-			case (name, value) if(assignedVars.contains(name))=> f"$name = $value"
+			case (name, value) if(assignedVars.contains(name))=> f"$name = ${asPythonString(value)}"
 			case _ => ""
 		}.filter(x=>x!="").mkString(", ")
 		f"#! ${index}) $inputs => $outputs"
