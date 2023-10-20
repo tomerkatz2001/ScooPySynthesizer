@@ -14,7 +14,15 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"rawCommentExamples": [],
+			"rawCommentExamples": [
+				{
+					"name": "'cool long name'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'c.l.n'"
+				}
+			],
 			"assignments": [],
 			"commentId": "1"
 		},

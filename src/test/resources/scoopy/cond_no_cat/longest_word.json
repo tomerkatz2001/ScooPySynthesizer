@@ -14,7 +14,14 @@
 			"outputVarNames": [
 				"longest_word"
 			],
-			"rawCommentExamples": [],
+			"rawCommentExamples": [{
+				"longest_word_in": "'The'",
+				"word": "'quick'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"longest_word": "'quick'"
+			}],
 			"assignments": [],
 			"commentId": "1"
 		},

@@ -1,0 +1,26 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "4",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"options" :"['even', 'odd']",
+			"rs": "'even'"
+		},
+		{
+			"a": "3",
+			"#": "",
+			"$": "",
+			"time": 2,
+			"options" :"['even', 'odd']",
+			"rs": "'odd'"
+		}
+	],
+	"solutions": ["if 1 > a % 2:\n\trs = options[0]\nelse:\n\trs = options[-1]"],
+	"previousEnvs": {
+	}
+}

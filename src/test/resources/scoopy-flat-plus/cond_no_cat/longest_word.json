@@ -1,0 +1,51 @@
+{
+	"varNames": [
+		"longest_word"
+	],
+	"envs": [
+		{
+			"word": "'The'",
+			"#": "0",
+			"$": "",
+			"time": 1,
+			"longest_word": "'The'"
+		},
+		{
+			"word": "'quick'",
+			"#": "1",
+			"$": "",
+			"time": 2,
+			"longest_word": "'quick'"
+		},
+		{
+			"word": "'brown'",
+			"#": "2",
+			"$": "",
+			"time": 3,
+			"longest_word": "'quick'"
+		},
+		{
+			"word": "'fox'",
+			"#": "3",
+			"$": "",
+			"time": 4,
+			"longest_word": "'quick'"
+		},
+		{
+			"word": "'jumped'",
+			"#": "4",
+			"$": "",
+			"time":5,
+			"longest_word": "'jumped'"
+		}
+	],
+	"solutions": ["if len(word) > len(longest_word):\n\tlongest_word = word"],
+	"previousEnvs": {
+		"1": {
+			"#": "",
+			"$": "",
+			"time": 0,
+			"longest_word": "''"
+		}
+	}
+}

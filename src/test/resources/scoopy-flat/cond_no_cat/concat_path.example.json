@@ -18,22 +18,6 @@
 			"#": "",
 			"$": "",
 			"out": "'world'"
-		},
-		{
-			"time": 30,
-			"a": "'Hello'",
-			"b": "'World'",
-			"#": "",
-			"$": "",
-			"out": "'Hello.World'"
-		},
-		{
-			"time": 40,
-			"a": "'path'",
-			"b": "'field'",
-			"#": "",
-			"$": "",
-			"out": "'path.field'"
 		}
 	],
 	"solutions" : ["if len(a) > 0:\n\tout = a + \".\" + b\nelse:\n\tout = b"],

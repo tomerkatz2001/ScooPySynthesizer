@@ -64,36 +64,6 @@
 					"time": "-1",
 					"product_of_even": "60",
 					"sum_of_odd": "21"
-				},
-				{
-					"product_of_even_in": "60",
-					"sum_of_odd_in": "18",
-					"num": "2",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "120",
-					"sum_of_odd": "18"
-				},
-				{
-					"product_of_even_in": "120",
-					"sum_of_odd_in": "34",
-					"num": "10",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "1200",
-					"sum_of_odd": "34"
-				},
-				{
-					"product_of_even_in": "1200",
-					"sum_of_odd_in": "99",
-					"num": "2",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "2400",
-					"sum_of_odd": "99"
 				}
 			],
 			"assignments": ["'product_of_even = product_of_even* num'"],
@@ -124,36 +94,7 @@
 					"product_of_even": "60",
 					"sum_of_odd": "28"
 				},
-				{
-					"product_of_even_in": "60",
-					"sum_of_odd_in": "28",
-					"num": "21",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "60",
-					"sum_of_odd": "49"
-				},
-				{
-					"product_of_even_in": "60",
-					"sum_of_odd_in": "49",
-					"num": "1",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "60",
-					"sum_of_odd": "50"
-				},
-				{
-					"product_of_even_in": "60",
-					"sum_of_odd_in": "50",
-					"num": "67",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "60",
-					"sum_of_odd": "117"
-				}
+
 
 			],
 			"assignments": ["'sum_of_odd = sum_of_odd + num'"],

@@ -15,15 +15,6 @@
 				"rs",
 				"split"
 			],
-			"rawCommentExamples": [],
-			"assignments": [],
-			"commentId": "1"
-		},
-		"2": {
-			"outputVarNames": [
-				"rs"
-
-			],
 			"rawCommentExamples": [
 				{
 					"#": "",
@@ -33,7 +24,18 @@
 					"split_in":"0",
 					"split": "0",
 					"i": "1"
-				},
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+
+			],
+			"rawCommentExamples": [
+
 				{
 					"#": "",
 					"inp": "[1, 6, 1, 2, 4, 5, 10, 7, 12]",

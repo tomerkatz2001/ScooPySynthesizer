@@ -1,0 +1,109 @@
+{
+	"varNames": [
+		"stack",
+		"m"
+	],
+	"envs": [
+		{
+			"i": "2",
+			"stack": "[-1,0]",
+			"m": "2",
+			"time": 1
+		},
+		{
+			"i": "1",
+			"stack": "[1]",
+			"m": "4",
+			"time": 3
+		},
+		{
+
+			"i": "11",
+			"stack": "[11]",
+			"m": "4",
+			"time": 5
+		},
+		{
+
+			"i": "11",
+			"stack": "[10]",
+			"m": "12",
+			"time": 7
+		},
+		{
+
+			"i": "24",
+			"stack": "[10]",
+			"m": "14",
+			"time": 9
+		},
+		{
+
+			"i": "24",
+			"stack": "[24]",
+			"m": "10",
+			"time": 11
+		},
+		{
+
+			"i": "24",
+			"stack": "[10]",
+			"m": "14",
+			"time": 13
+		},
+		{
+
+			"i": "26",
+			"stack": "[10]",
+			"m": "16",
+			"time": 14
+		}
+
+	],
+	"solutions": ["if 1 > len(stack):\n\tstack = [i]\nelse:\n\tlast_var = max(stack)\n\tm = max([m] + [i - last_var])\n\tcurrent_len = i - last_var",
+		"if 1 > len(stack):\n\tstack = [i]\nelse:\n\tlast_var = max(stack)\n\tcurrent_len = i - last_var\n\tm = max([m] + [current_len])"
+	],
+	"previousEnvs": {
+		"1":
+		{
+			"stack": "[-1,0]",
+			"m": "0",
+			"time": 0
+		},
+		"3": {
+			"stack": "[]",
+			"m": "4",
+			"time": 2
+		},
+		"5": {
+			"stack": "[]",
+			"m": "4",
+			"time": 4
+		},
+	"7":
+		{
+			"stack": "[10]",
+			"m": "12",
+			"time": 6
+		},
+	"9":
+		{
+		"m": "10",
+		"stack": "[10]",
+		"time": 8
+		},
+		"11":
+		{
+			"m": "10",
+			"stack": "[]",
+			"time": 10
+		},
+		"13":
+		{
+			"m": "8",
+			"stack": "[10]",
+			"time": 12
+		}
+
+	}
+}

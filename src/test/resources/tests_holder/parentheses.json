@@ -1,0 +1,136 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"-1": {}
+			},
+			"F": {
+				"2": {},
+				"3": {},
+				"-1": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"stack",
+				"m"
+			],
+			"rawCommentExamples": [
+				{
+					"stack_in": "[-1,0]",
+					"m_in": "0",
+					"i": "2",
+					"stack": "[-1,0]",
+					"m": "2",
+					"time": -1
+				},
+				{
+					"stack_in": "[]",
+					"m_in": "4",
+					"i": "1",
+					"stack": "[1]",
+					"m": "4",
+					"time": -1
+				},
+				{
+					"stack_in": "[]",
+					"m_in": "4",
+					"i": "11",
+					"stack": "[11]",
+					"m": "4",
+					"time": -1
+				},
+				{
+					"stack_in": "[10]",
+					"m_in": "12",
+					"i": "11",
+					"stack": "[10]",
+					"m": "12",
+					"time": -1
+				},
+				{
+					"stack_in": "[10]",
+					"m_in": "10",
+					"i": "24",
+					"stack": "[10]",
+					"m": "14",
+					"time": -1
+				}
+
+			],
+			"assignments": [
+				"stack = 666",
+				"m = 666"
+			],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"last_var"
+			],
+			"rawCommentExamples": [
+				{
+					"i": "2",
+					"s": "'(())'",
+					"stack": "[-1,0]",
+					"m": "0",
+					"last_var": "0",
+					"time": -1
+				},
+				{
+					"i": "3",
+					"s": "'(())'",
+					"stack": "[-1]",
+					"m": "2",
+					"last_var_in": "0",
+					"last_var": "-1",
+					"time": -1
+				}
+			],
+			"assignments": [
+				"last_var = 666"
+			],
+			"commentId": 2
+		},
+		"3": {
+			"outputVarNames": [
+				"current_len"
+			],
+			"rawCommentExamples": [
+				{
+					"i": "2",
+					"last_var": "0",
+					"current_len": "2",
+					"time": -1
+				},
+				{
+					"i": "3",
+					"last_var": "-1",
+					"current_len": "4",
+					"time": -1
+				},
+				{
+					"i": "4",
+					"last_var": "2",
+					"current_len": "2",
+					"time": -1
+				},
+				{
+					"i": "6",
+					"last_var": "5",
+					"current_len": "1",
+					"time": -1
+				}
+			],
+			"assignments": [
+				"current_len = 666"
+			],
+			"commentId": 3
+		}
+	},
+	"solutions": ["if 1 > len(stack):\n\tstack = [i]\nelse:\n\tlast_var = max(stack)\n\tm = max([m] + [i - last_var])\n\tcurrent_len = i - last_var",
+		"if 1 > len(stack):\n\tstack = [i]\nelse:\n\tlast_var = max(stack)\n\tcurrent_len = i - last_var\n\tm = max([m] + [current_len])"
+	]
+}

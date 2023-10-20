@@ -4,18 +4,11 @@
 	],
 	"envs": [
 		{
-			"name": "'Emma Rose'",
+			"name": "'cool long name'",
 			"#": "",
 			"$": "",
 			"time": 0,
-			"rs": "''"
-		},
-		{
-			"name": "'Kasra Ferdowsi Fard'",
-			"#": "",
-			"$": "",
-			"time": 1,
-			"rs": "'K.F.F'"
+			"rs": "'c.l.n'"
 		}
 
 	],

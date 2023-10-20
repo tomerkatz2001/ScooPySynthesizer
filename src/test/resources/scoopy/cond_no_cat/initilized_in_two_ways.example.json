@@ -36,13 +36,6 @@
 			],
 			"rawCommentExamples": [
 				{
-					"a": "['Augusta', 'Ada', 'King']",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"rs": "'A.A.K'"
-				},
-				{
 					"a": "['Augusta', 'ada', 'King']",
 					"#": "",
 					"$": "",

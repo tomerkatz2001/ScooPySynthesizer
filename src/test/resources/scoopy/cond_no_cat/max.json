@@ -15,7 +15,16 @@
 				"max_value"
 			],
 			"rawCommentExamples": [],
-			"assignments": [],
+			"assignments": [
+				{
+					"max_value_in": "3",
+					"num": "99",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"max_value": "99"
+				}
+			],
 			"commentId": "1"
 		},
 		"2": {

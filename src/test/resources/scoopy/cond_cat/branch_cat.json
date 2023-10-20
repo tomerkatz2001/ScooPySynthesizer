@@ -96,5 +96,5 @@
 			"commentId": "3"
 		}
 	},
-	"solutions": ["aux = len(a)\nrs = aux + 1 if (1 > aux % 2) else aux + aux"]
+	"solutions": ["aux = len(a)\nrs = aux + 1 if (1 > aux % 2) else aux + aux","if 1 > len(a) % 2:\n\trs = len(a + \" \")\nelse:\n\trs = len(a + a)"]
 }

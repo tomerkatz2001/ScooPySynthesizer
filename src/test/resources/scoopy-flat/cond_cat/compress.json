@@ -1,0 +1,26 @@
+{
+	"varNames": [
+		"rs", "count", "last"
+	],
+	"envs": [
+		{
+			"rs": "'2a2b'",
+			"count": "3",
+			"s": "'aabbccca'",
+			"last": "'c'",
+			"c":"'c'",
+			"time": 1
+		}
+	],
+	"solutions": ["if last == c:\n\tcount += 1\nelse:\n\trs = str(count) + last\n\tlast = c\n\tcount = 1"],
+	"previousEnvs": {
+		"1": {
+			"rs": "'2a2b'",
+			"count":"2",
+			"s": "'aabccca'",
+			"last": "'c'",
+			"c":"'c'",
+			"time": 0
+		}
+	}
+}

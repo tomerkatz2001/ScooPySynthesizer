@@ -14,7 +14,14 @@
 			"outputVarNames": [
 				"rs"
 			],
-			"rawCommentExamples": [],
+			"rawCommentExamples": [{
+				"a": "10",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"options" :"['even', 'odd']",
+				"rs": "'even'"
+			}],
 			"assignments": [],
 			"commentId": "1"
 		},

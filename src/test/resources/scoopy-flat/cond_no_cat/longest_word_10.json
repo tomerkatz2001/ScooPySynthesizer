@@ -9,78 +9,7 @@
 			"$": "",
 			"time": 1,
 			"longest_word": "'The'"
-		},
-		{
-			"word": "'quick'",
-			"#": "1",
-			"$": "",
-			"time": 2,
-			"longest_word": "'quick'"
-		},
-		{
-			"word": "'jumped'",
-			"#": "4",
-			"$": "",
-			"time":5,
-			"longest_word": "'jumped'"
-		},
-		{
-			"word": "'together'",
-			"#": "9",
-			"$": "",
-			"time": 10,
-			"longest_word": "'together'"
-		},
-		{
-			"word": "'longerwordddd'",
-			"#": "10",
-			"$": "",
-			"time": 11,
-			"longest_word": "'longerwordddd'"
-		},
-		{
-			"word": "'brown'",
-			"#": "2",
-			"$": "",
-			"time": 3,
-			"longest_word": "'quick'"
-		},
-		{
-			"word": "'fox'",
-			"#": "3",
-			"$": "",
-			"time": 4,
-			"longest_word": "'quick'"
-		},
-		{
-			"word": "'over'",
-			"#": "5",
-			"$": "",
-			"time": 6,
-			"longest_word": "'jumped'"
-		},
-		{
-			"word": "'the'",
-			"#": "6",
-			"$": "",
-			"time": 7,
-			"longest_word": "'jumped'"
-		},
-		{
-			"word": "'lazy'",
-			"#": "7",
-			"$": "",
-			"time": 8,
-			"longest_word": "'jumped'"
-		},
-		{
-			"word": "'dog'",
-			"#": "8",
-			"$": "",
-			"time": 9,
-			"longest_word": "'jumped'"
 		}
-
 	],
 	"solutions": ["if len(word) > len(longest_word):\n\tlongest_word = word"],
 	"previousEnvs": {

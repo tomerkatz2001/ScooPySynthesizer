@@ -9,13 +9,6 @@
 			"$": "",
 			"time": 1,
 			"longest_word": "'quick'"
-		},
-		{
-			"word": "'fox'",
-			"#": "1",
-			"$": "",
-			"time": 2,
-			"longest_word": "'quick'"
 		}
 
 	],

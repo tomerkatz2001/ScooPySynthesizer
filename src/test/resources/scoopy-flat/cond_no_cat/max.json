@@ -9,13 +9,6 @@
 			"$": "",
 			"time": 1,
 			"max_value": "99"
-		},
-		{
-			"num": "3",
-			"#": "1",
-			"$": "",
-			"time": 2,
-			"max_value": "99"
 		}
 	],
 	"solutions": ["if num > max_value:\n\tmax_value = num",

@@ -18,6 +18,6 @@
 			"rs": "10"
 		}
 	],
-	"solutions": ["aux = len(a) if 1 > aux % 2:\n\trs = aux + 1\nelse:\n\trs = aux + aux"],
+	"solutions": ["aux = len(a) if 1 > aux % 2:\n\trs = aux + 1\nelse:\n\trs = aux + aux","if 1 > len(a) % 2:\n\trs = len(a + \" \")\nelse:\n\trs = len(a + a)"],
 	"previousEnvs": {}
 }

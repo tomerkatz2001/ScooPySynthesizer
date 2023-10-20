@@ -1,0 +1,114 @@
+{
+	"varNames": [
+		"rs", "count", "last"
+	],
+	"envs": [
+		{
+			"time": 8,
+			"#": "0",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "''",
+			"count": "2",
+			"last": "'a'",
+			"c": "'a'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 5
+		},
+		{
+			"time": 10,
+			"#": "1",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "'2a'",
+			"count": "1",
+			"last": "'b'",
+			"c": "'b'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 5
+		},
+		{
+			"time": 11,
+			"#": "2",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "'2a'",
+			"count": "2",
+			"last": "'b'",
+			"c": "'b'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 5
+		},
+		{
+			"time": 12,
+			"#": "3",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "'2a2b'",
+			"count": "1",
+			"last": "'c'",
+			"c": "'c'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 5
+		},
+		{
+			"time": 14,
+			"#": "4",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "'2a2b'",
+			"count": "2",
+			"last": "'c'",
+			"c": "'c'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 5
+		},
+		{
+			"time": 16,
+			"#": "5",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "'2a2b'",
+			"count": "3",
+			"last": "'c'",
+			"c": "'c'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 5
+		},
+		{
+			"time": 18,
+			"#": "6",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "'2a2b3c'",
+			"count": "1",
+			"last": "'a'",
+			"c": "'a'",
+			"lineno": 4,
+			"prev_lineno": 5,
+			"next_lineno": 6
+		}
+	],
+	"solutions": ["if last == c:\n\tcount += 1\nelse:\n\trs += str(count) + last\n\tlast = c\n\tcount = 1// this is more than 5 so fail"],
+	"previousEnvs": {
+		"8": {
+			"time": 7,
+			"#": "0",
+			"$": "4",
+			"s": "'aabbccca'",
+			"rs": "''",
+			"count": "1",
+			"last": "'a'",
+			"c": "'a'",
+			"lineno": 5,
+			"prev_lineno": 4,
+			"next_lineno": 4
+		}
+	}
+}

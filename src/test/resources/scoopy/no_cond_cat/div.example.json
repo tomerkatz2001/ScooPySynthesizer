@@ -58,5 +58,5 @@
 			"commentId": "3"
 		}
 	},
-	"solutions": ["rs = n // 8", "rs = (n // 2) // 4"]
+	"solutions": ["rs = n // 8", "rs = (n // 2) // 4", "rs = (n // 4) // 2"]
 }

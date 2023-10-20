@@ -14,14 +14,6 @@
 			"outputVarNames": [
 				"sum"
 			],
-			"rawCommentExamples": [],
-			"assignments": [],
-			"commentId": "1"
-		},
-		"2": {
-			"outputVarNames": [
-				"sum"
-			],
 			"rawCommentExamples": [
 				{
 					"sum_in": "0",
@@ -30,7 +22,17 @@
 					"#": "",
 					"$": "",
 					"sum": "7"
-				},
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"sum"
+			],
+			"rawCommentExamples": [
+
 				{
 					"sum_in": "7",
 					"l": "[7,-1,12,-4, 2]",
