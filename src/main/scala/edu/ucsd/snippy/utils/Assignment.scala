@@ -12,6 +12,7 @@ sealed abstract class Assignment {
 	var innerSpecs: Option[Map[String, List[Map[String, Any]]]] = None
 	val scopePrefix = "#! Start of specification scope:"
 	val ScopeSuffix = "#! End of specification scope"
+	val programs: List[ASTNode];
 
 	def asPythonString(value: Any):String={
 		value match {
@@ -42,7 +43,8 @@ sealed abstract class Assignment {
 
 }
 
-case class SingleAssignment(name: String, var program: ASTNode) extends Assignment {
+case class SingleAssignment(name: String, val program: ASTNode) extends Assignment {
+	override val programs = List(program)
 	def code(disablePostProcess:Boolean = false): String = {
 		var rs = f"$name = ${PostProcessor.clean(program).code}"
 		val selfAssign = s"$name = $name + "
@@ -66,7 +68,7 @@ case class SingleAssignment(name: String, var program: ASTNode) extends Assignme
 
 }
 
-case class BasicMultivariableAssignment(names: List[String], programs: List[ASTNode]) extends Assignment
+case class BasicMultivariableAssignment(names: List[String], override val programs: List[ASTNode]) extends Assignment
 {
 	override def code(disablePostProcess:Boolean = false): String = {
 		// See if we can break it up into multiple lines
@@ -103,6 +105,7 @@ case class BasicMultivariableAssignment(names: List[String], programs: List[ASTN
 
 case class MultilineMultivariableAssignment(assignments: List[Assignment]) extends Assignment
 {
+	override val programs = assignments.flatMap(_.programs)
 	override def code(disablePostProcess:Boolean = false): String = {
 		assignments.map(_.code()).mkString("\n")
 	}
@@ -116,6 +119,7 @@ case class MultilineMultivariableAssignment(assignments: List[Assignment]) exten
 
 case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, var elseCase: Assignment) extends Assignment
 {
+	override val programs = thenCase.programs ++ elseCase.programs
 	override def addExamples(innerSpecs: Map[String, List[Map[String, Any]]]): Unit = {
 		thenCase.addExamples(innerSpecs)
 		elseCase.addExamples(innerSpecs)

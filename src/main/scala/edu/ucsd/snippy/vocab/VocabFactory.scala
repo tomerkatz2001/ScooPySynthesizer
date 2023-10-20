@@ -268,6 +268,16 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						Sum(children.head.asInstanceOf[ListNode[Int]])
 				},
+					new BasicVocabMaker {
+						override val arity: Int = 2
+						override val childTypes: List[Types] = List(Types.String, Types.String)
+						override val returnType: Types = Types.Bool
+						override val nodeType: Class[_ <: ASTNode] = classOf[StringEquals]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							StringEquals(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
+					},
 				new BasicVocabMaker
 				{
 					override val arity: Int = 2
@@ -290,17 +300,7 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						Equals(children.head.asInstanceOf[IntNode], children(1).asInstanceOf[IntNode])
 				},
-				new BasicVocabMaker
-				{
-					override val arity: Int = 2
-					override val childTypes: List[Types] = List(Types.String, Types.String)
-					override val returnType: Types = Types.Bool
-					override val nodeType: Class[_ <: ASTNode] = classOf[StringEquals]
-					override val head: String = ""
 
-					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						StringEquals(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-				},
 				new BasicVocabMaker
 				{
 					override val arity: Int = 2
@@ -345,28 +345,7 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						StringStep(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[IntNode])
 				},
-				new BasicVocabMaker
-				{
-					override val arity: Int = 2
-					override val childTypes: List[Types] = List(Types.String, Types.String)
-					override val returnType: Types = Types.Int
-					override val nodeType: Class[_ <: ASTNode] = classOf[Find]
-					override val head: String = ""
 
-					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						Find(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-				},
-				new BasicVocabMaker
-				{
-					override val arity: Int = 2
-					override val childTypes: List[Types] = List(Types.String, Types.String)
-					override val returnType: Types = Types.Int
-					override val nodeType: Class[_ <: ASTNode] = classOf[Count]
-					override val head: String = ""
-
-					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						Count(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-				},
 				new BasicVocabMaker
 				{
 					override val arity: Int = 2
@@ -629,6 +608,26 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						ListAppend[Int, IntNode](children.head.asInstanceOf[ListNode[Int]], children.tail.head.asInstanceOf[IntNode])
 				},
+					new BasicVocabMaker {
+						override val arity: Int = 2
+						override val childTypes: List[Types] = List(Types.String, Types.String)
+						override val returnType: Types = Types.Int
+						override val nodeType: Class[_ <: ASTNode] = classOf[Find]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							Find(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
+					},
+					new BasicVocabMaker {
+						override val arity: Int = 2
+						override val childTypes: List[Types] = List(Types.String, Types.String)
+						override val returnType: Types = Types.Int
+						override val nodeType: Class[_ <: ASTNode] = classOf[Count]
+						override val head: String = ""
+
+						override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+							Count(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
+					},
 				new BasicVocabMaker
 				{
 					override val arity: Int = 2

@@ -3,7 +3,7 @@ package edu.ucsd.snippy.ast
 import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.enumeration.Contexts
 
-abstract class AbsCondNode(val cond: BoolNode, val thenCase: ASTNode, val elseCase: ASTNode, val contexts: Contexts) extends ASTNode{
+abstract class AbsCondNode(val cond: BoolNode, val thenCase: ASTNode, val elseCase: ASTNode, val contexts: Contexts,reqVeq: List[Boolean] =List()) extends ASTNode{
 
 //	def make(cond: BoolNode, thenCase: ASTNode, elseCase: ASTNode): SemiCondNode = {
 //		SemiCondNode(cond, thenCase, elseCase)
@@ -30,6 +30,7 @@ abstract class AbsCondNode(val cond: BoolNode, val thenCase: ASTNode, val elseCa
 	override val children: Iterable[ASTNode] = List(cond, thenCase, elseCase)
 	override val usesVariables: Boolean = cond.usesVariables || thenCase.usesVariables || elseCase.usesVariables
 	override protected val parenless: Boolean = false
+	override val requireBits = if(reqVeq.isEmpty) thenCase.requireBits.zipAll(elseCase.requireBits,false,false).map(x=>x._1 || x._2 ) else reqVeq
 
 
 }

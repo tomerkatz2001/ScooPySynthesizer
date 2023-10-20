@@ -179,7 +179,7 @@ case class Max(arg: ListNode[Int], reqVeq: List[Boolean] =List()) extends UnaryO
 	override lazy val code: String = "max(" + arg.code + ")"
 
 	override def doOp(x: Any): Option[Int] = x match {
-		case lst: Iterable[Int] => if (lst.isEmpty) None else Some(lst.max)
+		case lst: Iterable[Int] => if (lst.isEmpty || lst.toList.contains(None)) None else Some(lst.max)
 		case _ => wrongType(x)
 	}
 
@@ -196,7 +196,7 @@ case class Min(arg: ListNode[Int], reqVeq: List[Boolean] =List()) extends UnaryO
 	override lazy val code: String = "min(" + arg.code + ")"
 
 	override def doOp(x: Any): Option[Int] = x match {
-		case lst: Iterable[Int] => if (lst.isEmpty) None else Some(lst.min)
+		case lst: Iterable[Int] => if (lst.isEmpty || lst.toList.contains(None)) None else Some(lst.min)
 		case _ => wrongType(x)
 	}
 
@@ -300,7 +300,7 @@ case class SortedIntList(arg: ListNode[Int], reqVeq: List[Boolean] =List()) exte
 	override lazy val code: String = "sorted(" + arg.code + ")"
 
 	override def doOp(arg: Any): Option[Iterable[Int]] = arg match {
-		case lst: Iterable[Int] => Some(lst.toList.sorted)
+		case lst: Iterable[Int]  if(!lst.toList.contains(None))=> Some(lst.toList.sorted)
 		case _ => wrongType(arg)
 	}
 
@@ -389,10 +389,11 @@ case class Sum(arg: ListNode[Int], reqVeq: List[Boolean] =List()) extends UnaryO
 {
 	override lazy val code: String = f"sum(${arg.code})"
 	override val parenless = true
-	override def doOp(x: Any): Option[Int] = x match {
-		case lst: List[Int] => Some(lst.sum)
+	override def doOp(x: Any): Option[Int] ={
+		x match {
+		case lst: List[Int] if !lst.contains(None)=> Some(lst.sum)
 		case _ => wrongType(x)
-	}
+	}}
 	override def make(x: ASTNode): Sum = Sum(x.asInstanceOf[ListNode[Int]])
 	override def updateValues(contexts: Contexts): Sum = copy(arg.updateValues(contexts))
 

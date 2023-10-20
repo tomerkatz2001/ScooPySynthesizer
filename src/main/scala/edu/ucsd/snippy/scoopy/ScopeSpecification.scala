@@ -22,10 +22,12 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 						 val required: Map[String, List[(List[ASTNode], Map[String, Map[String, ASTNode]])=>SynthesisTask]],
 						 val outputVarNames: Set[String],
 						 val scopeType:String,
-						 val appliedOperators: List[String]){
+						 val appliedOperators: List[String],
+						 val totalExamplesCount: Int){
 
 
 	def getPartitionFunc(): List[Any] => List[(Set[Int], Set[Int])] = {
+		return (indices:List[Any]) => getBinaryPartitions(indices)
 		val pastPartition = (this.partition._1.toSet, this.partition._2.toSet)
 		(indices: List[Any]) => {
 			getBinaryPartitions(indices).filter(part =>
@@ -131,7 +133,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 //		if(innerVars.nonEmpty){
 //			partition = (extendedExamples.indices.toList, List())
 //		}
-		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, partition, this.required, newVars, this.scopeType, this.appliedOperators), seenASTs, requiredAssignments.values.flatten.toMap)
+		val finalTask = SynthesisTask.fromSpec(new ScopeSpecification(extendedExamples, partition, this.required, newVars, this.scopeType, this.appliedOperators, this.totalExamplesCount), seenASTs, requiredAssignments.values.flatten.toMap)
 		sol = synthesize(finalTask, timeout);
 		if (sol._4.nonEmpty && innerSpecifications.contains("then")) {
 			sol._4.get.addExamples(innerSpecifications("then").map(tup => (tup._1, tup._2.getEnvs())).toMap) //TODO: add context to support _in vars
@@ -149,7 +151,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 			requiredAssignments ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			seenASTs ++= synthesisTask.outputVariables.map(v => extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			innerSpecifications ++= synthesisTask.outputVariables.filter(!topLevelVarNames.contains(_)).map(v => v -> synthesisTask.predicate).toList
-			println("found solution: " + sol._4.get.code(true))
+			//println("found solution: " + sol._4.get.code(true))
 		}
 
 		(seenASTs, requiredAssignments.toMap, innerSpecifications.toMap)
@@ -195,7 +197,7 @@ object ScopeSpecification {
 
 	def assign(code: String): ScopeSpecification = {
 		val varNames = code.split("=")(0).replace("\'","").split(",").map(_.trim).toSet
-		new ScopeSpecification(List(), Tuple2(List(), List()), Map.empty ,varNames,scopeType = "assign", List("assign"))
+		new ScopeSpecification(List(), Tuple2(List(), List()), Map.empty ,varNames,scopeType = "assign", List("assign"), 0)
 	}
 
 	def cond(scopeSpecification1: ScopeSpecification, scopeSpecification2: ScopeSpecification): ScopeSpecification ={
@@ -205,12 +207,14 @@ object ScopeSpecification {
 			Range(scopeSpecification1.scopeExamples.size, jointExamples.size).toList);
 		val required = Map("then" -> scopeSpecification1.required.values.toList.flatten, "else" -> scopeSpecification2.required.values.toList.flatten);
 		val varNames = scopeSpecification1.outputVarNames ++ scopeSpecification2.outputVarNames;
-		var appliedOperators = "cond" :: (scopeSpecification1.appliedOperators ++ scopeSpecification2.appliedOperators)
-		new ScopeSpecification(jointExamples, partition, required, varNames, scopeType = "cond", appliedOperators)
+		val appliedOperators = "cond" :: (scopeSpecification1.appliedOperators ++ scopeSpecification2.appliedOperators)
+		val totalExamplesCount = scopeSpecification1.totalExamplesCount + scopeSpecification2.totalExamplesCount
+		new ScopeSpecification(jointExamples, partition, required, varNames, scopeType = "cond", appliedOperators, totalExamplesCount)
 	}
 
 	def concat(scopeSpecifications: List[ScopeSpecification]): ScopeSpecification ={
 		val jointExamples = List();
+		val totalExamplesUsed = scopeSpecifications.map(_.totalExamplesCount).sum
 //		val jointContexts:Contexts = new Contexts(List())// no examples so no need of contexts
 		val partition = Tuple2(List(), List());
 		val fixed_scopeSpecifications = scopeSpecifications.map((spec)=>if (spec.scopeExamples.size > 0) toScopeable(spec) else spec);
@@ -218,7 +222,7 @@ object ScopeSpecification {
 		val inner_required = fixed_scopeSpecifications.flatMap(_.required.values.toList.flatten);
 		val required = Map("then" -> inner_required)
 		val appliedOperators = "concat" :: (scopeSpecifications.map(_.appliedOperators).reduce((a,b)=> a++b));
-		new ScopeSpecification(jointExamples, partition, required, jointOutputVarNames, scopeType = "concat", appliedOperators)
+		new ScopeSpecification(jointExamples, partition, required, jointOutputVarNames, scopeType = "concat", appliedOperators, totalExamplesUsed)
 	}
 
 	def scope(specification: ScopeSpecification, examples:List[Map[String, Any]], outputVarNames: Set[String]):ScopeSpecification ={
@@ -226,7 +230,7 @@ object ScopeSpecification {
 //		val contexts = getContextsFromExamples(jointExamples, outputVarNames);
 		//val jointOutputVarNames = (specification.outputVarNames ++ outputVarNames).filter(jointExamples.head.contains);
 		val appliedOperators = "scope" :: specification.appliedOperators;
-		new ScopeSpecification(jointExamples, specification.partition, specification.required, outputVarNames, scopeType = "scope", appliedOperators)
+		new ScopeSpecification(jointExamples, specification.partition, specification.required, outputVarNames, scopeType = "scope", appliedOperators, specification.totalExamplesCount + examples.length)
 	}
 
 	def toScopeable(specification: ScopeSpecification): ScopeSpecification ={
@@ -235,7 +239,7 @@ object ScopeSpecification {
 		val x = specification.required.filter(tup=> tup._2.nonEmpty).map(tup => (tup._1 , required::tup._2))
 		val newRequired = if(x.isEmpty) emptyReq  else x
 		val appliedOperators = "scopeable" :: specification.appliedOperators;
-		new ScopeSpecification(List(), (List(), List()), newRequired, specification.outputVarNames, scopeType = "scopeable", appliedOperators)
+		new ScopeSpecification(List(), (List(), List()), newRequired, specification.outputVarNames, scopeType = "scopeable", appliedOperators, specification.totalExamplesCount)
 	}
 
 	class ScopeTree(val scopeInfo: ParsedComment, val falseSons:List[ScopeTree], val trueSons:List[ScopeTree], val nonBranchSons:List[ScopeTree] ){

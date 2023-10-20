@@ -95,10 +95,11 @@ object Utils
 	import spire.syntax.all._
 	@inline def programConnects(tup: (Option[Any], Any)): Boolean = {
 		if (tup._2 == None){ // the variable is __bot__
-			return true
+			return tup._1.nonEmpty
 		}
 		tup._1 match {
 			case None => false
+			case Some(None) => false
 //			case Some(a:Double) => a === tup._2.asInstanceOf[Double]
 			case Some(x: scala.List[_]) if x.nonEmpty => x.head match { //type erasure is bad and gross
 //				case _: Double =>

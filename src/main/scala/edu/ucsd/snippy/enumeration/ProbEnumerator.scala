@@ -1,7 +1,7 @@
 package edu.ucsd.snippy.enumeration
 
 import edu.ucsd.snippy.ast._
-import edu.ucsd.snippy.vocab.{RequiredVocabMaker, VocabFactory, VocabMaker}
+import edu.ucsd.snippy.vocab.{VocabFactory, VocabMaker}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -160,6 +160,7 @@ class ProbEnumerator(
 //					println("root")
 //				}
 				val program = rootMaker.next
+
 				if (program.exampleValues.exists(_.isDefined) && oeManager.isRepresentative(program)) {
 					res = Some(program)
 					progs += 1

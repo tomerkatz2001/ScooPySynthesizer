@@ -29,6 +29,7 @@ class ConditionalSingleEnumSingleVarSolutionEnumerator(
 				store.elseCase = VariableNode.nodeFromType(varName,retType, contexts)
 			part -> store
 		}
+	print("number of partitions: " + stores.size+";")
 	var solution: Option[Assignment] = None
 
 	/*default constructor if the partitioning is not known*/

@@ -20,6 +20,7 @@ class ConditionalSingleEnumMultivarSolutionEnumeratorInnerVars(
 			 requiredASTs: List[ASTNode]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
+	print("number of partitions: " + partitions.size+";")
 	val conditionals: List[CondStore] = this.partitions.map(part => {
 		val rs = new CondStore
 		if (part._2.isEmpty) {
@@ -58,6 +59,13 @@ class ConditionalSingleEnumMultivarSolutionEnumeratorInnerVars(
 	         literals: Iterable[String]) {
 		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices),Map(), Nil)
 	}
+	def containsAllReqs(Assignments: List[Assignment], reqLen: Int): Boolean ={
+		return true
+		val vectors = Assignments.flatMap(_.programs).map(_.requireBits)
+		val reqVec:List[Boolean] = vectors.fold(List())((v1:List[Boolean], v2:List[Boolean])=> v1.zipAll(v2, false, false).map(x=>x._1 || x._2))
+		//println(reqVec.forall(p => p) && reqVec.length == reqLen)
+		reqVec.forall(p => p) && reqVec.length == reqLen
+	}
 	def step(): Unit = {
 		if (this.graph.step()) { // if graph has changed
 			this.graph.computeShortestPaths()
@@ -72,10 +80,12 @@ class ConditionalSingleEnumMultivarSolutionEnumeratorInnerVars(
 
 					graph.traverse(index) match {
 						case Some((thenAssignments, elseAssignments)) =>
-							this.solution = Some(ConditionalAssignment(
-								condStore.cond.get,
-								MultilineMultivariableAssignment(thenAssignments),
-								MultilineMultivariableAssignment(elseAssignments)))
+							if(containsAllReqs(thenAssignments ++ elseAssignments, requiredASTs.length)) {
+								this.solution = Some(ConditionalAssignment(
+									condStore.cond.get,
+									MultilineMultivariableAssignment(thenAssignments),
+									MultilineMultivariableAssignment(elseAssignments)))
+							}
 						case _ => ()
 					}
 			}
@@ -177,15 +187,33 @@ object MultiValueNode {
 				val oldVars = edge.child.state._1.flatten.filter(x => x._2 != None).map(x => x._1).toSet // _1 symmetric to _2
 				for (v <- knownVarsAssignments.keys) {
 					if (edge.variables.map(_._1.name).contains(v)) {
-						val thenVals = knownVarsAssignments(v).updateValues(new Contexts(node.state._1)).exampleValues.map(x => if (x.nonEmpty) x.get else x)
-						val elseVals = VariableNode.nodeFromType(v, knownVarsAssignments(v).nodeType, node.state._2).get.updateValues(new Contexts(node.state._2)).exampleValues.map(x => if (x.nonEmpty) x.get else x)
+						val thenProgram = knownVarsAssignments(v).updateValues(new Contexts(node.state._1))
+						val thenVals =thenProgram.exampleValues.map(x => if (x.nonEmpty) x.get else x)
+						val elseProgram = VariableNode.nodeFromType(v, knownVarsAssignments(v).nodeType, node.state._2).get.updateValues(new Contexts(node.state._2))
+						val elseVals = elseProgram.exampleValues.map(x => if (x.nonEmpty) x.get else x)
 						val newTup = (edge.child.state._1.zipWithIndex.map(x => x._1.updated(v, thenVals(x._2))), edge.child.state._2.zipWithIndex.map(x => x._1.updated(v, elseVals(x._2))))
 						edge.child.state = newTup
+
+						for (i <- node.distancesToEnd.indices) {
+							edge.variables.foreach { case (_, stores) =>
+								stores(i).thenCase.program = Some(thenProgram)
+								stores(i).elseCase.program = Some(elseProgram)
+								if (filterByIndices(thenVals,stores(i).thenCase.indices).contains(None)) {
+									node.distancesToEnd.update(i, node.distancesToEnd(i).copy(thenPath = (Int.MaxValue, Some(edge))))
+								}
+								if (filterByIndices(elseVals, stores(i).elseCase.indices).contains(None)) {
+									node.distancesToEnd.update(i, node.distancesToEnd(i).copy(elsePath = (Int.MaxValue, Some(edge))))
+								}
+							}
+						}
 					}
 				}
 				val useableVars = knownVarsAssignments.keys.filter(x => !oldVars.contains(x))
 				val newVocab = edge.child.enum.vocab.addVars(edge.child.state._1.head.filter(x => useableVars.contains(x._1) && x._2 != None).map(x => (x._1, typeof(x._2))).toList)
 				edge.child.enum = edge.child.enum.copy(newVocab, edge.child.enum.oeManager, edge.child.state._1)
+
+
+
 			})
 		}
 	}
@@ -274,13 +302,12 @@ case class MultiValueNode(
 			seen = true
 			var graphChanged = false
 
-		if (!done && this.enum.hasNext) {
+		if (!done &&  this.enum.hasNext) {
 			val program = this.enum.next()
-			if(program.code.contains("[count + count] + rs") && program.code.contains("rs + [num]")) {
-				print("cond")
-			}
 
-			//print(program.code+" .... "+this.edges.map(e=>e.toString).toString()+" .... "+program.exampleValues + "\n")
+
+//			print(program.code+" .... "+this.toString+" .... "+program.exampleValues + "\n")
+
 			this.onStep(program)
 			val thenProgram = program // the enumerator has the then state already
 			val elseProgram = program.updateValues(new Contexts(this.state._2))
@@ -320,7 +347,7 @@ case class MultiValueNode(
 				done = true
 			}
 		}
-		else if (done) { //don't run this enumerator but still run children.
+		else if (done ) { //don't run this enumerator but still run children.
 			for (edge <- this.edges) {
 				graphChanged |= edge.child.do_step()
 			}
@@ -344,20 +371,19 @@ case class MultiValueNode(
 			edge.child.do_computeShortest()
 			for (i <- distancesToEnd.indices) {
 				//then case
-				if (edge.variables.map(_._2(i)).forall(store => store.thenCase.program.isDefined) && edge.child.distancesToEnd(i).thenPath._1 < Int.MaxValue) {
+				if (edge.variables.map(_._2(i)).forall(store => store.thenCase.program.isDefined && !store.thenCase.program.get.exampleValues.contains(None)) && edge.child.distancesToEnd(i).thenPath._1 < Int.MaxValue) {
 					val distanceOnThenEdge = edge.child.distancesToEnd(i).thenPath._1 + edge.variables.map { case (_, stores) =>
-						stores(i).thenCase.program.get.terms
+						if (stores(i).thenCase.program.get.exampleValues.contains(None))  Int.MaxValue else  stores(i).thenCase.program.get.terms - stores(i).thenCase.program.get.requireBits.count(_== true) * 4 // 4 for no reason
 					}.sum
 					if (distanceOnThenEdge < distancesToEnd(i).thenPath._1 || (distanceOnThenEdge == distancesToEnd(i).thenPath._1 && distancesToEnd(i).thenPath._2.exists(e => edge.variables.size < e.variables.size))) {
 						distancesToEnd.update(i,distancesToEnd(i).copy(thenPath = (distanceOnThenEdge,Some(edge))))
 					}
 				}
 				//else case
-				if (edge.variables.map(_._2(i)).forall(store => store.elseCase.program.isDefined) && edge.child.distancesToEnd(i).elsePath._1 < Int.MaxValue) {
+				if (edge.variables.map(_._2(i)).forall(store => store.elseCase.program.isDefined && !store.elseCase.program.get.exampleValues.contains(None)) && edge.child.distancesToEnd(i).elsePath._1 < Int.MaxValue) {
 					val distanceOnElseEdge = edge.child.distancesToEnd(i).elsePath._1 + edge.variables.map{ case (_,stores) =>
-						stores(i).elseCase.program.get.terms
+						if (stores(i).elseCase.program.get.exampleValues.contains(None))  Int.MaxValue else stores(i).elseCase.program.get.terms - stores(i).elseCase.program.get.requireBits.count(_== true) * 4 // 4 for no reason
 					}.sum
-
 
 					if (distanceOnElseEdge < distancesToEnd(i).elsePath._1 || (distanceOnElseEdge == distancesToEnd(i).elsePath._1 && distancesToEnd(i).elsePath._2.exists(e => edge.variables.size < e.variables.size))) {
 						distancesToEnd.update(i,distancesToEnd(i).copy(elsePath = (distanceOnElseEdge,Some(edge))))
@@ -369,9 +395,9 @@ case class MultiValueNode(
 	}
 
 	def traverse(partitionIndex: Int): Option[(List[Assignment], List[Assignment])] = {
-		if (this.distancesToEnd(partitionIndex).thenPath._2.isEmpty || this.distancesToEnd(partitionIndex).elsePath._2.isEmpty)
+		if (this.distancesToEnd(partitionIndex).thenPath._2.isEmpty || this.distancesToEnd(partitionIndex).elsePath._2.isEmpty) {
 			None
-		else {
+		} else {
 			val thenAssigns = traverse(partitionIndex,thenBranch = true)
 			val elseAssigns = traverse(partitionIndex,thenBranch = false)
 			for (t <- thenAssigns; e <- elseAssigns) yield (t,e)

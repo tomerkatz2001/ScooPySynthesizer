@@ -159,9 +159,9 @@ object Snippy extends App
 			case Array(task, timeout) => (new JFile(task), timeout.toInt)
 		}
 
-		val (program, time, count) = synthesize(file, timeout) match {
-			case (None, time, count, _) => ("None", time, count)
-			case (Some(program), time, count, _) => (program, time, count)
+		val (program, time, count, assignment) = synthesize(file, timeout) match {
+			case (None, time, count, assignment) => ("None", time, count,assignment)
+			case (Some(program), time, count, assignment) => (program, time, count,assignment)
 		}
 
 		val writer = new BufferedWriter(new FileWriter(args.head + ".out"))

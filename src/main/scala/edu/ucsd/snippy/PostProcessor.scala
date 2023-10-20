@@ -35,6 +35,15 @@ object PostProcessor
 				}
 				case _ => IntSubtraction(lhs, rhs)
 			}
+		case mul: IntMultiply =>
+			val lhs: IntNode = clean(mul.lhs).asInstanceOf[IntNode]
+			val rhs: IntNode = clean(mul.rhs).asInstanceOf[IntNode]
+			(lhs, rhs) match {
+				case (a: IntLiteral, b: IntLiteral) => IntLiteral(a.value * b.value, a.exampleValues.length)
+				case (a: IntLiteral, b:IntNode) if (a.value == 1) => return b
+				case (a: IntNode, b:IntLiteral) if (b.value == 1) => return a
+				case _ => IntMultiply(lhs, rhs)
+			}
 		case sub: IntDivision =>
 			val lhs: IntNode = clean(sub.lhs).asInstanceOf[IntNode]
 			val rhs: IntNode = clean(sub.rhs).asInstanceOf[IntNode]

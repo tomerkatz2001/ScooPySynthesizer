@@ -12,6 +12,7 @@ class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 	partitionFunction: List[Any] => List[(Set[Int], Set[Int])]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
+	print("number of partitions: " + partitions.size+";")
 	val conditionals: List[CondStore] = this.partitions.map(part => {
 		val rs = new CondStore
 		if (part._2.isEmpty) {
@@ -29,7 +30,6 @@ class ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(
 		partitions,
 		variables,
 		literals,
-		knownVarsAssignments = Map.empty
 	)
 	var solution: Option[Assignment] = None
 

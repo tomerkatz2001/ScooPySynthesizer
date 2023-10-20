@@ -1,5 +1,5 @@
 package edu.ucsd.snippy.solution
-import edu.ucsd.snippy.ast.Types.{Types, typeof}
+import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.ast._
 import edu.ucsd.snippy.enumeration.{Contexts, Enumerator, InputsValuesManager, ProbEnumerator}
 import edu.ucsd.snippy.predicates.MultilineMultivariablePredicate
@@ -7,7 +7,6 @@ import edu.ucsd.snippy.utils.Utils.{falseForIndices, filterByIndices, getBinaryP
 import edu.ucsd.snippy.utils._
 import edu.ucsd.snippy.vocab.{RequiredVocabMaker, VocabFactory}
 
-import scala.collection.convert.ImplicitConversions.`collection asJava`
 import scala.collection.mutable
 
 class ConditionalSingleEnumMultivarSolutionEnumerator(
@@ -19,6 +18,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 			 requiredASTs: List[ASTNode]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
+	print("number of partitions: " + partitions.size+";")
 	val conditionals: List[CondStore] = this.partitions.map(part => {
 		val rs = new CondStore
 		if (part._2.isEmpty) {
@@ -26,7 +26,7 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 		}
 		rs
 	})
-	val graph: Node = Node.convert(predicate.graphStart, partitions, variables, literals,knownVarsAssignments= knownVarAssignments, requiredASTs=requiredASTs)
+	val graph: Node = Node.convert(predicate.graphStart, partitions, variables, literals, requiredASTs=requiredASTs)
 	var solution: Option[Assignment] = None
 
 	// Setup the conditional enum listener
@@ -57,13 +57,15 @@ class ConditionalSingleEnumMultivarSolutionEnumerator(
 	         literals: Iterable[String]) {
 		this(predicate, variables, literals, (indices:List[Any]) => getBinaryPartitions(indices),Map(), Nil)
 	}
+	var step_counter =0;
 	def step(): Unit = {
-		if (this.graph.step()) { // if graph has changed
+		if (this.graph.step() || step_counter==0) { // if graph has changed, maybe we have solutions before starting.
+			step_counter+=1
 			this.graph.computeShortestPaths()
 			if (this.solution.isEmpty) {
 				val paths = for ((condStore, index) <- this.conditionals.zipWithIndex; if condStore.cond.isDefined) yield {
 					val weight = if (graph.distancesToEnd(index).thenPath._1 == Int.MaxValue || graph.distancesToEnd(index).elsePath._1 == Int.MaxValue) Int.MaxValue
-					else if (index == 0) 0
+					//else if (index == 0) 0
 					else graph.distancesToEnd(index).thenPath._1 + graph.distancesToEnd(index).elsePath._1 + condStore.cond.get.terms
 					(condStore,weight,index)
 				}
@@ -112,19 +114,12 @@ object Node {
 		envs: List[Map[String, Any]],
 		variable: Variable,
 		partition: (Set[Int], Set[Int]),
-		knownAssignments:Map[String, ASTNode]): CondProgStore = {
+		): CondProgStore = {
 		val values = envs.map(_(variable.name))
 		val rs = CondProgStore(
 			new ProgStore(partition._1, filterByIndices(values, partition._1)),
 			new ProgStore(partition._2, filterByIndices(values, partition._2)))
 
-		val knownVars = knownAssignments.map({case (v,node)=>(v,node.nodeType)})
-		if (knownVars.keys.contains(variable.name)) {
-			val defaultNode = VariableNode.nodeFromType(variable.name, knownVars(variable.name),List())
-			rs.thenCase.program = if(knownAssignments.contains(variable.name)) Some(knownAssignments(variable.name)) else defaultNode
-			rs.elseCase.program = defaultNode
-			return rs
-		}
 
 		// If the else case is empty, we can set it to any program, and it will be removed in post-
 		// processing
@@ -165,44 +160,20 @@ object Node {
 	  variables: List[(String, Types)],
 	  literals: Iterable[String],
 	  seen: mutable.Map[edu.ucsd.snippy.predicates.Node, Node] = mutable.Map.empty,
-	  knownVarsAssignments: Map[String, ASTNode],
 	  requiredASTs: List[ASTNode] = Nil): Node={
 
-		val n = convertAux(parent, partitionIndices, variables, literals, seen, knownVarsAssignments, requiredASTs)
-		replaceNones(n, knownVarsAssignments)
+		val n = convertAux(parent, partitionIndices, variables, literals, seen, requiredASTs)
 		n
 	}
 
-	def replaceNones(n:Node, knownVarsAssignments: Map[String, ASTNode]): Unit = {
-		var l = n::Nil
-		while (l.nonEmpty){
-			val node = l.head
-			l = l.tail ::: node.edges.map(_.child)
-
-			node.edges.foreach(edge => if (edge.child.blocked && edge.variables.size == 1 && edge.child.edges.nonEmpty) {
-				val oldVars = edge.child.state.flatten.filter(x => x._2 != None).map(x => x._1).toSet
-				for (v <- knownVarsAssignments.keys) {
-					if (edge.variables.map(_._1.name).contains(v)) {
-						val newVals = knownVarsAssignments(v).updateValues(new Contexts(node.state)).exampleValues.map(x => if (x.nonEmpty) x.get else x)
-						edge.child.state = edge.child.state.zipWithIndex.map(x => x._1.updated(v, newVals(x._2)))
-					}
-				}
-				val useableVars = knownVarsAssignments.keys.filter(x => !oldVars.contains(x))
-				val newVocab = edge.child.enum.vocab.addVars(edge.child.state.head.filter(x => useableVars.contains(x._1) && x._2 != None).map(x => (x._1, typeof(x._2))).toList)
-				edge.child.enum = edge.child.enum.copy(newVocab, edge.child.enum.oeManager, edge.child.state)
-			})
-		}
-	}
 	def convertAux (
 		parent: edu.ucsd.snippy.predicates.Node,
 		partitionIndices: List[(Set[Int], Set[Int])],
 		variables: List[(String, Types)],
 		literals: Iterable[String],
 		seen: mutable.Map[edu.ucsd.snippy.predicates.Node,Node] = mutable.Map.empty,
-		knownVarsAssignments: Map[String, ASTNode],
 		requiredASTs:List[ASTNode] = Nil): Node = {
 		if (seen.contains(parent)) return seen(parent)
-		val assignedVars = parent.nodesVars;
 		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List("count", "rs"), x._2, new Contexts(parent.state))) // makes the contexts good in singleVar. in multi var it will be done inside the node
 
 		val enumerator = new ProbEnumerator(
@@ -217,35 +188,31 @@ object Node {
 		val n: Node = Node(enumerator, parent.state, Nil, partitionIndices)
 		val edges = parent.edges
 			.map{e =>
-				e -> convertAux(e.child, partitionIndices, variables, literals, seen,knownVarsAssignments, requiredASTs)
+				e -> convertAux(e.child, partitionIndices, variables, literals, seen, requiredASTs)
 			}
 			.map {
 				case (edu.ucsd.snippy.predicates.SingleEdge(_, variable, outputType, _, _), child) =>
 					val newVariable = Variable(variable, outputType)
-					val stores = partitionIndices.map(indices => createProgStore(parent.state, child.state, newVariable, indices, knownVarsAssignments))
+					val stores = partitionIndices.map(indices => createProgStore(parent.state, child.state, newVariable, indices))
 					Edge(n, child, List(newVariable -> stores).toMap)
 				case (edu.ucsd.snippy.predicates.MultiEdge(_, outputTypes, _, _), child) =>
 					val variables = outputTypes.map {
 						case (variable, outputType) =>
 							val newVariable = Variable(variable, outputType)
-							val stores = partitionIndices.map(idxs => createProgStore(parent.state, child.state, newVariable, idxs, knownVarsAssignments))
+							val stores = partitionIndices.map(idxs => createProgStore(parent.state, child.state, newVariable, idxs))
 							newVariable -> stores
 					}
 					Edge(n, child, variables)
 			}
 
 		n.edges = edges
-
-
 		if (n.edges.isEmpty) {
-			knownVarsAssignments.keys.foreach(fixedVarName => n.state.foreach(env => env.updated(fixedVarName, Some(None))))
 			for (i <- n.distancesToEnd.indices) n.distancesToEnd.update(i,DistancePaths((0,None),(0,None)))
 		}
 		seen += parent -> n
 		n
 	}
 }
-
 
 
 case class DistancePaths(thenPath: (Int,Option[Edge]),elsePath: (Int,Option[Edge]))
@@ -271,14 +238,13 @@ case class Node(
 		if (seen)
 			false
 		else {
+
 			seen = true
 			var graphChanged = false
 
-		if (!done && !this.blocked() && this.enum.hasNext) {
+		if (!done && this.enum.hasNext) {
 			val program = this.enum.next()
-			if(program.code.contains("[count + count] + rs") && program.code.contains("rs + [num]")) {
-				print("cond")
-			}
+
 
 			//print(program.code+" .... "+this.edges.map(e=>e.toString).toString()+" .... "+program.exampleValues + "\n")
 			this.onStep(program)
@@ -319,7 +285,7 @@ case class Node(
 				done = true
 			}
 		}
-		else if (done || this.blocked()) { //don't run this enumerator but still run children.
+		else if (done) { //don't run this enumerator but still run children.
 			for (edge <- this.edges) {
 				graphChanged |= edge.child.do_step()
 			}
@@ -329,9 +295,6 @@ case class Node(
 		}
 	}
 
-	def blocked():Boolean={ // if some variable is on None, the father Node is not yet finished
-		state.exists(env => env.exists(tup => tup._2 == None))
-	}
 	val distancesToEnd: Array[DistancePaths] = Array.fill(this.partitionIndices.length)(DistancePaths((Int.MaxValue,None),(Int.MaxValue,None)))
 	def computeShortestPaths(): Unit = {
 		reset_seen()
