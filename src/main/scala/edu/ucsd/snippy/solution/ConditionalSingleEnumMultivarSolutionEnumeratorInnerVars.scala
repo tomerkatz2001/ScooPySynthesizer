@@ -20,7 +20,6 @@ class ConditionalSingleEnumMultivarSolutionEnumeratorInnerVars(
 			 requiredASTs: List[ASTNode]) extends SolutionEnumerator
 {
 	val partitions: List[(Set[Int], Set[Int])] = partitionFunction(predicate.graphStart.state.indices.toList)
-	print("number of partitions: " + partitions.size+";")
 	val conditionals: List[CondStore] = this.partitions.map(part => {
 		val rs = new CondStore
 		if (part._2.isEmpty) {
@@ -278,7 +277,7 @@ object MultiValueNode {
 case class MultiValueDistancePaths(thenPath: (Int,Option[MultiValueEdge]),elsePath: (Int,Option[MultiValueEdge]))
 case class MultiValueNode(
 	var enum: Enumerator,
-	var state: (List[Map[String, Any]],List[Map[String, Any]]), // first element is state after then, second is state after else
+	var state: (List[Map[String, Any]],List[Map[String, Any]]), // first element is state after then, second is state else
 	var edges: List[MultiValueEdge],
 	partitionIndices: List[(Set[Int], Set[Int])],
 	val nodeVars:Set[String],
@@ -306,7 +305,7 @@ case class MultiValueNode(
 			val program = this.enum.next()
 
 
-//			print(program.code+" .... "+this.toString+" .... "+program.exampleValues + "\n")
+			print(program.code+" .... "+this.toString+" .... "+program.exampleValues + "\n")
 
 			this.onStep(program)
 			val thenProgram = program // the enumerator has the then state already

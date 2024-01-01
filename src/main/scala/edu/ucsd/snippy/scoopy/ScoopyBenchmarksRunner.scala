@@ -37,12 +37,12 @@ object ScoopyBenchmarksRunner extends App{
 					val operators = spec.appliedOperators
 					//val task = SynthesisTask.fromSpec(spec, List())
 					variables = spec.outputVarNames.toList
-					val topLevelExamples = spec.getPrevEnvsAndEnvs()._2.length
+					val Examples = spec.totalExamplesCount
 					val cond = if(operators.contains("cond")) "+" else "-"
 					val concat = if(operators.contains("concat")) "+" else "-"
 					//variables = task.outputVariables.toList
 
-					if (pnt) print(s"$suite;$group;$name;$variables;$topLevelExamples;$cond;$concat; ")
+					if (pnt) print(s"$suite;$group;$name;$variables;$Examples;$cond;$concat; ")
 
 
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
@@ -86,7 +86,7 @@ object ScoopyBenchmarksRunner extends App{
 	}
 
 
-		val benchmarksDir = new File("synthesizer/src/test/resources/test")
+		val benchmarksDir = new File("synthesizer/src/test/resources/scoopy")
 		assert(benchmarksDir.isDirectory)
 
 
@@ -99,7 +99,7 @@ object ScoopyBenchmarksRunner extends App{
 			case _ => 10 * 60
 		}
 
-		println("suite;group;name;variables;top_level_examples;cond;concat;time;count;correct")
+		println("suite;group;name;variables;examples_count;cond;concat;time;count;correct")
 		val benchmarks = if (filterArgs.nonEmpty) {
 			benchmarksDir.listFiles()
 				.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
@@ -115,10 +115,10 @@ object ScoopyBenchmarksRunner extends App{
 				.toList
 		}
 		// First, warm up
-		benchmarks.foreach(this.runBenchmark(_, 700, pnt = true))
+		//benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
 
 		// Then actually run
-		//benchmarks.foreach(this.runBenchmark(_, timeout))
+		benchmarks.foreach(this.runBenchmark(_, 10, pnt = true))
 
 
 

@@ -109,7 +109,7 @@ object Snippy extends App
 		System.gc()
 	}
 
-	def ReSynthesizeIO(timeout: Int = 7): Unit = {
+	def ReSynthesizeIO(timeout: Int = 10000): Unit = {
 		val stdout = scala.sys.process.stdout
 		val stdin = scala.sys.process.stdin
 		var code: Option[String] = None
@@ -120,8 +120,8 @@ object Snippy extends App
 
 			val taskStr = StdIn.readLine()
 			val spec = ScopeSpecification.fromString(taskStr)
-
-			code = Some(spec.solve()._4.get.code(true))
+			val sol = spec.solve()._4
+			code = Some(sol.get.code(true))
 		} catch {
 			case e: Throwable => stderr.println(e.toString)
 		}

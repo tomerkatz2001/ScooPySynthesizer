@@ -33,9 +33,10 @@ object BenchmarksCSV extends App
 				try {
 					val taskStr = fromFile(file).mkString
 					val task = json.parse(taskStr).asInstanceOf[JObject].values
+					val examples = task("envs").asInstanceOf[List[Any]].length
 					variables = task("varNames").asInstanceOf[List[String]].length
 
-					if (pnt) print(s"$suite,$group,$name,$variables,")
+					if (pnt) print(s"$suite,$group,$name,$variables,$examples,")
 
 					val start = LocalDateTime.now()
 					val callable: Callable[(Option[String], Int, Int, Option[Assignment])] = () => synthesize(taskStr, benchTimeout)
@@ -45,16 +46,16 @@ object BenchmarksCSV extends App
 
 						promise.get(benchTimeout, TimeUnit.SECONDS)
 					} catch {
-						case _: TimeoutException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1)
-						case _: InterruptedException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1)
+						case _: TimeoutException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1, None)
+						case _: InterruptedException => (None, Duration.between(start, LocalDateTime.now()).toMillis.toInt, -1, None)
 						case e: ExecutionException => throw e.getCause
 					} finally {
 						promise.cancel(true)
 					}
 
 					rs match {
-						case (Some(program: String), tim: Int, coun: Int, _) =>
-							//print("the program is: " + program + "\n");
+						case (Some(program: String), tim: Int, coun: Int, _ ) =>
+							print("the program is: " + program + "\n");
 							time = tim
 							count = coun
 							correct = task.get("solutions") match {
@@ -62,7 +63,7 @@ object BenchmarksCSV extends App
 								case Some(_) => "-"
 								case None => "?"
 							}
-						case (None, _, coun: Int) =>
+						case (None, _, coun: Int, _) =>
 							count = coun
 					}
 				} catch {
@@ -91,7 +92,7 @@ object BenchmarksCSV extends App
 		case _ => 10 * 60
 	}
 
-	println("suite,group,name,variables,time,count,correct")
+	println("suite,group,name,variables,examples_count,time,count,correct")
 	val benchmarks = if (filterArgs.nonEmpty) {
 		benchmarksDir.listFiles()
 			.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
@@ -111,5 +112,5 @@ object BenchmarksCSV extends App
 	//benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
 
 	// Then actually run
-	benchmarks.foreach(this.runBenchmark(_, 7))
+	benchmarks.foreach(this.runBenchmark(_, 100))
 }

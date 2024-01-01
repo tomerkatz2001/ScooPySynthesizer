@@ -100,11 +100,11 @@ object Utils
 		tup._1 match {
 			case None => false
 			case Some(None) => false
-//			case Some(a:Double) => a === tup._2.asInstanceOf[Double]
+			case Some(a:Double) if tup._2.isInstanceOf[Double] => a === tup._2.asInstanceOf[Double]
 			case Some(x: scala.List[_]) if x.nonEmpty => x.head match { //type erasure is bad and gross
-//				case _: Double =>
-//					//x.length == tup._2.length && x.asInstanceOf[List[Double]].zip(b.asInstanceOf[List[Double]]).forall(t => t._1 === t._2)
-//					x.asInstanceOf[List[Double]] === tup._2.asInstanceOf[List[Double]]
+				case _: Double if tup._2.isInstanceOf[List[Double]]=>
+					x.length == tup._2.asInstanceOf[List[Double]].length && x.asInstanceOf[List[Double]].zip(tup._2.asInstanceOf[List[Double]]).forall(t => t._1 === t._2)
+					//x.asInstanceOf[List[Double]] === tup._2.asInstanceOf[List[Double]]
 				case _ => tup._1.get == tup._2
 			}
 			case _ => tup._1.isDefined && (tup._1.get == tup._2)

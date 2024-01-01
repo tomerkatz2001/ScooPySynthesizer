@@ -154,7 +154,7 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 			var thenCode: List[Assignment] = this.flatten(thenCase) //can this change too somehow? Does it need to go in the loop?
 			var elseCode: List[Assignment] = this.flatten(elseCase)
 			var postCondition: List[Assignment] = List()
-			if(!disablePostProcess) {
+
 				while (preStrs != preCondition.map(_.code()) || thenStrs != thenCode.map(_.code()) || elseStrs != elseCode.map(_.code()) || postStrs != postCondition.map(_.code())) {
 					//changed, update the prev state:
 					preStrs = preCondition.map(_.code())
@@ -162,10 +162,12 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 					elseStrs = elseCode.map(_.code())
 					postStrs = postCondition.map(_.code())
 					// Now take out common prefixes,...
-					while (thenCode.nonEmpty && elseCode.nonEmpty && thenCode.head.code() == elseCode.head.code()) {
+					if(!disablePostProcess) {
+						while (thenCode.nonEmpty && elseCode.nonEmpty && thenCode.head.code() == elseCode.head.code()) {
 						preCondition = preCondition :+ thenCode.head
 						thenCode = thenCode.tail
 						elseCode = elseCode.tail
+						}
 					}
 
 					// ...Lines sandwiched b/w other assignments,...
@@ -219,7 +221,7 @@ case class ConditionalAssignment(var cond: BoolNode, var thenCase: Assignment, v
 					postCondition = postCondition.filter(deadCodeFilter)
 
 				} //end while changed
-			}
+
 			val preCondString = preCondition.map(_.code()).mkString("\n")
 			val postCondString = postCondition.map(_.code()).mkString("\n")
 
