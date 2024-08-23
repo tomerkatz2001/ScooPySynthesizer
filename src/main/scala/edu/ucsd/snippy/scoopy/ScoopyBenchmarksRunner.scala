@@ -41,8 +41,9 @@ object ScoopyBenchmarksRunner extends App{
 					val cond = if(operators.contains("cond")) "+" else "-"
 					val concat = if(operators.contains("concat")) "+" else "-"
 					//variables = task.outputVariables.toList
-
-					if (pnt) print(s"$suite;$group;$name;$variables;$Examples;$cond;$concat; ")
+					//val row = s"$suite;$group;$name;$variables;$Examples;$cond;$concat; ";
+					val row = f"${suite}%10s|${group}%10s|${name}%20s|${variables}%20s|${Examples}%8s|${cond}%5s|${concat}%5s|";
+					if (pnt) print(row)
 
 
 					val callable: Callable[(Option[String], Int, Int,  Option[Assignment])] = () => spec.solve(benchTimeout)
@@ -62,7 +63,7 @@ object ScoopyBenchmarksRunner extends App{
 							time = Duration.between(start, LocalDateTime.now()).toMillis.toInt
 							count = coun
 							//println("\nthe program is: \n" + program)
-							print("\nthe program is: \n" + assignment.code())
+							//print("\nthe program is: \n" + assignment.code())
 							correct = task("solutions") match {
 								case solutions if solutions.asInstanceOf[List[String]].contains(program) => "+"
 								case Some(_) =>  "-";
@@ -79,14 +80,16 @@ object ScoopyBenchmarksRunner extends App{
 				}
 
 				if (pnt) {
-					println(s"$time;$count;$correct")
+					//val row = s"$time;$count;$correct";
+					val row = f"${time}%10s|${count}%10s|${correct}%10s"
+					println(row)
 				}
 				Runtime.getRuntime.gc()
 			})
 	}
 
 
-		val benchmarksDir = new File("synthesizer/src/test/resources/scoopy")
+		val benchmarksDir = new File("C:\\Users\\tomerkatz\\Desktop\\test")//"src/test/resources/scoopy")
 		assert(benchmarksDir.isDirectory)
 
 
@@ -98,8 +101,9 @@ object ScoopyBenchmarksRunner extends App{
 			}
 			case _ => 10 * 60
 		}
-
-		println("suite;group;name;variables;examples_count;cond;concat;time;count;correct")
+		val headers = f"${"suite"}%10s|${"group"}%10s|${"name"}%20s|${"variables"}%20s|${"examples"}%8s|${"cond"}%2s|${"concat"}%2s|${"time"}%10s|${"count"}%10s|${"correct"}%10s"
+		//val headres = "suite;group;name;variables;examples_count;cond;concat;time;count;correct"
+		println(headers)
 		val benchmarks = if (filterArgs.nonEmpty) {
 			benchmarksDir.listFiles()
 				.flatMap(f => if (f.isDirectory) f :: f.listFiles().toList else Nil)
@@ -118,7 +122,7 @@ object ScoopyBenchmarksRunner extends App{
 		//benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
 
 		// Then actually run
-		benchmarks.foreach(this.runBenchmark(_, 10, pnt = true))
+		benchmarks.foreach(this.runBenchmark(_, 20, pnt = true))
 
 
 
