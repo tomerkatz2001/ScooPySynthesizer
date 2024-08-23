@@ -17,15 +17,16 @@ trait MapCompNode[K, V] extends MapNode[K, V]
 
 	override val requireBits: List[Boolean] = list.requireBits.zipAll(key.requireBits, false, false).map(x=>x._1|| x._2 ).zipAll(value.requireBits, false, false).map(x=>x._1|| x._2 )
 	override val _values: List[Option[Map[K, V]]] = {
-//		val entries: Iterable[(Option[K], Option[V])] = key
-//			.values
-//			.zip(value.values)
-//			.asInstanceOf[Iterable[(Option[K], Option[V])]]
+		//		val entries: Iterable[(Option[K], Option[V])] = key
+		//			.values
+		//			.zip(value.values)
+		//			.asInstanceOf[Iterable[(Option[K], Option[V])]]
 
 		var idx = 0
 
 		list.exampleValues.map {
 			case None => None
+			case Some(None)=> None
 			case Some(value: String) =>
 				// First collect the tuples matching this value
 				val keys: List[Option[K]] = this.key.exampleValues.slice(idx, idx + value.length).asInstanceOf[List[Option[K]]]
@@ -50,7 +51,6 @@ trait MapCompNode[K, V] extends MapNode[K, V]
 				}
 		}
 	}
-
 	override val height: Int = 1 + Math.max(list.height, value.height)
 	override val terms: Int = 1 + list.terms + value.terms
 	override val children: Iterable[ASTNode] = List(list, value)
