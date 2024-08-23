@@ -62,7 +62,7 @@
 					"split_in": "3",
 					"split": "3",
 					"i": "5"
-				},
+				}
 			],
 			"assignments": ["'rs = []'"],
 			"commentId": "2"

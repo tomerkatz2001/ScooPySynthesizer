@@ -48,7 +48,7 @@
 					"$": "",
 					"time": "-1",
 					"longest_word": "'jumped'"
-				},
+				}
 
 			],
 			"assignments": ["'longest_word = ffffff'"],
@@ -66,9 +66,7 @@
 					"$": "",
 					"time": "-1",
 					"longest_word": "'quick'"
-				},
-
-
+				}
 
 			],
 			"assignments": ["'longest_word = ffffffff'"],

@@ -14,16 +14,16 @@
 			"outputVarNames": [
 				"max_value"
 			],
-			"rawCommentExamples": [],
-			"assignments": [
-				{
+			"rawCommentExamples": [{
 					"max_value_in": "3",
 					"num": "99",
 					"#": "",
 					"$": "",
 					"time": "-1",
 					"max_value": "99"
-				}
+				}],
+			"assignments": [
+				"max_values = 44"
 			],
 			"commentId": "1"
 		},
