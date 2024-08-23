@@ -52,7 +52,7 @@ object Snippy extends App
 		breakable {
 			for (solution <- task.enumerator) {
 				solution match {
-					case (Some(assignment: Assignment)) =>
+					case Some(assignment: Assignment) =>
 						rs = (Some(assignment.code()), timeout * 1000 - deadline.timeLeft.toMillis.toInt, task.enumerator.programsSeen, Some(assignment))
 						break
 					case _ => ()
@@ -109,7 +109,7 @@ object Snippy extends App
 		System.gc()
 	}
 
-	def ReSynthesizeIO(timeout: Int = 10000): Unit = {
+	def ReSynthesizeIO(timeout: Int = 7): Unit = {
 		val stdout = scala.sys.process.stdout
 		val stdin = scala.sys.process.stdin
 		var code: Option[String] = None
@@ -120,7 +120,7 @@ object Snippy extends App
 
 			val taskStr = StdIn.readLine()
 			val spec = ScopeSpecification.fromString(taskStr)
-			val sol = spec.solve()._4
+			val sol = spec.solve(timeout)._4
 			code = Some(sol.get.code(true))
 		} catch {
 			case e: Throwable => stderr.println(e.toString)

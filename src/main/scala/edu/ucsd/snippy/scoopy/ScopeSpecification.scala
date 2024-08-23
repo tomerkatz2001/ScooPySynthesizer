@@ -27,7 +27,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 
 
 	def getPartitionFunc(): List[Any] => List[(Set[Int], Set[Int])] = {
-		return (indices:List[Any]) => getBinaryPartitions(indices)
+		//return (indices:List[Any]) => getBinaryPartitions(indices)
 		val pastPartition = (this.partition._1.toSet, this.partition._2.toSet)
 		(indices: List[Any]) => {
 			getBinaryPartitions(indices).filter(part =>
@@ -77,6 +77,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 							ifTrueList.head match {
 								case _: IntNode =>IntCondNode(condition, ifTrueList.head.asInstanceOf[IntNode], ifFalseList.head.asInstanceOf[IntNode], contexts) :: Nil;
 								case _: StringNode => StringCondNode(condition, ifTrueList.head.asInstanceOf[StringNode], ifFalseList.head.asInstanceOf[StringNode], contexts) :: Nil;
+								case _: BoolNode => BoolCondNode(condition, ifTrueList.head.asInstanceOf[BoolNode], ifFalseList.head.asInstanceOf[BoolNode], contexts) ::Nil;
 								case _: DoubleNode => {DoubleCondNode(condition,ifTrueList.head.asInstanceOf[DoubleNode], ifFalseList.head.asInstanceOf[DoubleNode], contexts) :: Nil};
 								case _: IntListNode => IntListCondNode(condition, ifTrueList.head.asInstanceOf[IntListNode], ifFalseList.head.asInstanceOf[IntListNode], contexts) :: Nil;
 								case _:ListNode[Int] => IntListCondNode(condition, ifTrueList.head.asInstanceOf[ListNode[Int]], ifFalseList.head.asInstanceOf[ListNode[Int]], contexts) :: Nil;
@@ -96,7 +97,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 		assert(index >= 0)
 		covertToASTList(assignment, contexts)(index)
 	}
-	def solve(timeout:Int = 10000) ={
+	def solve(timeout:Int) ={
 		assert(this.scopeType == "scope")
 		val topLevelVarNames = this.outputVarNames
 
@@ -147,6 +148,10 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 		for (req <- Reqs.reverse) {
 			val synthesisTask = req.apply(List(), Map())
 			val sol = synthesize(synthesisTask, timeout);
+			if(sol._4.isEmpty){
+				Console.err.println("Failed to synthesize inner scope waiting to timeout");
+				while (true){};
+			}
 			assert(synthesisTask.outputVariables.forall(v => !requiredAssignments.contains(v))) // we dont require veriables twice
 			requiredAssignments ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			seenASTs ++= synthesisTask.outputVariables.map(v => extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList

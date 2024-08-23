@@ -91,6 +91,34 @@ case class StringCondNode(override  val cond: BoolNode, override  val thenCase: 
 	)
 }
 
+case class BoolCondNode(override val cond: BoolNode, override val thenCase: BoolNode, override val elseCase: BoolNode, override val contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with BoolNode {
+
+	override val nodeType: Types = Types.String
+	override val _values: List[Option[Boolean]] = {
+		val condValues = cond.exampleValues
+		val thenValues = thenCase.exampleValues
+		val elseValues = elseCase.exampleValues
+
+		condValues.zip(thenValues).zip(elseValues).map {
+			case ((Some(c), Some(t)), Some(e)) => Some(if (c) t else e)
+			case _ => None
+		}
+	};
+
+	override def updateValues(contexts: Contexts): BoolNode = copy(
+		cond = cond.updateValues(contexts),
+		thenCase = thenCase.updateValues(contexts),
+		elseCase = elseCase.updateValues(contexts),
+		contexts
+	)
+
+	override def updateChildren(children: Seq[ASTNode], requiredVec: List[Boolean]): ASTNode = copy(
+		cond = children.head.asInstanceOf[BoolNode],
+		thenCase = children(1).asInstanceOf[BoolNode],
+		elseCase = children(2).asInstanceOf[BoolNode],
+		contexts
+	)
+}
 case class DoubleCondNode(override  val cond: BoolNode, override  val thenCase: DoubleNode,override val elseCase: DoubleNode,override val contexts: Contexts) extends AbsCondNode(cond, thenCase, elseCase, contexts) with DoubleNode {
 
 	override val nodeType: Types = Types.Double
