@@ -48,7 +48,7 @@ class RequiredVocabMaker(program: ASTNode, assignedVars: List[String], idx:Int, 
 			newProgram = newProgram.updateChildren(newProgram.children.toSeq, vec)
 
 
-		for (child <- children) {
+		for (child <- children.reverse) {
 			val childVec = child.requireBits
 			val newVec =  vec.zipAll(childVec,false, false).map{case (a,b) => a || b}
 			newProgram.updateValues(new Contexts(contexts))
