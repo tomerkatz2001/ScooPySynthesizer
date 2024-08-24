@@ -401,17 +401,17 @@ object VocabFactory
 					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
 						Max(children.head.asInstanceOf[ListNode[Int]])
 				},
-				new BasicVocabMaker
-				{
-					override val arity: Int = 1
-					override val childTypes: List[Types] = List(Types.String)
-					override val returnType: Types = Types.Bool
-					override val nodeType: Class[_ <: ASTNode] = classOf[IsAlpha]
-					override val head: String = ""
-
-					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						IsAlpha(children.head.asInstanceOf[StringNode])
-				},
+//				new BasicVocabMaker
+//				{
+//					override val arity: Int = 1
+//					override val childTypes: List[Types] = List(Types.String)
+//					override val returnType: Types = Types.Bool
+//					override val nodeType: Class[_ <: ASTNode] = classOf[IsAlpha]
+//					override val head: String = ""
+//
+//					override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
+//						IsAlpha(children.head.asInstanceOf[StringNode])
+//				},
 				new BasicVocabMaker
 				{
 					override val arity: Int = 1
