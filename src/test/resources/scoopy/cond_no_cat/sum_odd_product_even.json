@@ -25,16 +25,6 @@
 					"time": "-1",
 					"product_of_even": "6",
 					"sum_of_odd": "0"
-				},
-				{
-					"product_of_even_in": "6",
-					"sum_of_odd_in": "0",
-					"num": "6",
-					"#": "",
-					"$": "",
-					"time": "-1",
-					"product_of_even": "36",
-					"sum_of_odd": "0"
 				}
 			],
 			"assignments": [],
@@ -46,13 +36,13 @@
 			],
 			"rawCommentExamples": [
 				{
-					"product_of_even_in": "6",
+					"product_of_even_in": "22",
 					"sum_of_odd_in": "0",
 					"num": "10",
 					"#": "",
 					"$": "",
 					"time": "-1",
-					"product_of_even": "60",
+					"product_of_even": "220",
 					"sum_of_odd": "0"
 				}
 			],

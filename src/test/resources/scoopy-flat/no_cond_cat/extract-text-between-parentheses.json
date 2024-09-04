@@ -1,0 +1,21 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'Jones <60> '",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'60'"
+		}
+	],
+
+	"solutions": [
+		"rs = text[1 + text.find(sep1):text.find(sep2)]\nfirst = 1 + text.find(sep1)\nend = text.find(sep2)"
+	],
+	"previousEnvs": {}
+}

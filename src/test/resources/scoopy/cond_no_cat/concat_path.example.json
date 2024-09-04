@@ -13,14 +13,7 @@
 			],
 			"rawCommentExamples": [
 				{
-					"a": "'Hello'",
-					"b": "'World'",
-					"#": "",
-					"$": "",
-					"out": "'Hello.World'"
-				},
-				{
-					"a": "''",
+					"a": "' '",
 					"b": "'world'",
 					"#": "",
 					"$": "",
@@ -44,17 +37,17 @@
 					"out": "'Hello.World'"
 				},
 				{
-					"a": "'path'",
+					"a": "'#path'",
 					"b": "'field'",
 					"#": "",
 					"$": "",
 					"time": "-1",
-					"out": "'path.field'"
+					"out": "'#path.field'"
 				}
 			],
 			"assignments": ["'out = a + \".\" + b'"],
 			"commentId": "2"
 		}
 	},
-	"solutions" : ["if len(a) > 0:\n\tout = a + \".\" + b\nelse:\n\tout = b"]
+	"solutions" : ["if a == \" \":\n\tout = b\nelse:\n\tout = a + \".\" + b"]
 }

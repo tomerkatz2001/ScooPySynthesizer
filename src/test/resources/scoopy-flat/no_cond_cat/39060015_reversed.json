@@ -1,0 +1,20 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'This is a line. /keep words in the area/delete this part '",
+			"sep": "'/'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'keep words in the area'"
+		}
+	],
+	"solutions": [
+		"first = 1 + text.find(sep)\nsub = text[first:len(text)]\nsecond = first + sub.find(sep)\nrs = text[first:second]",
+		"rs = text.split(sep)[1]"
+	],
+	"previousEnvs": {}
+}

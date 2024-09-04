@@ -1,0 +1,19 @@
+{
+	"varNames": [
+	"rs"
+	],
+	"envs": [
+		{
+			"text": "'knowthat'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know'"
+		}
+	]
+	"solutions": [
+		"i = len(sep)\nsub = text[0:i] if (sep in text) else text\nrs = sub"
+	]
+	"previousEnvs": {}
+}

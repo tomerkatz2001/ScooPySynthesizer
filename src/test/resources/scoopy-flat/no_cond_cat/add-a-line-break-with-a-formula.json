@@ -1,0 +1,20 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [{
+		"a": "'Traci Brown'",
+		"b": "'1301 Robinson Court'",
+		"c": "'Saginaw, MI 48607'",
+		"sep": "'\\n'",
+		"#": "",
+		"$": "",
+		"time": 1,
+		"rs": "'Traci Brown\\n1301 Robinson Court\\nSaginaw, MI 48607'"
+	}
+	],
+	"solutions": ["rs = a + sep + b + sep + c + sep + d", 
+		      "rs = sep.join([a, b, c, d])",
+		      "street = a + sep + b\nstate = street + sep + c\nrs = state"],
+	"previousEnvs": {}
+}

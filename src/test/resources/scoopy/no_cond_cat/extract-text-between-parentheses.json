@@ -1,0 +1,74 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3": {}
+		      }
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'Jones <60> '",
+					"sep1": "'<'",
+					"sep2": "'>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'60'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"first"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'Jones <60> '",
+					"sep1": "'<'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"first": "7"
+				}
+
+			],
+			"assignments": [
+				"'first=2'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"end"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'Jones <60>'",
+					"sep2": "'>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"end": "9"
+				}
+
+
+			],
+			"assignments": [
+				"'end=2'"
+			],
+			"commentId": "2"
+		}
+	},
+	"solutions": [
+		"rs = text[1 + text.find(sep1):text.find(sep2)]\nfirst = 1 + text.find(sep1)\nend = text.find(sep2)"
+	]
+}

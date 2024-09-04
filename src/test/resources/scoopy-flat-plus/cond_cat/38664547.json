@@ -1,0 +1,60 @@
+{
+	"varNames": [
+	"rs"
+	],
+	"envs": [
+		{
+			"text": "'knowthat'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know'"
+		},
+		{
+			"text": "'know'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know'"
+		},
+		{
+			"text": "'know,thatforsure'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know'"
+		},
+		{
+			"text": "'know that for sure'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know'"
+		},
+		{
+			"text": "'know that for sure'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know'"
+		},
+		{
+			"text": "'know for sure'",
+			"sep": "'that'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"rs": "'know for sure'"
+		}
+	]
+	"solutions": [
+		"i = len(sep)\nsub = text[0:i] if (sep in text) else text\nrs = sub",
+		"if sep in text:\n\trs = text[0:len(sep)]\nelse:\n\trs = text"
+	]
+	"previousEnvs": {}
+}

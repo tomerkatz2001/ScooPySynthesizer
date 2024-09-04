@@ -1,0 +1,56 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"-1":{},
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'<b>0.66<b>'",
+					"tag_start": "'<'",
+					"tag": "'b'",
+					"tag_end" :"'>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'0.66'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"sep"
+			],
+			"rawCommentExamples": [
+				{
+					"sep": "'<b>'",
+					"tag_start": "'<'",
+					"tag": "'b'",
+					"tag_end" :"'>'",
+					"#": "",
+					"$": "",
+					"time": "-1"
+				}
+
+			],
+			"assignments": [
+				"'sep=2'"
+			],
+			"commentId": "2"
+		},
+	},
+	"solutions": [
+		"sep = tag_start + tag + tag_end\nrs = text.split(sep)[-1]",
+		"rs = text.split(tag_start + tag + tag_end)[-1]"
+	]
+}

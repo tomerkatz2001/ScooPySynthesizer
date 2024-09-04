@@ -1,0 +1,77 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"shortest_word"
+			],
+			"rawCommentExamples": [
+				{
+					"shortest_word_in": "''",
+					"word": "'The'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"shortest_word": "''"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"shortest_word"
+			],
+			"rawCommentExamples": [
+
+				{
+					"shortest_word_in": "'The'",
+					"word": "'quick'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"shortest_word": "'The'"
+				},
+				{
+					"shortest_word_in": "'quick'",
+					"word": "'jumped'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"shortest_word": "'quick'"
+				}
+
+			],
+			"assignments": ["'longest_word = ffffff'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"shortest_word"
+			],
+			"rawCommentExamples": [
+				{
+					"shortest_word_in": "'quick'",
+					"word": "'brown'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"shortest_word": "'brown'"
+				}
+
+			],
+			"assignments": ["'longest_word = ffffffff'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["if len(word) <= len(shortest_word):\n\tshortest_word = word"]
+}

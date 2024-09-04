@@ -1,0 +1,89 @@
+{
+    "scopesTree": {
+        "1": {
+            "NB": {
+                "2": {},
+                "-1": {}
+            }
+        }
+    },
+    "scopes": {
+        "1": {
+            "outputVarNames": [
+                "rs"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'+106 769-858-438'",
+                    "sep": "'+'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "rs": "'106'"
+                }
+            ],
+            "assignments": [],
+            "commentId": "1"
+        },
+        "2": {
+            "outputVarNames": [
+                "code"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'+106 769-858-438'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "code": "'+106'"
+                }
+            ],
+            "assignments": [
+                "'code=2'"
+            ],
+            "commentId": "2"
+        },
+        "3": {
+            "outputVarNames": [
+                "sub"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'text_text/delete/more_text_here'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "first": "10",
+                    "sub": "'delete/more_text_here'"
+                }
+            ],
+            "assignments": [
+                "'sub=2'"
+            ],
+            "commentId": "2"
+        },
+        "4": {
+            "outputVarNames": [
+                "second"
+            ],
+            "rawCommentExamples": [
+                {
+                    "sub": "'delete/more_text_here'",
+                    "first": "10",
+                    "second": "16",
+                    "sep": "'/'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1"
+                }
+            ],
+            "assignments": [
+                "'second=2'"
+            ],
+            "commentId": "2"
+        }
+    },
+    "solutions": [
+        "code = text.split()[0]\nrs = text[1:-1].split()[0]"
+    ]
+}

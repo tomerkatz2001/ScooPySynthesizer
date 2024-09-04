@@ -1,0 +1,43 @@
+{
+			"varNames": [
+				"shortest_word"
+			],
+			"envs": [
+				{
+					"shortest_word_in": "''",
+					"word": "'The'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"shortest_word": "''"
+				},
+				{
+					"shortest_word_in": "'Large'",
+					"word": "'The'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"shortest_word": "'The'"
+				}
+				{
+					"shortest_word_in": "'short'",
+					"word": "'longer'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"shortest_word": "'short'"
+				},
+				{
+					"shortest_word_in": "'Short'",
+					"word": "'longer'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"shortest_word": "'Short'"
+				}
+			],
+
+	"solutions": ["if len(word) <= len(shortest_word):\n\tshortest_word = word",
+	"if len(shortest_word_in) > len(word):\n\tshortest_word = word\nelse:\n\tshortest_word = shortest_word_in"],
+"previousEnvs": {}
+}

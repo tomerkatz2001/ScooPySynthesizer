@@ -1,0 +1,94 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3": {},
+				"4": {}
+		     }
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'USD.EUR<IDEALPRO,CASH,EUR>'",
+					"end": "'>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'EUR'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"end_i"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'USD.EUR<IDEALPRO,CASH,EUR>'",
+					"end": "'>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"end_i": "25"
+				}
+			],
+			"assignments": [
+				"'end_i=2'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"start"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'USD.EUR<IDEALPRO,CASH,EUR>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"end_i": "25",
+					"start": "22"
+				}
+
+			],
+			"assignments": [
+				"'start=2'"
+			],
+			"commentId": "3"
+		},
+		"4": {
+			"outputVarNames": [
+				"sub"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'USD.EUR<IDEALPRO,CASH,EUR>'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"end_i": "25",
+					"start": "22",
+					"sub": "'EUR'"
+				}
+
+			],
+			"assignments": [
+				"'start=2'"
+			],
+			"commentId": "4"
+		}
+
+	},
+	"solutions": [
+		"end_i = text.find(end)\nstart = end_i - 3\nsub = text[start:end_i]\nrs = sub"
+	]
+}

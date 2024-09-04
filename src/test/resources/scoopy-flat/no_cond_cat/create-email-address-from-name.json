@@ -1,0 +1,22 @@
+{
+			"varNames": [
+				"rs"
+			],
+			"envs": [
+				{
+					"last_name": "'brown'",
+					"name": "'traci'",
+					"postfix": "'_acme.com'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'tbrown_acme.com'"
+				}
+			],
+			
+	"solutions": [
+		"prefix = name[0] + last_name\nrs = prefix + postfix",
+		"rs = name[0] + last_name + postfix"
+	],
+	"previousEnvs": {}
+}

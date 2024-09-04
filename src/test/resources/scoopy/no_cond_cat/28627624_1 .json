@@ -1,0 +1,81 @@
+
+
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3": {},
+				"4": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [{
+				"text": "'Dec 2, 2014, 11=23 PM - +91 90000 80000= loren ipsum'",
+				"sep": "'-'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"rs": "'Dec 2, 2014, 11=23 PM'"
+			}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"l"
+			],
+			"rawCommentExamples": [{
+				"text": "'Dec 2, 2014, 11=23 PM - +91 90000 80000= loren ipsum'",
+				"sep": "'-'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"l": "['Dec 2, 2014, 11=23 PM ', ' +91 90000 80000= loren ipsum']"
+				}
+			],
+			"assignments": ["'l=5'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"first"
+			],
+			"rawCommentExamples": [{
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"l": "['Dec 2, 2014, 11=23 PM ', ' +91 90000 80000= loren ipsum']",
+				"first": "'Dec 2, 2014, 11=23 PM '"
+				}
+
+			],
+			"assignments": ["'first = 3'"],
+			"commentId": "3"
+		},
+		"4": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [{
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"first": "'Dec 2, 2014, 11=23 PM '",
+				"rs": "'Dec 2, 2014, 11=23 PM'"
+				}
+
+			],
+			"assignments": ["'rs = 4'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["l = text.split(sep)\nfirst = l[0]\nrs = first.trim()", 
+		      "l = text.split(sep)\nfirst = l[0]\nrs = \" \".join(first.split())"]
+}

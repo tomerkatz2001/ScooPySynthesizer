@@ -1,0 +1,80 @@
+{
+	"scopesTree": {
+		"0": {
+			"NB": {
+				"2": {},
+
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"s": "'abcdefg'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'[a.c.e.g]'"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"letters"
+			],
+			"rawCommentExamples": [
+				{
+					"s": "'abcdefg'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"letters": "['a', 'c','e','g']"
+				}
+			],
+			"assignments": ["'letters = list(s)[::2]'"],
+			"commentId": "2"
+		},
+		"2": {
+			"outputVarNames": [
+				"word"
+			],
+			"rawCommentExamples": [
+				{
+					"s": "'abcdefg'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"word": "'a.c.e.g'"
+				}
+			],
+			"assignments": ["'word = \"\".\"\".join(letters)'"],
+			"commentId": "3"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"s": "'abcdefg'",
+					"letters": "['a', 'c', 'e', 'g']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'[a.c.e.g]'",
+					"word": "'a.c.e.g'"
+				}
+			],
+			"assignments": ["'word = [a.c.e.g]'"],
+			"commentId": "4"
+		}
+	},
+	"solutions": ["rs = \".\".join(list(s[::2]))", "word = \".\".join(list(s[::2]))\nrs = \"[\" + word + \"]\""]
+}

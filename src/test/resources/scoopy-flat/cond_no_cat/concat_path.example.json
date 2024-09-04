@@ -13,13 +13,13 @@
 		},
 		{
 			"time": 20,
-			"a": "''",
+			"a": "' '",
 			"b": "'world'",
 			"#": "",
 			"$": "",
 			"out": "'world'"
 		}
 	],
-	"solutions" : ["if len(a) > 0:\n\tout = a + \".\" + b\nelse:\n\tout = b"],
+	"solutions" : ["if a == \" \":\n\tout = b\nelse:\n\tout = a + \".\" + b"],
 	"previousEnvs": {}
 }

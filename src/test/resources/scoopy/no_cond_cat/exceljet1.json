@@ -1,0 +1,76 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3":{}
+		     }
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'achang_maaker.com'",
+					"name": "'ann chang'",
+					"sep1": "'_'",
+					"sep2": "'.'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'maaker'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"first"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'achang_maaker.com'",
+					"name": "'ann chang'",
+					"sep1": "'_'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"first": "'maaker.com'"
+
+				}
+			],
+			"assignments": [
+				"'first=2'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"r"
+			],
+			"rawCommentExamples": [
+				{
+					"sep2": "'.'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"first": "'maaker.com'",
+					"r": "'maaker'"
+
+				}
+			],
+			"assignments": [
+				"'r=2'"
+			],
+			"commentId": "2"
+		}
+
+	},
+	"solutions": [
+		"first = text.split(sep1)[-1]\nr = first[0:first.find(sep2)]\nrs = r"
+	]
+}

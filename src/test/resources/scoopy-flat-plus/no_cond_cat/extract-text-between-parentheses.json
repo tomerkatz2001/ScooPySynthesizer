@@ -1,0 +1,66 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'Jones <60> '",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'60'"
+		},
+		{
+			"text": "'Jones <61> '",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'61'"
+		},
+		{
+			"text": "'Jones <62> '",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'62'"
+		},
+		{
+			"text": "'Jones <62> The King'",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'62'"
+		},
+		{
+			"text": "'Jones <63> The King'",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'63'"
+		},
+		{
+			"text": "'Jones  The <63> King'",
+			"sep1": "'<'",
+			"sep2": "'>'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'63'"
+		}
+	],
+
+	"solutions": [
+		"rs = text[1 + text.find(sep1):text.find(sep2)]\nfirst = 1 + text.find(sep1)\nend = text.find(sep2)"
+	],
+	"previousEnvs": {}
+}

@@ -1,0 +1,68 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [{
+				"a": "'Traci Brown'",
+				"b": "'1301 Robinson Court'",
+				"c": "'Saginaw, MI 48607'",
+				"sep": "'\\n'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"rs": "'Traci Brown\\n1301 Robinson Court\\nSaginaw, MI 48607'"
+			}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"street"
+			],
+			"rawCommentExamples": [{
+				"a": "'Traci Brown'",
+				"b": "'1301 Robinson Court'",
+				"sep":  "'\\n'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"street": "'Traci Brown\\n1301 Robinson Court'"
+				}
+			],
+			"assignments": ["'street=2'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"state"
+			],
+			"rawCommentExamples": [{
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"sep":  "'\\n'",
+				"c": "'Saginaw, MI 48607'",
+				"street":  "'Traci Brown\\n1301 Robinson Court'",
+				"state": "'Traci Brown\\n1301 Robinson Court\\nSaginaw, MI 48607'"
+				}
+
+			],
+			"assignments": ["'state = 3'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["rs = a + sep + b + sep + c + sep + d", 
+		      "rs = sep.join([a, b, c, d])",
+		      "street = a + sep + b\nstate = street + sep + c\nrs = state"]
+}
