@@ -13,7 +13,7 @@
 				"rs"
 			],
 			"rawCommentExamples": [{
-				"text" : "'ABCDE/FGHI/JKL/MNOPQR'"
+				"text" : "'ABCDE/FGHI/JKL/MNOPQR'",
 				"sep": "'/'",
 				"#": "",
 				"$": "",
@@ -39,7 +39,7 @@
 			],
 			"assignments": ["'l=2'"],
 			"commentId": "2"
-		},
+		}
 			},
 	"solutions": ["rs = text.split(sep)[-1]",
 		      "l = text.split(sep)\nrs = l[-1]"]

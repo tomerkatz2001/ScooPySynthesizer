@@ -3,7 +3,7 @@
 		"1": {
 			"NB": {
 				"2": {},
-				"-1":{},
+				"-1":{}
 			}
 		}
 	},
@@ -47,7 +47,7 @@
 				"'sep=2'"
 			],
 			"commentId": "2"
-		},
+		}
 	},
 	"solutions": [
 		"sep = tag_start + tag + tag_end\nrs = text.split(sep)[-1]",
