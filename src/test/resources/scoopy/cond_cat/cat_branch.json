@@ -60,7 +60,7 @@
 					"rs": "'The number is greater than 5'"
 				}
 			],
-			"assignments": ["'rs = prefix + aux'"],
+			"assignments": ["'rs = 3'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -79,7 +79,7 @@
 
 				}
 			],
-			"assignments": ["'aux = options[0]'"],
+			"assignments": ["'aux = 3]'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -97,7 +97,7 @@
 					"aux": "'less than 5'"
 				}
 			],
-			"assignments": ["'aux = options[1]'"],
+			"assignments": ["'aux = 3'"],
 			"commentId": "3"
 		}
 	},

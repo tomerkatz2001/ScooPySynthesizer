@@ -45,7 +45,7 @@
 					"out": "'#path.field'"
 				}
 			],
-			"assignments": ["'out = a + \".\" + b'"],
+			"assignments": ["'out = 3'"],
 			"commentId": "2"
 		}
 	},

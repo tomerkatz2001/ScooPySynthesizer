@@ -46,7 +46,7 @@
 					"sum_of_odd": "0"
 				}
 			],
-			"assignments": ["'product_of_even = product_of_even * num'"],
+			"assignments": ["'product_of_even = 3'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -75,7 +75,7 @@
 					"sum_of_odd": "10"
 				}
 			],
-			"assignments": ["'sum_of_odd = sum_of_odd + num'"],
+			"assignments": ["'sum_of_odd =3'"],
 			"commentId": "3"
 		}
 	},

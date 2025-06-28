@@ -40,7 +40,7 @@
 				}
 
 			],
-			"assignments": ["'rs = a * a'"],
+			"assignments": ["'rs = 2'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -56,8 +56,8 @@
 					"rs": "6"
 				}
 			],
-			"assignments": ["'rs = a + a'"],
-			"commentId": "2"
+			"assignments": ["'rs =3'"],
+			"commentId": "3"
 		}
 	},
 	"solutions": ["if a > 3:\n\trs = a * a\nelse:\n\trs = a + a"]

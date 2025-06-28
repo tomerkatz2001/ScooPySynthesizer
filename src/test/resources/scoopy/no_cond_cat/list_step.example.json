@@ -37,7 +37,7 @@
 					"letters": "['a', 'c','e','g']"
 				}
 			],
-			"assignments": ["'letters = list(s)[::2]'"],
+			"assignments": ["'letters = 2'"],
 			"commentId": "2"
 		},
 		"2": {
@@ -54,7 +54,7 @@
 					"rs": "'a.c.e.g'"
 				}
 			],
-			"assignments": ["'rs = \"\".\"\".join(letters)'"],
+			"assignments": ["'rs = 3'"],
 			"commentId": "3"
 		}
 	},

@@ -41,7 +41,7 @@
 					"rs": "['a','b','c','d']"
 				}
 			],
-			"assignments": ["'rs = a + b'"],
+			"assignments": ["'rs = 3'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -60,7 +60,7 @@
 					"rs": "['a','b','c','d','e','f']"
 				}
 			],
-			"assignments": ["'rs = rs + c'"],
+			"assignments": ["'rs = 3'"],
 			"commentId": "2"
 		}
 	},

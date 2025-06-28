@@ -55,7 +55,7 @@
 
 				}
 			],
-			"assignments": ["'_sum = sum(a)'"],
+			"assignments": ["'_sum = ds'"],
 			"commentId": "2"
 		}
 	},

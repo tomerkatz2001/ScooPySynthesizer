@@ -22,7 +22,7 @@
 					"words": "['alison', 'hack']"
 				}
 			],
-			"assignments": ["'words, caps = a.split()'"],
+			"assignments": ["'words, caps = a'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -38,7 +38,7 @@
 					"words": "['alison', 'hack']"
 				}
 			],
-			"assignments": ["'words = a.upper().split()'"],
+			"assignments": ["'words = b'"],
 			"commentId": "2"
 		}
 	},

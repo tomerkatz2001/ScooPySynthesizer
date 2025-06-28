@@ -37,7 +37,7 @@
 					"rs": "6"
 				}
 			],
-			"assignments": ["'rs = n // 4'"],
+			"assignments": ["'rs = 74'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -54,7 +54,7 @@
 					"rs": "3"
 				}
 			],
-			"assignments": ["'rs = rs_in // 2'"],
+			"assignments": ["'rs = 44'"],
 			"commentId": "3"
 		}
 	},

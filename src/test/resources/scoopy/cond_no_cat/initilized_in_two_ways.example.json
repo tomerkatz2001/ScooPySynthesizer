@@ -27,7 +27,7 @@
 					"rs": "'A.A.K'"
 				}
 			],
-			"assignments": ["'rs = \"\"-\"\".join([var[0] for var in a])'"],
+			"assignments": ["'rs = 3'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -43,7 +43,7 @@
 					"rs": "'A.A.K'"
 				}
 			],
-			"assignments": ["'rs = \"\".\"\".join([var[0] for var in a]).upper()'"],
+			"assignments": ["'rs = 7'"],
 			"commentId": "2"
 		}
 	},

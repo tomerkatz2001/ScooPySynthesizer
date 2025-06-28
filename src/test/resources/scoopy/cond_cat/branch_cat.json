@@ -50,7 +50,7 @@
 					"aux": "3"
 				}
 			],
-			"assignments": ["'aux = len(a)'"],
+			"assignments": ["'aux = 2'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -75,7 +75,7 @@
 					"rs": "7"
 				}
 			],
-			"assignments": ["'rs = aux + 1'"],
+			"assignments": ["'rs = 2'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -92,7 +92,7 @@
 					"rs": "10"
 				}
 			],
-			"assignments": ["'rs = aux + aux'"],
+			"assignments": ["'rs = 2'"],
 			"commentId": "3"
 		}
 	},

@@ -47,7 +47,7 @@
 					"rs": "'L.J.W'"
 				}
 			],
-			"assignments": ["'rs = \".\".join([var[0] for var in name.split(\" \")])'"],
+			"assignments": ["'rs = 4'"],
 			"commentId": "2"
 		},
 		"3": {

@@ -39,7 +39,7 @@
 					"rs": "'even'"
 				}
 			],
-			"assignments": ["'rs = \"even\"'"],
+			"assignments": ["'rs = 34'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -56,7 +56,7 @@
 					"rs": "'odd'"
 				}
 			],
-			"assignments": ["'rs = \"odd\"'"],
+			"assignments": ["'rs = 43'"],
 			"commentId": "2"
 		}
 	},

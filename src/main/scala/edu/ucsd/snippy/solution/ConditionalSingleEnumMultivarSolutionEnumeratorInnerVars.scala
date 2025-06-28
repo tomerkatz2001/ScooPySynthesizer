@@ -123,7 +123,7 @@ object MultiValueNode {
 		if (knownVars.keys.contains(variable.name)) {
 			val defaultNode = VariableNode.nodeFromType(variable.name, knownVars(variable.name),List())
 			rs.thenCase.program = if(knownAssignments.contains(variable.name)) Some(knownAssignments(variable.name)) else defaultNode
-			rs.elseCase.program = defaultNode
+			rs.elseCase.program = if(knownAssignments.contains(variable.name)) Some(knownAssignments(variable.name)) else defaultNode
 			return rs
 		}
 
@@ -187,8 +187,8 @@ object MultiValueNode {
 				for (v <- knownVarsAssignments.keys) {
 					if (edge.variables.map(_._1.name).contains(v)) {
 						val thenProgram = knownVarsAssignments(v).updateValues(new Contexts(node.state._1))
-						val thenVals =thenProgram.exampleValues.map(x => if (x.nonEmpty) x.get else x)
-						val elseProgram = VariableNode.nodeFromType(v, knownVarsAssignments(v).nodeType, node.state._2).get.updateValues(new Contexts(node.state._2))
+						val thenVals = thenProgram.exampleValues.map(x => if (x.nonEmpty) x.get else x)
+						val elseProgram = knownVarsAssignments(v).updateValues(new Contexts(node.state._2))//VariableNode.nodeFromType(v, knownVarsAssignments(v).nodeType, node.state._2).get.updateValues(new Contexts(node.state._2))
 						val elseVals = elseProgram.exampleValues.map(x => if (x.nonEmpty) x.get else x)
 						val newTup = (edge.child.state._1.zipWithIndex.map(x => x._1.updated(v, thenVals(x._2))), edge.child.state._2.zipWithIndex.map(x => x._1.updated(v, elseVals(x._2))))
 						edge.child.state = newTup
@@ -226,8 +226,8 @@ object MultiValueNode {
 		requiredASTs:List[ASTNode] = Nil): MultiValueNode = {
 		if (seen.contains(parent)) return seen(parent)
 		val assignedVars = parent.nodesVars;
-		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List("count", "rs"), x._2, new Contexts(parent.state))) // makes the contexts good in singleVar. in multi var it will be done inside the node
-
+		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List("last", "rs", "count"), x._2, new Contexts(parent.state))) // makes the contexts good in singleVar. in multi var it will be done inside the node
+		//change the empty list accurding to what we wrote on replace hole
 		val enumerator = new ProbEnumerator(
 			VocabFactory(variables, literals, requiredVocabMakers),
 			new InputsValuesManager,
@@ -305,7 +305,7 @@ case class MultiValueNode(
 			val program = this.enum.next()
 
 
-			print(program.code+" .... "+this.toString+" .... "+program.exampleValues + "\n")
+			//print(program.code+" .... "+this.toString+" .... "+program.exampleValues + "\n")
 
 			this.onStep(program)
 			val thenProgram = program // the enumerator has the then state already

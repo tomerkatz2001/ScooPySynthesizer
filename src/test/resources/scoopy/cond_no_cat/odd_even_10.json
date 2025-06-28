@@ -82,7 +82,7 @@
 					"rs": "'even'"
 				}
 			],
-			"assignments": ["'rs = \"even\"'"],
+			"assignments": ["'rs = 2'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -131,8 +131,8 @@
 					"rs": "'odd'"
 				}
 			],
-			"assignments": ["'rs = \"odd\"'"],
-			"commentId": "2"
+			"assignments": ["'rs = 3'"],
+			"commentId": "3"
 		}
 	},
 	"solutions": ["if 1 > a % 2:\n\trs = options[0]\nelse:\n\trs = options[-1]"]

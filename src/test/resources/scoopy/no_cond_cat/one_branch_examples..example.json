@@ -46,7 +46,7 @@
 					"rs": "3"
 				}
 			],
-			"assignments": ["'rs = len(a)'"],
+			"assignments": ["'rs = 22'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -76,7 +76,7 @@
 					"rs": "5"
 				}
 			],
-			"assignments": ["'rs = len(a)//2'"],
+			"assignments": ["'rs = 55'"],
 			"commentId": "2"
 		}
 	},

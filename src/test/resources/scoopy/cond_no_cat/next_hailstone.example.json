@@ -53,7 +53,7 @@
 					"out": "250000002"
 				}
 			],
-			"assignments": ["'out = a // 2'"],
+			"assignments": ["'out = 3'"],
 			"commentId": 2
 		},
 		"3": {
@@ -76,7 +76,7 @@
 					"out": "1500000016"
 				}
 			],
-			"assignments": ["'out = a + a + a + 1'"],
+			"assignments": ["'out = 3'"],
 			"commentId": 3
 		}
 	},

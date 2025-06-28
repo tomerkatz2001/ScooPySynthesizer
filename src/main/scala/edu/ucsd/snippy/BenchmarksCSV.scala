@@ -55,7 +55,7 @@ object BenchmarksCSV extends App
 
 					rs match {
 						case (Some(program: String), tim: Int, coun: Int, _ ) =>
-							print("the program is: " + program + "\n");
+							//print("the program is: " + program + "\n");
 							time = tim
 							count = coun
 							correct = task.get("solutions") match {
@@ -76,8 +76,10 @@ object BenchmarksCSV extends App
 				Runtime.getRuntime.gc()
 			})
 	}
-
-	val benchmarksDir = new File("synthesizer/src/test/resources/scoopy-flat")
+	val patha = "src/test/resources/scoopy-flat"
+	val pathb = "C:\\Users\\tomerkatz\\Desktop\\LooPy\\synthesizer\\src\\test\\resources\\scoopy-flat-plus"
+	val pathc = "C:\\Users\\tomerkatz\\Desktop\\loopy_new_bench"
+	val benchmarksDir = new File(pathc)
 	assert(benchmarksDir.isDirectory)
 
 	DebugPrints.debug = false
@@ -112,5 +114,5 @@ object BenchmarksCSV extends App
 	//benchmarks.foreach(this.runBenchmark(_, 30, pnt = false))
 
 	// Then actually run
-	benchmarks.foreach(this.runBenchmark(_, 100))
+	benchmarks.foreach(this.runBenchmark(_, 10))
 }

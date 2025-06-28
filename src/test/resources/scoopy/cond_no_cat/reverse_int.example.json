@@ -27,7 +27,7 @@
 					"rs": "-31"
 				}
 			],
-			"assignments": ["'rs = int(str(a)[::-1])'"],
+			"assignments": ["'rs = 1'"],
 			"commentId": "16"
 		},
 		"18": {
@@ -50,7 +50,7 @@
 					"rs": "-143"
 				}
 			],
-			"assignments": ["'rs = -1 * int(str(a * -1)[::-1])'"],
+			"assignments": ["'2'"],
 			"commentId": "18"
 		}
 	},

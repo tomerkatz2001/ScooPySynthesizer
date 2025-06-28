@@ -50,7 +50,7 @@
 					"sum": "21"
 				}
 			],
-			"assignments": ["'sum = sum + num'"],
+			"assignments": ["'sum = 3'"],
 			"commentId": "2"
 		},
 		"3": {

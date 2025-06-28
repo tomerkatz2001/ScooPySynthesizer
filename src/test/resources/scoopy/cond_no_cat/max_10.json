@@ -41,7 +41,7 @@
 					"max_value": "14"
 				}
 			],
-			"assignments": ["'max_value = num'"],
+			"assignments": ["'max_value = 3'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -59,7 +59,7 @@
 				}
 
 			],
-			"assignments": ["'max_value = max_value'"],
+			"assignments": ["'max_value = 5'"],
 			"commentId": "3"
 		}
 	},

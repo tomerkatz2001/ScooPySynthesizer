@@ -24,7 +24,7 @@
 					"rs": "[1, 3, 4, 6]"
 				}
 			],
-			"assignments": ["'rs = sorted(inp)'"],
+			"assignments": ["'rs = 3'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -41,7 +41,7 @@
 					"rs": "[3, 4, 6, 1]"
 				}
 			],
-			"assignments": ["'rs = inp[::-1]'"],
+			"assignments": ["'rs = 2'"],
 			"commentId": "2"
 		},
 

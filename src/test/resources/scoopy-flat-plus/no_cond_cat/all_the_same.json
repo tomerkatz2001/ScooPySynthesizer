@@ -9,7 +9,9 @@
 		{"a": "[]", "rs": "True", "time": 40},
 		{"a": "[-1, -1, -1]", "rs": "True", "time": 60},
 		{"a": "[0, 0]", "rs": "True", "time": 70},
-		{"a": "[4, 5]", "rs": "False", "time": 80}
+		{"a": "[4, 5]", "rs": "False", "time": 80},
+		{"a": "[4, -5,]", "rs": "False", "time": 90},
+		{"a": "[-4, -5]", "rs": "False", "time": 90},
 	],
 	"solutions": ["rs = 2 > len(set(a))","no_dups = set(a)\nrs = 2 > len(no_dups)"],
 	"previousEnvs": {}

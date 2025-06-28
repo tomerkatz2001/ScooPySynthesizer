@@ -156,7 +156,7 @@ class ScopeSpecification(private val scopeExamples: List[Map[String, Any]],
 			requiredAssignments ++= synthesisTask.outputVariables.diff(topLevelVarNames).map(v => v -> extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			seenASTs ++= synthesisTask.outputVariables.map(v => extractAstOf(v, sol._4.get, new Contexts(synthesisTask.contexts))).toList
 			innerSpecifications ++= synthesisTask.outputVariables.filter(!topLevelVarNames.contains(_)).map(v => v -> synthesisTask.predicate).toList
-			println("found solution: " + sol._4.get.code(true))
+			//println("found solution: " + sol._4.get.code(true))
 		}
 
 		(seenASTs, requiredAssignments.toMap, innerSpecifications.toMap)

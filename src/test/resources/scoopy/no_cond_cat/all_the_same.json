@@ -15,7 +15,7 @@
 			"rawCommentExamples": [
 				{"a": "[1, 20, 30]" ,"no_dups":  "{1,20,30}"},
 				{"a": "[1, 1, 1]" ,"no_dups":  "{1}"}],
-			"assignments": ["'no_dups = set(a)'"],
+			"assignments": ["'no_dups = q'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -25,7 +25,7 @@
 			"rawCommentExamples": [
 				{"no_dups":  "{1,20,30}", "rs": "False"},
 				{"no_dups":  "{1}", "rs": "True"}],
-			"assignments": ["'rs = 2 > len(no_dups)'"],
+			"assignments": ["'rs = q'"],
 			"commentId": "2"
 		},
 		"3": {

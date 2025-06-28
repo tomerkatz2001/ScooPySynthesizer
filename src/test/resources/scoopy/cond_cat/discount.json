@@ -56,7 +56,7 @@
 					"discounted_price": "180.0"
 				}
 			],
-			"assignments": ["'rs = original_price - discount'"],
+			"assignments": ["'rs = 2'"],
 			"commentId": "1"
 		},
 		"2": {
@@ -74,7 +74,7 @@
 					"discount": "20.0"
 				}
 			],
-			"assignments": ["'discount = percent * original_price'"],
+			"assignments": ["'discount = 2'"],
 			"commentId": "2"
 		},
 		"3": {
@@ -92,7 +92,7 @@
 					"discount": "0.0"
 				}
 			],
-			"assignments": ["'discount = no_discount'"],
+			"assignments": ["'discount = 2'"],
 			"commentId": "3"
 		}
 	},

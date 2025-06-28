@@ -54,7 +54,7 @@
 					"word": "'a.c.e.g'"
 				}
 			],
-			"assignments": ["'word = \"\".\"\".join(letters)'"],
+			"assignments": ["'word = 45'"],
 			"commentId": "3"
 		},
 		"3": {
@@ -72,7 +72,7 @@
 					"word": "'a.c.e.g'"
 				}
 			],
-			"assignments": ["'word = [a.c.e.g]'"],
+			"assignments": ["'word = 432'"],
 			"commentId": "4"
 		}
 	},
