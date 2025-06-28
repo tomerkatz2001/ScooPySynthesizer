@@ -1,0 +1,65 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"#": "0",
+			"elem": "'start'",
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "['start']",
+			"time": 1
+		},
+		{
+			"#": "1",
+			"elem": "'startswith'",
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "['start', 'startswith']",
+			"time": 2
+		},
+		{
+			"#": "2",
+			"elem": "'xstart'",
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "['start', 'startswith']",
+			"time": 3
+		},
+		{
+			"#": "3",
+			"elem": "'Start'",
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "['start', 'startswith']",
+			"time": 4
+		},
+		{
+			"#": "4",
+			"elem": "'start 123'",
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "['start', 'startswith', 'start 123']",
+			"time": 5
+		},
+		{
+			"#": "5",
+			"elem": "''",
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "['start', 'startswith', 'start 123']",
+			"time": 6
+		}
+	],
+	"previousEnvs": {
+		"1": {
+			"inp": "['start', 'startswith', 'xstart', 'Start', 'start 123', '']",
+			"startsWith": "'start'",
+			"out": "[]"
+		}
+	},
+	"solutions": [
+		"if elem.startswith(startsWith):\n\tout += [elem]"
+	]
+}

@@ -1,0 +1,16 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"s": "'abcdefg'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'a.c.e.g'"
+		}
+	],
+	"solutions": ["rs = \".\".join(list(s[::2]))", "letters = list(s[::2])\nrs = \".\".join(letters)"],
+	"previousEnvs": {}
+}

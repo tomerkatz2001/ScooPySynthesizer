@@ -1,0 +1,23 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "531",
+			"#": "",
+			"$": "",
+			"time": 10,
+			"rs": "135"
+		},
+		{
+			"a": "-13",
+			"#": "",
+			"$": "",
+			"time": 20,
+			"rs": "-31"
+		}
+	],
+	"solutions": ["if a > -1:\n\trs = int(str(a)[::-1])\nelse:\n\trs = -1 * int(str(a * -1)[::-1])"],
+	"previousEnvs": {}
+}

@@ -1,0 +1,77 @@
+{
+	"varNames": [
+		"rs",
+		"count",
+		"last"
+	],
+	"envs": [
+		{
+			"time": 9,
+			"#": "0",
+			"s": "'aabccca'",
+			"rs": "''",
+			"count": "2",
+			"last": "'a'",
+			"c": "'a'"
+		},
+		{
+			"time": 11,
+			"#": "1",
+			"s": "'aabccca'",
+			"rs": "'2a'",
+			"count": "1",
+			"last": "'b'",
+			"c": "'b'"
+		},
+		{
+			"time": 13,
+			"#": "2",
+			"s": "'aabccca'",
+			"rs": "'2a1b'",
+			"count": "1",
+			"last": "'c'",
+			"c": "'c'"
+		},
+		{
+			"time": 15,
+			"#": "3",
+			"s": "'aabccca'",
+			"rs": "'2a1b'",
+			"count": "2",
+			"last": "'c'",
+			"c": "'c'"
+		},
+		{
+			"time": 17,
+			"#": "4",
+			"s": "'aabccca'",
+			"rs": "'2a1b'",
+			"count": "3",
+			"last": "'c'",
+			"c": "'c'"
+		},
+		{
+			"time": 19,
+			"#": "5",
+			"s": "'aabccca'",
+			"rs": "'2a1b3c'",
+			"count": "1",
+			"last": "'a'",
+			"c": "'a'"
+		}
+	],
+	"solutions": [
+		"if last in c:\n\tcount += 1\nelse:\n\trs += str(count) + last\n\tlast = c\n\tcount = len(last)"
+	],
+	"previousEnvs": {
+		"9": {
+			"time": 8,
+			"#": "0",
+			"s": "'aabccca'",
+			"rs": "''",
+			"count": "1",
+			"last": "'a'",
+			"c": "'a'"
+		}
+	}
+}

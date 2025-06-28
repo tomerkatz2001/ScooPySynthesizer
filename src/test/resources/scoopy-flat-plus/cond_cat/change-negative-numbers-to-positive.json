@@ -1,0 +1,30 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'-%134'",
+			"sign": "'-'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'%134'"
+		},
+		{
+                    "text": "'500'",
+                    "#": "",
+                    "$": "",
+                    "time": 2,
+                    "num": "'500'",
+                    "i": "-1"
+                }
+
+	],
+    "solutions": [
+        "i = text.find(sign)\nnum = text[1:len(text)] if (i > -1) else text\nrs = num", "i = text.find(sign)\nnum = text[i:len(text)] if (i > -1) else text\nrs = num",
+"rs = text.split(sign)[-1]"
+
+    ],
+	"previousEnvs": {}
+}

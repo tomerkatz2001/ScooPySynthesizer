@@ -1,0 +1,18 @@
+{
+			"varNames": [
+				"shortest_word"
+			],
+			"envs": [
+				{
+					"shortest_word_in": "''",
+					"word": "'The'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"shortest_word": "''"
+				}
+			],
+
+	"solutions": ["if len(word) <= len(shortest_word):\n\tshortest_word = word"],
+"previousEnvs": {}
+}

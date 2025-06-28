@@ -1,0 +1,19 @@
+ {
+			"varNames": [
+				"rs"
+			],
+			"envs": [
+				{
+					"text": "'Polygonum amphibium'",
+					"sep": "'ssp.'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'Polygonum'"
+				},
+			],
+	"solutions": [
+		"i = text.find(sep)\nname = text[0:i] if (i > -1) else text.split()[0]\nrs = name"
+	],
+	"previousEnvs": {}
+}

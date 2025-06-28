@@ -1,0 +1,21 @@
+
+
+{
+			"varNames": [
+				"rs"
+			],
+			"envs": [{
+				"text": "'Dec 2, 2014, 11=23 PM - +91 90000 80000= loren ipsum'",
+				"sep": "'-'",
+				"#": "",
+				"$": "",
+				"time": 1,
+				"rs": "'Dec 2, 2014, 11=23 PM'"
+			}],
+"solutions": [
+	"l = text.split(sep)\nfirst = l[0]\nrs = first.trim()", 
+	"l = text.split(sep)\nfirst = l[0]\nrs = \" \".join(first.split())",
+	"rs = text.split(\" \" + sep)[0]"
+],
+"previousEnvs": {}
+}

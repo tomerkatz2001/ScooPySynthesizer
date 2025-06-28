@@ -1,0 +1,49 @@
+{
+	"varNames": [
+		"count"
+	],
+	"envs": [
+		{
+			"#": "0",
+			"s": "'aaeeeio'",
+			"vowels": "'aeiouAEIOU'",
+			"count": "2",
+			"v": "'a'",
+			"time": 1
+		},
+		{
+			"#": "1",
+			"s": "'aaeeeio'",
+			"vowels": "'aeiouAEIOU'",
+			"count": "5",
+			"v": "'e'",
+			"time": 2
+		},
+		{
+			"#": "2",
+			"s": "'aaeeeio'",
+			"vowels": "'aeiouAEIOU'",
+			"count": "6",
+			"v": "'i'",
+			"time": 3
+		},
+		{
+			"#": "3",
+			"s": "'aaeeeio'",
+			"vowels": "'aeiouAEIOU'",
+			"count": "7",
+			"v": "'o'",
+			"time": 4
+		}
+	],
+	"solutions": [
+		"count += s.count(v)"
+	],
+	"previousEnvs": {
+		"1": {
+			"s": "'aaeeeio'",
+			"vowels": "'aeiouAEIOU'",
+			"count": "0"
+		}
+	}
+}

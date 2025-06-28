@@ -1,0 +1,23 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "['Hello', 'World']",
+			"#": "",
+			"$": "",
+			"time": 10,
+			"rs": "'H-W'"
+		},
+		{
+			"a": "['Augusta', 'Ada', 'King']",
+			"#": "",
+			"$": "",
+			"time": 20,
+			"rs": "'A.A.K'"
+		}
+	],
+	"solutions": ["if len(a) > 2:\n\trs = \".\".join([var[0] for var in a]).upper()\nelse:\n\trs = \"-\".join([var[0] for var in a])"],
+	"previousEnvs": {}
+}

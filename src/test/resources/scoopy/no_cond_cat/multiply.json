@@ -1,0 +1,61 @@
+{
+	"scopesTree": {
+		"0": {
+			"NB": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "48"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "6",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "24"
+				}
+			],
+			"assignments": ["'rs =6'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in": "24",
+					"rs": "96"
+				}
+			],
+			"assignments": ["'rs = 48'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["rs = n * 16", "rs = (n * 4) * 4"]
+}

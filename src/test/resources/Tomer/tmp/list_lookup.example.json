@@ -1,0 +1,61 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"8": {},
+				"9": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"s": "['abc', 'bcd', 'cde', 'def', 'efg']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'cde'"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"8": {
+			"outputVarNames": [
+				"idx"
+			],
+			"commentExamples": [
+				{
+					"s": "['abc', 'bcd', 'cde', 'def', 'efg']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"idx": "2"
+				}
+			],
+			"assignments": [],
+			"commentId": 8
+		},
+		"9": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"s": "['abc', 'bcd', 'cde', 'def', 'efg']",
+					"idx": "2",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'cde'"
+				}
+			],
+			"assignments": [],
+			"commentId": 9
+		}
+	}
+}

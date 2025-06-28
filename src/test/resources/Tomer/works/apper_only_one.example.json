@@ -1,0 +1,34 @@
+{
+	"scopeTree": {
+		"1": {
+			"NoBranch": {
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"_set"
+			],
+			"commentExamples": [
+				{"a" : "[4, 5, 9, 22, 3, 22, 9]",  "_set": "{4,5,9,22,3}"},
+				{"a" : "[4, 5, 9, 22, 3]",  "_set": "{4,5,9,22,3}"},
+				{"a" : "[4, 5, 9, 22, 3, 6]",  "_set": "{4, 5, 9 ,22, 3, 6}"}
+			],
+			"assignments": ["'_set = set(a)'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{"a" : "[4, 5, 9, 22, 3, 22, 9]" ,"_set" : "{4, 5, 9, 22, 3}",  "rs": "False"},
+				{"a" : "[4, 5, 9, 22, 3]" ,"_set" : "{4, 5, 9, 22, 3}",  "rs": "True"},
+				{"a" : "[4, 5, 9, 22, 3, 6]","_set" : "{4, 5, 9, 22, 3, 6}",  "rs": "True"}],
+			"assignments": ["'rs = len(a) in a'"],
+			"commentId": 2
+		}
+	}
+}

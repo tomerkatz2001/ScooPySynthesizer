@@ -1,0 +1,26 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"line": "'hello world!'",
+			"rs": "'olleh !dlrow'",
+			"time": 1,
+			"#": ""
+		},
+		{
+			"line": "'Sorin Lerner'",
+			"rs": "'niroS renreL'",
+			"time": 2,
+			"#": ""
+		}
+	],
+	"solutions": [
+		"rs = \" \".join([var[::-1] for var in line.split(\" \")])",
+		"rs = \" \".join([var[::-1] for var in line.split()])",
+		"rs = \" \".join(line.split(\" \")[::-1])[::-1]",
+		"rs = \" \".join(line.split()[::-1])[::-1]"
+	],
+	"previousEnvs": {}
+}

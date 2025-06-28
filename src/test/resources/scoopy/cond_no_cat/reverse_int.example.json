@@ -1,0 +1,58 @@
+{
+	"scopesTree": {
+		"16": {
+			"T": {
+				"18": {}
+			}
+		}
+	},
+	"scopes": {
+		"16": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "531",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "135"
+				},
+				{
+					"a": "-13",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "-31"
+				}
+			],
+			"assignments": ["'rs = 1'"],
+			"commentId": "16"
+		},
+		"18": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "-13",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "-31"
+				},
+				{
+					"a": "-341",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "-143"
+				}
+			],
+			"assignments": ["'2'"],
+			"commentId": "18"
+		}
+	},
+	"solutions": ["if a > -1:\n\trs = int(str(a)[::-1])\nelse:\n\trs = -1 * int(str(a * -1)[::-1])"]
+}

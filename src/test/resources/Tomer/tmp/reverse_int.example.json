@@ -1,0 +1,57 @@
+{
+	"scopeTree": {
+		"16": {
+			"F": {
+				"18": {}
+			}
+		}
+	},
+	"scopes": {
+		"16": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "531",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "135"
+				},
+				{
+					"a": "-13",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "-31"
+				}
+			],
+			"assignments": [],
+			"commentId": 16
+		},
+		"18": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "-13",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "-31"
+				},
+				{
+					"a": "-341",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "-143"
+				}
+			],
+			"assignments": [],
+			"commentId": 18
+		}
+	}
+}

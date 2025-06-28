@@ -21,3 +21,15 @@ build/
 #general
 *.class
 *.out
+
+# node
+yarn.lock
+node_modules
+
+# Pyodide
+src/main/resources/static/pyodide/*
+!src/main/resources/static/pyodide/webworker.js
+
+# Language server
+.bloop
+.metals

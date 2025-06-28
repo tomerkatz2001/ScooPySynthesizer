@@ -1,0 +1,62 @@
+{
+	"varNames": [
+		"rs","last", "count",
+	],
+	"envs": [
+		{
+			"#": "0",
+			"rs": "''",
+			"last": "'a'",
+			"c": "'a'",
+			"count": "2",
+			"time": 1
+		},
+		{
+			"#": "1",
+			"rs": "'2a'",
+			"last": "'b'",
+			"c": "'b'",
+			"count": "1",
+			"time": 2
+		},
+		{
+			"#": "2",
+			"rs": "'2a'",
+			"last": "'b'",
+			"c": "'b'",
+			"count": "2",
+			"time": 4
+		},
+		{
+			"#": "3",
+			"rs": "'2a'",
+			"last": "'b'",
+			"c": "'b'",
+			"count": "3",
+			"time": 5
+		},
+		{
+			"#": "4",
+			"rs": "'2a3b'",
+			"last": "'c'",
+			"c": "'c'",
+			"count": "1",
+			"time": 6
+		},
+
+	],
+	"previousEnvs": {
+		"1": {
+			"#": "",
+			"rs": "''",
+			"last": "'a'",
+			"c": "'a'",
+			"count": "1"
+		}
+	},
+	"solutions": [
+		"if c == last:\n\tcount += 1\nelse:\n\tres = res + str(count) + last\n\tcount = 1\nlast = c",
+		"if not (elem <= 0):\n\tsum = sum + elem",
+		"if not (elem <= 0):\n\tsum = elem + sum"
+	]
+}

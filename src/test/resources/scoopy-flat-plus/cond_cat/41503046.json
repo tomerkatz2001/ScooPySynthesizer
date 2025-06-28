@@ -1,0 +1,52 @@
+ {
+			"varNames": [
+				"rs"
+			],
+			"envs": [
+				{
+					"text": "'Polygonum amphibium'",
+					"sep": "'ssp.'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'Polygonum'"
+				},
+				{
+					"text": "'Juncus bulbosus ssp. bulbosus'",
+					"sep": "'ssp.'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'Juncus bulbosus '"
+				},
+				{
+					"text": "'Hippuris vulgaris'",
+					"sep": "'ssp.'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'Hippuris'"
+				},
+				{
+					"text": "'Lycopus europaeus ssp. europaeus'",
+					"sep": "'ssp.'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'Lycopus europaeus '"
+				},
+				{
+					"text": "'Lysimachia vulgaris'",
+					"sep": "'ssp.'",
+					"#": "",
+					"$": "",
+					"time": 1,
+					"rs": "'Lysimachia'"
+				},
+			],
+	"solutions": [
+		"i = text.find(sep)\nname = text[0:i] if (i > -1) else text.split()[0]\nrs = name",
+		"if sep in text:\n\trs = text.split(sep)[0]\nelse:\n\trs = text.split()[0]"
+	],
+	"previousEnvs": {}
+}

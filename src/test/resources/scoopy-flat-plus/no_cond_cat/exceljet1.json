@@ -1,0 +1,21 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'achang_maaker.com'",
+			"name": "'ann chang'",
+			"sep1": "'_'",
+			"sep2": "'.'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'maaker'"
+		}
+	],
+	"solutions": [
+		"first = text.split(sep1)[-1]\nr = first[0:first.find(sep2)]\nrs = r"
+	],
+	"previousEnvs": {}
+}

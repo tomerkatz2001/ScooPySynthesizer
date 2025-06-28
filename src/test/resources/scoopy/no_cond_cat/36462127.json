@@ -1,0 +1,46 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"-1": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [{
+				"text" : "'ABCDE/FGHI/JKL/MNOPQR'",
+				"sep": "'/'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"rs": "'MNOPQR'"
+			}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"l"
+			],
+			"rawCommentExamples": [{
+				"text" : "'ABCDE/FGHI/JKL/MNOPQR'",
+				"sep": "'/'",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"l": "['ABCDE','FGHI','JKL','MNOPQR']"
+				}
+			],
+			"assignments": ["'l=2'"],
+			"commentId": "2"
+		}
+			},
+	"solutions": ["rs = text.split(sep)[-1]",
+		      "l = text.split(sep)\nrs = l[-1]"]
+}

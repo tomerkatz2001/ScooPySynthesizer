@@ -1,0 +1,59 @@
+{
+	"scopesTree": {
+		"3": {
+			"NB": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"rs": "25"
+				}
+			],
+			"assignments": ["'rs = n + 5'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"rs_in" : "25",
+					"rs": "27"
+				}
+			],
+			"assignments": ["'rs = rs_in + 2'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"rs": "27"
+				}
+			],
+			"assignments": ["rs = 44444"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["rs = n + 7", "rs = n + 2 + 5", "rs = n + 5 + 2"]
+}

@@ -1,0 +1,24 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "7",
+			"#": "",
+			"$": "",
+			"time": 10,
+			"rs": "49"
+		},
+		{
+			"a": "3",
+			"#": "",
+			"$": "",
+			"time": 20,
+			"rs": "6"
+		}
+
+	],
+	"solutions": ["if a > 3:\n\trs = a * a\nelse:\n\trs = a + a"],
+	"previousEnvs": {}
+}

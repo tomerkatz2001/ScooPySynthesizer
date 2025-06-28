@@ -1,0 +1,77 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3":{}
+		     }
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"last_name": "'brown'",
+					"name": "'traci'",
+					"domain": "'acme'",
+					"end" : "'.com'",
+					"sep": "'_'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'tbrown_acme.com'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"prefix"
+			],
+			"rawCommentExamples": [
+				{
+					"last_name": "'brown'",
+					"name": "'traci'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"prefix": "'tbrown'"
+
+				}
+			],
+			"assignments": [
+				"'prefix=2'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"postfix"
+			],
+			"rawCommentExamples": [
+				{
+					"domain": "'acme'",
+					"end" : "'.com'",
+
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"postfix": "'acme.com'"
+
+				}
+			],
+			"assignments": [
+				"'prefix=2'"
+			],
+			"commentId": "3"
+		}
+
+	},
+	"solutions": [
+		"postfix = domain + end\nprefix = name[0] + last_name\nrs = prefix + sep + postfix"
+	]
+}

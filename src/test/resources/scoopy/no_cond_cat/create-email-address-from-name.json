@@ -1,0 +1,54 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"-1":{}
+		     }
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"last_name": "'brown'",
+					"name": "'traci'",
+					"postfix": "'_acme.com'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'tbrown_acme.com'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"prefix"
+			],
+			"rawCommentExamples": [
+				{
+					"last_name": "'brown'",
+					"name": "'traci'",
+					"postfix": "'_acme.com'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"prefix": "'tbrown'"
+
+				}
+			],
+			"assignments": [
+				"'prefix=2'"
+			],
+			"commentId": "2"
+		}
+	},
+	"solutions": [
+		"prefix = name[0] + last_name\nrs = prefix + postfix"
+	]
+}

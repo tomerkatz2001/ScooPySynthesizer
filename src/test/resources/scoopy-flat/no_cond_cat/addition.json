@@ -1,0 +1,16 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"time": 0,
+			"n": "20",
+			"#": "",
+			"$": "",
+			"rs": "27"
+		}
+	],
+	"solutions": ["rs = n + 7", "rs = n + 2 + 5", "rs = n + 5 + 2"],
+	"previousEnvs": {}
+}

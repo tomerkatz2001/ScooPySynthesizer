@@ -1,0 +1,83 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {}
+			},
+			"T": {
+				"2":{}
+			}
+			}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "'abhdj'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "5"
+				},
+				{
+					"a": "'abhdjd'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "3"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "'mkl'",
+					"#": "",
+					"$": "",
+					"time": "9",
+					"rs": "3"
+				}
+			],
+			"assignments": ["'rs = len(a)'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "'aabb'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "2"
+				},
+				{
+					"a": "'aabbdddd'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "4"
+				},
+				{
+					"a": "'aabbdffddd'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "5"
+				}
+			],
+			"assignments": ["'rs = len(a)//2'"],
+			"commentId": 2
+		}
+	}
+}

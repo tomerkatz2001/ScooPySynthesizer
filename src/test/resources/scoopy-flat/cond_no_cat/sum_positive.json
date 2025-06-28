@@ -1,0 +1,26 @@
+{
+	"varNames": [
+		"sum"
+	],
+	"envs": [
+		{
+			"time": 1,
+			"l": "[7,-1,12,-4, 2]",
+			"num": "7",
+			"#": "0",
+			"$": "",
+			"sum": "7"
+		}
+	],
+	"solutions": ["if num > 0:\n\tsum = num + sum",
+		"if num > -1:\n\tsum = num + sum"],
+	"previousEnvs": {
+		"1": {
+			"time": 0,
+			"l": "[7,-1,12,-4, 2]",
+			"#": "",
+			"$": "",
+			"sum": "0"
+		}
+	}
+}

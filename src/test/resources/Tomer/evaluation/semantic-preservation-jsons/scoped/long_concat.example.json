@@ -1,0 +1,94 @@
+{
+	"scopeTree": {
+		"5": {
+			"NoBranch": {
+				"1": {},
+				"2": {},
+				"3": {},
+				"4": {},
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"n1"
+			],
+			"commentExamples": [
+				{
+					"n": "0",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"n1": "5"
+				}
+			],
+			"assignments": ["'n1 = n + 5'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"n2"
+			],
+			"commentExamples": [
+				{
+					"n1": "97",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"n2": "102"
+				}
+			],
+			"assignments": ["'n2 = n1 + 5'"],
+			"commentId": 2
+		},
+		"3": {
+			"outputVarNames": [
+				"n3"
+			],
+			"commentExamples": [
+				{
+					"n2": "0",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"n3": "5"
+				}
+			],
+			"assignments": ["'n3 = n3 + 5'"],
+			"commentId": 3
+		},
+		"4": {
+			"outputVarNames": [
+				"n5"
+			],
+			"commentExamples": [
+				{
+					"n4": "99",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"n5": "104"
+				}
+			],
+			"assignments": ["'n5 = n4 + 5'"],
+			"commentId": 4
+		},
+		"5": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "45"
+				}
+			],
+			"assignments": [],
+			"commentId": 3
+		}
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"varNames": [
+		"longest_word"
+	],
+	"envs": [
+		{
+			"word": "'The'",
+			"#": "0",
+			"$": "",
+			"time": 1,
+			"longest_word": "'The'"
+		}
+	],
+	"solutions": ["if len(word) > len(longest_word):\n\tlongest_word = word"],
+	"previousEnvs": {
+		"1": {
+			"#": "",
+			"$": "",
+			"time": 0,
+			"longest_word": "''"
+		}
+	}
+}

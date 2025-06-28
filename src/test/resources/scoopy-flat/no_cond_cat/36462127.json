@@ -1,0 +1,17 @@
+{
+			"varNames": [
+				"rs"
+			],
+			"envs": [{
+				"text" : "'ABCDE/FGHI/JKL/MNOPQR'"
+				"sep": "'/'",
+				"#": "",
+				"$": "",
+				"time": -1,
+				"rs": "'MNOPQR'"
+			}
+			],
+	"solutions": ["rs = text.split(sep)[-1]",
+		      "l = text.split(sep)\nrs = l[-1]"],
+"previousEnvs": {}
+}

@@ -1,0 +1,29 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"s": "'test'",
+			"rs": "'es'",
+			"time": 1,
+			"#": ""
+		},
+		{
+			"s": "'example'",
+			"rs": "'m'",
+			"time": 2,
+			"#": ""
+		},
+		{
+			"s": "'testing'",
+			"rs": "'t'",
+			"time": 3,
+			"#": ""
+		}
+	],
+	"solutions": [
+		"rs = s[(len(s) - 1) // 2:len(s) // 2 + 1]"
+	],
+	"previousEnvs": {}
+}

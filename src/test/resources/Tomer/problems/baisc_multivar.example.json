@@ -1,0 +1,47 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"x",
+				"y",
+				"z"
+			],
+			"commentExamples": [
+				{
+					"a": "1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"x": "2",
+					"y": "3",
+					"z": "4"
+				}
+			],
+			"assignments": ["'x = a + a'", "'y = a + x'"],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"z"
+			],
+			"commentExamples": [
+				{
+					"a": "1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"z": "4"
+				}
+			],
+			"assignments": ["'z = a + a + 2'"],
+			"commentId": 1
+		}
+	}
+}

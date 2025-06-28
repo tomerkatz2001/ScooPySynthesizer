@@ -1,0 +1,65 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"name": "'cool long name'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'c.l.n'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"name": "'Kasra Ferdowsi Fard'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'K.F.F'"
+				}
+			],
+			"assignments": ["'rs = 4'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"name": "'Emma Rose'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "''"
+				}
+			],
+
+			"assignments": ["rs = '"],
+			"commentId": "2"
+		}
+	},
+	"solutions": ["if name.count(\" \") > 1:\n\trs = \".\".join([var[0] for var in name.split(\" \")])\nelse:\n\trs = \"\"",
+	"if 2 > name.count(\" \"):\n\trs = \"\"\nelse:\n\trs = \".\".join([var[0] for var in name.split()])"]
+}

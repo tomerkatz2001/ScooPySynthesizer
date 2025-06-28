@@ -1,0 +1,17 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"name": "'Kasra Ferdowsi Fard'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'K.F.F'"
+		}
+	],
+	"solutions": ["if name.count(\" \") > 1:\n\trs = \".\".join([var[0] for var in name.split(\" \")])\nelse:\n\trs = \"\"",
+		"if 2 > name.count(\" \"):\n\trs = \"\"\nelse:\n\trs = \".\".join([var[0] for var in name.split()])"],
+	"previousEnvs": {}
+}

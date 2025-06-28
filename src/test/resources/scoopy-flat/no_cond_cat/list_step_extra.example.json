@@ -1,0 +1,20 @@
+{
+	"varNames": [
+		"rs",
+		"word",
+		"letters"
+	],
+	"envs": [
+		{
+			"s": "'abcdefg'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"letters": "['a', 'c', 'e', 'g']",
+			"word" : "'a.c.e.g'",
+			"rs": "'[a.c.e.g]'"
+		}
+	],
+	"solutions": ["letters = list(s[::2])\nword = \".\".join(letters)\nrs = \"[\" + word + \"]\""],
+	"previousEnvs": {}
+}

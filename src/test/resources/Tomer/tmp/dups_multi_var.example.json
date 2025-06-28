@@ -1,0 +1,45 @@
+{
+	"scopeTree": {
+		"8": {
+			"NoBranch": {
+				"9": {}
+			}
+		}
+	},
+	"scopes": {
+		"8": {
+			"outputVarNames": [
+				"count"
+			],
+			"commentExamples": [
+				{
+					"a": "'{'a': 2, 'b': 2, 'c': 1, 'd': 1, 'e': 1}'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"dups": "'{'a': 2, 'b': 2}'",
+					"count": "2"
+				}
+			],
+			"assignments": [],
+			"commentId": 8
+		},
+		"9": {
+			"outputVarNames": [
+				"count"
+			],
+			"commentExamples": [
+				{
+					"a": "'{'a': 2, 'b': 2, 'c': 1, 'd': 1, 'e': 1}'",
+					"dups": "'{'a': 2, 'b': 2}'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"count": "2"
+				}
+			],
+			"assignments": [],
+			"commentId": 9
+		}
+	}
+}

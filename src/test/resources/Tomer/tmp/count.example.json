@@ -1,0 +1,81 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"total"
+			],
+			"commentExamples": [
+				{
+					"s": "'10110011011011'",
+					"n": "1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"total": "9"
+				},
+				{
+					"s": "'2055220522'",
+					"n": "5",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"total": "15"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"times"
+			],
+			"commentExamples": [
+				{
+					"s": "'10110011011011'",
+					"n": "1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"times": "9"
+				}
+			],
+			"assignments": ["'times = s.count(str(n))'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"total"
+			],
+			"commentExamples": [
+				{
+					"s": "'10110011011011'",
+					"n": "1",
+					"times": "9",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"total": "9"
+				},
+				{
+					"s": "'2055220522'",
+					"n": "5",
+					"times": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"total": "15"
+				}
+			],
+			"assignments": ["'total = n * times'"],
+			"commentId": 2
+		}
+	}
+}

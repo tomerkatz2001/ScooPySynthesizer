@@ -1,0 +1,68 @@
+{
+	"scopesTree": {
+		"0": {
+			"NB": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "['a', 'b']",
+					"b": "['c', 'd']",
+					"c": "['e', 'f']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "['a','b','c','d','e','f']"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "['a', 'b']",
+					"b": "['c', 'd']",
+					"c": "['e', 'f']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "['a','b','c','d']"
+				}
+			],
+			"assignments": ["'rs = 3'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "['a', 'b']",
+					"b": "['c', 'd']",
+					"c": "['e', 'f']",
+					"rs_in": "['a', 'b', 'c', 'd']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "['a','b','c','d','e','f']"
+				}
+			],
+			"assignments": ["'rs = 3'"],
+			"commentId": "2"
+		}
+	},
+	"solutions": ["rs = a + b + c", "rs = a + (b + c)", "rs = (a + b) + c"]
+}

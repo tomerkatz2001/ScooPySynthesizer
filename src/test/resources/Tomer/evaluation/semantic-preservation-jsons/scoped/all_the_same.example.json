@@ -1,0 +1,42 @@
+{
+	"scopeTree": {
+		"3": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"no_dups"
+			],
+			"commentExamples": [
+				{"a": "[1, 20, 30]" ,"no_dups":  "{1,20,30}"},
+				{"a": "[1, 1, 1]" ,"no_dups":  "{1}"}],
+			"assignments": ["'no_dups = set(a)'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{"no_dups":  "{1,20,30}", "rs": "True"},
+				{"no_dups":  "{1}", "rs": "False"}],
+			"assignments": ["'rs = 2 > len(no_dups)'"],
+			"commentId": 2
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{"a": "[1, 1, 1]", "rs": "False"},
+				{"a": "[1, 20, 30]", "rs": "True"}],
+			"assignments": [],
+			"commentId": 3
+		}
+	}
+}

@@ -1,0 +1,91 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3": {},
+				"4": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'This is a line. /keep words in the area /delete this part '",
+					"sep": "'/'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'keep words in the area '"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"first"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'text_text/delete/more_text_here'",
+					"sep": "'/'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"first": "10"
+				}
+			],
+			"assignments": [
+				"'first=2'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"sub"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'text_text/delete/more_text_here'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"first": "10",
+					"sub": "'delete/more_text_here'"
+				}
+			],
+			"assignments": [
+				"'sub=2'"
+			],
+			"commentId": "2"
+		},
+		"4": {
+			"outputVarNames": [
+				"second"
+			],
+			"rawCommentExamples": [
+				{
+					"sub": "'delete/more_text_here'",
+					"first": "10",
+					"second": "16",
+					"sep": "'/'",
+					"#": "",
+					"$": "",
+					"time": "-1"
+				}
+			],
+			"assignments": [
+				"'second=2'"
+			],
+			"commentId": "2"
+		}
+	},
+	"solutions": [
+		"first = 1 + text.find(sep)\nsub = text[first:len(text)]\nsecond = first + sub.find(sep)\nrs = text[first:second]"
+	]
+}

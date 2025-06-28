@@ -1,0 +1,43 @@
+{
+	"scopesTree": {
+		"3": {
+			"NB": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"no_dups"
+			],
+			"rawCommentExamples": [
+				{"a": "[1, 20, 30]" ,"no_dups":  "{1,20,30}"},
+				{"a": "[1, 1, 1]" ,"no_dups":  "{1}"}],
+			"assignments": ["'no_dups = q'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{"no_dups":  "{1,20,30}", "rs": "False"},
+				{"no_dups":  "{1}", "rs": "True"}],
+			"assignments": ["'rs = q'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{"a": "[1, 1, 1]", "rs": "True"},
+				{"a": "[1, 20, 30]", "rs": "False"}],
+			"assignments": ["rs = 3333"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["rs = 2 > len(set(a))","no_dups = set(a)\nrs = 2 > len(no_dups)"]
+}

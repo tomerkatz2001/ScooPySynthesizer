@@ -1,0 +1,23 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "'abhdj'",
+			"#": "",
+			"$": "",
+			"time": 10,
+			"rs": "5"
+		},
+		{
+			"a": "'abhdjd'",
+			"#": "",
+			"$": "",
+			"time": 20,
+			"rs": "3"
+		}
+	],
+	"solutions": ["aux = len(a)\nrs = aux + 1 if (1 > aux % 2) else aux + aux"],
+	"previousEnvs": {}
+}

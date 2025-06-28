@@ -1,0 +1,62 @@
+{
+	"scopesTree": {
+		"0": {
+			"NB": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "24",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "3"
+				}
+			],
+			"assignments": [],
+			"commentId": "0"
+		},
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "24",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "6"
+				}
+			],
+			"assignments": ["'rs = 74'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "24",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in": "6",
+					"rs": "3"
+				}
+			],
+			"assignments": ["'rs = 44'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["rs = n // 8", "rs = (n // 2) // 4", "rs = (n // 4) // 2"]
+}

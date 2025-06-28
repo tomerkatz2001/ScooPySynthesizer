@@ -1,0 +1,64 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "7",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "49"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "16"
+				}
+
+			],
+			"assignments": ["'rs = 2'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "6"
+				}
+			],
+			"assignments": ["'rs =3'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["if a > 3:\n\trs = a * a\nelse:\n\trs = a + a"]
+}

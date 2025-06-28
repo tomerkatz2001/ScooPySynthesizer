@@ -1,0 +1,28 @@
+{
+	"varNames": [
+		"longest"
+	],
+	"envs": [
+		{
+			"#": "",
+			"inp": "['long', 'short', '', 'longest', 'longer']",
+			"longest": "7",
+			"time": 1
+		},
+		{
+			"#": "",
+			"inp": "['long', 'short', '', 'short', 'longer']",
+			"longest": "6",
+			"time": 2
+		}
+	],
+	"previousEnvs": {
+		"1": {
+			"#": "",
+			"inp": "['long', 'short', '', 'longest', 'longer']"
+		}
+	},
+	"solutions": [
+		"longest = max([len(var) for var in inp])"
+	]
+}

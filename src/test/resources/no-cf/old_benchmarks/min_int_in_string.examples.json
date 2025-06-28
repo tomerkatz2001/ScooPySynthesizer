@@ -1,0 +1,18 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"s": "'333 200 322 123 321'",
+			"rs": "123",
+			"time": 1,
+			"#": ""
+		}
+	],
+	"solutions": [
+		"rs = min([int(var) for var in s.split(\" \")])",
+		"rs = min([int(var) for var in s.split()])"
+	],
+	"previousEnvs": {}
+}

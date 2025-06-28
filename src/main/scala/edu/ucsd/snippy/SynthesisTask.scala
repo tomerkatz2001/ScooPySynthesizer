@@ -1,503 +1,344 @@
 package edu.ucsd.snippy
 
-import edu.ucsd.snippy.ast.Types.Types
 import edu.ucsd.snippy.ast._
+import edu.ucsd.snippy.enumeration._
+import edu.ucsd.snippy.predicates._
+import edu.ucsd.snippy.scoopy.ScopeSpecification
+//import edu.ucsd.snippy.scoopy.ScopeSpecification
+import edu.ucsd.snippy.solution._
+import edu.ucsd.snippy.utils._
 import edu.ucsd.snippy.vocab._
 import net.liftweb.json.JsonAST.JObject
 import net.liftweb.json.JsonParser
 
+import scala.collection.mutable
 
-trait SynthesisTask
+class SynthesisTask(
+	// Problem definition8
+	val parameters: List[(String, ast.Types.Value)],
+	val outputVariables: Set[String],
+	val vocab     : VocabFactory,
+	val contexts: List[Map[String, Any]],
+	val predicate: Predicate,
+
+	// Synthesizer state
+	val oeManager : OEValuesManager,
+	val enumerator: SolutionEnumerator)
 {
-	val returnType: ast.Types.Value
-	val parameters: List[(String, ast.Types.Value)]
-	val vocab: VocabFactory
-	val examples: List[Example]
-
-	def fit(program: ASTNode): (Int, Int)
-
 	override def toString: String =
 	{
-		s"\treturnType: $returnType\n" +
-		  s"\tparameters: $parameters\n" +
-		  "\tvocab: [...]\n" +
-		  s"\texamples: $examples"
+		s"\tparameters: $parameters\n" +
+			"\tvocab: [...]\n" +
+			s"\tcontexts: $contexts" +
+			s"\tpredicate: $predicate"
 	}
 }
 
-class PythonExample(var env: Map[String, String])
+object SynthesisTask
 {
-	env = env.filter(pair => PythonExample.reserved_names.contains(pair._1))
-}
-
-object PythonExample
-{
+	type Context = Map[String, Any]
 	val reserved_names: Set[String] =
 		Set("time", "#", "$", "lineno", "prev_lineno", "next_lineno", "__run_py__")
-}
 
-class PythonPBETask(
-  val returnType: ast.Types.Value,
-  val parameters: List[(String, ast.Types.Value)],
-  val vocab: VocabFactory,
-  val examples: List[Example],
-  val outputVar: String) extends SynthesisTask
-{
-	override def fit(program: ASTNode): (Int, Int) =
-	{
-		val expectedResults = examples.map(_.output)
-		val k = program.values.zip(expectedResults).count(pair => pair._1 == pair._2)
-		val n = expectedResults.length
-		(k, n)
+	def fromString(jsonString: String, simAssign: Boolean = false): SynthesisTask = {
+		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
+		val outputVarNames: Set[String] = input("varNames").asInstanceOf[List[String]].toSet
+		val envs: List[Map[String, Any]] = input("envs").asInstanceOf[List[Map[String, Any]]]
+		val previousEnvMap: Map[Int, Map[String, Any]] = input("previousEnvs").asInstanceOf[Map[String, Map[String, Any]]].map(tup => tup._1.toInt -> tup._2)
+
+		// First, build a tuple of (prevEnv, env) for all the envs
+		val allEnvs: List[(Option[Map[String, Any]], Map[String, Any])] = organizeEnvs(envs, previousEnvMap);
+		val justEnvs = allEnvs.map(_._2)
+
+		var contexts: List[Context] = allEnvs.map {
+			case (Some(prevEnv), env) =>
+				env.filter(entry => !outputVarNames.contains(entry._1)) ++
+					outputVarNames.filter(prevEnv.contains).collect(varName => varName -> prevEnv(varName)).toMap
+			case (None, env) => env.filter(entry => !outputVarNames.contains(entry._1))
+		}
+
+		val oeManager = new InputsValuesManager
+		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
+
+		val predicate: Predicate = outputVarNames.toList match {
+			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager, new Contexts(contexts))
+			case multiple =>
+				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, justEnvs)
+				contexts = newContexts
+				pred
+		}
+
+		val parameters = contexts.flatMap(_.keys)
+			.toSet[String]
+			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
+			.filter(!_._2.equals(Types.Unknown))
+			.toList
+		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals)
+
+		val enumerator: SolutionEnumerator = predicate match {
+			case pred: MultilineMultivariablePredicate if simAssign =>
+				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals)
+			case pred: MultilineMultivariablePredicate =>
+				new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals)
+			case pred: SingleVariablePredicate =>
+				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
+				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
+				val enumerator = new enumeration.ProbEnumerator(vocab, oeManager, contexts, false, 0, bank, mini, 100)
+				new ConditionalSingleEnumSingleVarSolutionEnumerator(enumerator, pred.varName, pred.retType, pred.values, contexts)
+			case _ =>
+				val enumerator = new BasicEnumerator(vocab, oeManager, contexts)
+				new BasicSolutionEnumerator(predicate, enumerator)
+		}
+
+		new SynthesisTask(
+			parameters,
+			outputVarNames,
+			vocab,
+			contexts,
+			predicate,
+			oeManager,
+			enumerator)
 	}
-}
 
-object PythonPBETask
-{
-	private def cleanupInputs(input: Map[String, Any]): Map[String, Any] = {
+
+	def getContextsFromExamples(examples: List[Map[String, Any]], outVarNames: Set[String]): List[Context] = {
+		examples.map {
+			env => env.filter(entry => !outVarNames.contains(entry._1))
+		}
+	}
+
+	/**
+	 * This function is used to create a SynthesisTask from a ScopeSpecification
+	 * @param spec - the ScopeSpecification
+	 * @param requiredASTs asts that must be in the solution
+	 * @param knownAssignments known assignments to variables. its maps from the branch name to to required assignments
+	 * @param simAssign
+	 * @return SynthesisTask
+	 */
+	def fromSpec(spec:ScopeSpecification, requiredASTs:List[ASTNode]=List(), knownAssignments:Map[String, ASTNode], simAssign: Boolean = false): SynthesisTask={
+		val outputVarNames: Set[String] = spec.outputVarNames
+		val (previousEnvMap, envs):(Map[Int, Map[String, Any]], List[Map[String, Any]]) = spec.getPrevEnvsAndEnvs()
+
+
+		val allEnvs: List[(Option[Map[String, Any]], Map[String, Any])] = organizeEnvs(envs, previousEnvMap);
+		val justEnvs = allEnvs.map(_._2)
+
+		var contexts: List[Context] = allEnvs.map {
+			case (Some(prevEnv), env) =>
+				env.filter(entry => !outputVarNames.contains(entry._1)) ++
+					outputVarNames.filter(prevEnv.contains).collect(varName => varName -> prevEnv(varName)).toMap
+			case (None, env) => env.filter(entry => !outputVarNames.contains(entry._1))
+		}
+
+
+
+		val oeManager = new RequiresValuesManager
+		val additionalLiterals = getStringLiterals(justEnvs, outputVarNames.toList)
+
+		val predicate: Predicate = outputVarNames.toList match {
+			case single :: Nil => Predicate.getPredicate(single, justEnvs, oeManager, new Contexts(contexts))
+			case multiple =>
+				val (newContexts, pred) = this.mulitvariablePredicate(multiple, contexts, justEnvs)
+				contexts = newContexts
+				pred
+		}
+
+		val parameters = contexts.flatMap(_.keys)
+			.toSet[String]
+			.map(varName => varName -> Utils.getTypeOfAll(contexts.map(ex => ex.get(varName)).filter(_.isDefined).map(_.get)))
+			.filter(!_._2.equals(Types.Unknown))
+			.toList
+		val requiredVocabMakers = requiredASTs.zipWithIndex.map((x)=> new RequiredVocabMaker(x._1, List(), x._2, new Contexts(contexts))) // makes the contexts good in singleVar. in multi var it will be done inside the node
+
+		val vocab: VocabFactory = VocabFactory(parameters, additionalLiterals,  requiredVocabMakers)
+
+
+		val enumerator: SolutionEnumerator = predicate match {
+			case pred: MultilineMultivariablePredicate if simAssign =>
+				new ConditionalSingleEnumMultivarSimultaneousSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc)
+			case pred: MultilineMultivariablePredicate =>
+				if(requiredASTs.nonEmpty){
+					new ConditionalSingleEnumMultivarSolutionEnumeratorInnerVars(pred, parameters, additionalLiterals, spec.getPartitionFunc, knownAssignments, requiredASTs)
+				}
+				else{
+					new ConditionalSingleEnumMultivarSolutionEnumerator(pred, parameters, additionalLiterals, spec.getPartitionFunc, knownAssignments, requiredASTs)
+				}
+			case pred: SingleVariablePredicate =>
+				val bank = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
+				val mini = mutable.Map[Int, mutable.ArrayBuffer[ASTNode]]()
+				val enumerator = new enumeration.ProbEnumerator(vocab, oeManager, contexts, false, 0, bank, mini, 100)
+				new ConditionalSingleEnumSingleVarSolutionEnumerator(enumerator, pred.varName, pred.retType, pred.values, contexts, spec.getPartitionFunc, requiredVocabMakers.length)
+		}
+
+		new SynthesisTask(
+			parameters,
+			outputVarNames,
+			vocab,
+			contexts,
+			predicate,
+			oeManager,
+			enumerator)
+	}
+	//build a tuple of (prevEnv, env) for all the envs
+	def organizeEnvs(envs: List[Map[String, Any]], previousEnvMap:Map[Int, Map[String, Any]]): List[(Option[Map[String, Any]], Map[String, Any])] ={
+		envs.map(env => {
+			val time = env("time").asInstanceOf[BigInt].toInt
+			if (previousEnvMap.contains(time)) {
+				Some(previousEnvMap(time)) -> env
+			} else {
+				// We need to use the time + iter to see if we can find the previous env in the
+				// other envs
+
+				val iterStr =if (env.contains("#"))  env("#").asInstanceOf[String] else "";
+				if (iterStr.isEmpty) {
+					// Not a loop, and no prev env, so no luck :(
+					None -> env
+				} else {
+					// Find the nearest entry with the iter one less than this one
+					val iter = iterStr.toInt
+					val prevEnv = envs
+						.filter(env => env("time").asInstanceOf[BigInt].toInt < time)
+						.filter(env => env.contains("#") && env("#").asInstanceOf[String].toInt == iter - 1)
+						.lastOption
+					prevEnv -> env
+				}
+			}
+		})
+			.map(tup => tup._1.map(cleanupInputs) -> cleanupInputs(tup._2))
+	}
+
+	def mulitvariablePredicate(
+		outputVarNames: List[String],
+		inputContexts: List[Context],
+		outputEnvs: List[Map[String, Any]]): (List[Context], MultilineMultivariablePredicate) = {
+		var contexts = inputContexts
+
+
+		val dupVarNames = outputVarNames.filter(name=>name.contains("else") || name.contains("then")).map(_.replace("_then", "").replace("_else", "")).toSet
+		val ActualVarName = (outputVarNames.filter(name=> !name.contains("else") && !name.contains("then")) ++ dupVarNames).toSet
+		// We can support multiline assignments, so let's build the graph
+		// We start with enumerating all the possible environments
+		val environments_ = this.enumerateEnvs(outputVarNames, contexts, outputEnvs)
+		val environments = environments_.filter(tup => tup._1.count(name => name.contains("_then") || name.contains("_else")) < 2) //no mre than 2 of the same var TODO:what if there is two _then vars. rs_then t_then
+		// enviornments.head := Same as "contexts", the environment with all old values -> The starting node
+		// environment.last := processedEnvs, the environment with all the new values -> The end node
+
+		// We need to add all but the above to the evaluation context, both to preserve completeness under OE, and
+		// because the MultilineMultivariablePredicate uses them to determine when Synthesis is complete.
+		// We also need to keep track of their indices in the final context, since the context is a flatmap of them,
+		// while the predicate needs to be able to extract only the relevant values from synthesized ASTNodes.
+
+		// We can actually just overwrite `context` here, since the original context is represented by the
+		// first graph node.
+
+		val nodes = environments
+			.map { case (preAssigned, envs) =>
+				contexts = contexts ++ envs
+				(envs, Range(contexts.length - envs.length, contexts.length).toList, preAssigned)
+			}
+			.map { case (env, indices, preAssigned) => new predicates.Node(env, Nil, indices, false, preAssigned.toList) }
+
+		// We never evaluate in the final env, so can we pop that from context.
+		contexts = contexts.dropRight(1)
+
+		// Set the final node
+		//nodes.last.isEnd = true
+		nodes.foreach(x=> if(x.nodesVars.length==ActualVarName.size) {x.isEnd=true})
+
+		// Note: There's a dependency here between the order of nodes, and the order of the `environments`, which
+		// we use below to find the nodes that should have a variable in-between.
+
+		// Now we need to create the edges and set them in the nodes
+		environments.zipWithIndex.foreach{ case ((thisVars, _), thisIdx) =>
+			val nodeEdges: List[predicates.Edge] = Range(thisIdx + 1, environments.length).map(thatIdx => {
+				val thatVars = environments(thatIdx)._1
+				if (thatVars.size > thisVars.size && thisVars.forall(thatVars.contains)) {
+					// We need to create an edge between the two
+					val newVars = thatVars -- thisVars
+					val parent = nodes(thisIdx)
+					val child = nodes(thatIdx)
+
+					if (newVars.size == 1) {
+						val values = outputEnvs.flatMap(map => map.filter(_._1 == newVars.head).values)
+						Some(SingleEdge(None, newVars.head, Utils.getTypeOfAll(values), parent, child))
+					} else {
+						Some(MultiEdge(
+							mutable.Map.from(newVars.map(_ -> None)),
+							newVars.map(varName => varName -> Utils.getTypeOfAll(outputEnvs.flatMap(map => map.filter(_._1 == varName).values))).toMap,
+							parent,
+							child))
+					}
+				} else {
+					// There is no edge between these nodes
+					None
+				}
+			})
+				.filter(_.isDefined)
+				.map(_.get)
+				.toList
+
+			nodes(thisIdx).edges = nodeEdges
+		}
+
+		(contexts, new MultilineMultivariablePredicate(nodes.head, new Contexts(contexts)))
+	}
+
+	def cleanupInputs(input: Map[String, Any]): Map[String, Any] =
+	{
 		val parser = new InputParser
 		input
-		  .filter(v => !PythonExample.reserved_names.contains(v._1))
-		  // TODO Is there a cleaner way to do this?
-		  .filter(_._2.isInstanceOf[String])
-		  .map(variable => parser.parse(variable._2.asInstanceOf[String]) match {
-			  case None =>
-				  trace.DebugPrints.eprintln(s"Input not recognized: $variable")
-				  (variable._1, null)
-			  case Some(v) =>
-				  (variable._1, v)
-		  })
-  		.filter(v => v._2 != null)
+			.filter(v => !reserved_names.contains(v._1))
+			// TODO Is there a cleaner way to do this?
+			.filter(_._2.isInstanceOf[String])
+			.map(variable => parser.parse(variable._2.asInstanceOf[String]) match {
+				case None =>
+					DebugPrints.eprintln(s"Input not recognized: $variable")
+					(variable._1, null) ;
+				case Some("__BOT__")=> (variable._1, None)
+				case Some(v) =>
+					(variable._1, v)
+			})
+			.filter(v => v._2 != null)
 	}
 
-	private def getTypeOfAll(values: List[Any]): Types = {
-		val (empty, nonempty) = values.partition(v => v.isInstanceOf[Iterable[_]] && v.asInstanceOf[Iterable[_]].isEmpty)
-		val neType = if (nonempty.isEmpty) Types.Unknown else nonempty.map(v => Types.typeof(v)).reduce((acc,t) => if (acc == t) t else Types.Unknown)
-		if (!empty.isEmpty) {
-			if (nonempty.isEmpty){
-				val defaultTypes: Set[Types] = empty.map( v => v match {
-					case l: List[_] => Types.StringList
-					case m: Map[_,_] => Types.Map(Types.String,Types.Int)
-				}).toSet
-				return if (defaultTypes.size == 1) defaultTypes.head else Types.Unknown
-			}
-			else  for (v <- empty) {
-				if (neType match {
-					case Types.StringList | Types.IntList => !v.isInstanceOf[List[_]]
-					case Types.Map(kt, vt) => !v.isInstanceOf[Map[_, _]]
-					case _ => false //nonempties are not a list/map, fail.
-				}) return Types.Unknown
-			}
-			neType
+	private def enumerateEnvs(
+		outputVariables: List[String],
+		startingEnvs: List[Map[String, Any]],
+		endingEnvs: List[Map[String, Any]]): List[(Set[String], List[Map[String, Any]])] = {
+		outputVariables match {
+			case last :: Nil => List(
+				(Set(), startingEnvs),
+				(Set(last), startingEnvs.zip(endingEnvs).map(envs => envs._1 + (last -> envs._2(last)))))
+			case first :: rest =>
+				enumerateEnvs(rest, startingEnvs, endingEnvs) ++
+				enumerateEnvs(
+					rest,
+					startingEnvs.zip(endingEnvs).map(envs => envs._1 + (first -> envs._2(first))),
+					endingEnvs)
+					.map(tup => (tup._1 + first, tup._2))
 		}
-		else neType
 	}
 
-	def fromString(jsonString: String): PythonPBETask =
+	def getStringLiterals(
+		startingContexts: List[Map[String, Any]],
+		outputNames: List[String]): Set[String] =
 	{
-		val input = JsonParser.parse(jsonString).asInstanceOf[JObject].values
-		val outputVarName: String = input("varName").asInstanceOf[String]
-		val examples = input("envs").asInstanceOf[List[Map[String,Any]]]
-		  .map(cleanupInputs)
-  		  .map(env => Example(env.filter(_._1 != outputVarName), env(outputVarName)))
-
-		val returnType = getTypeOfAll(examples.map(_.output))
-		val parameters =
-			examples.head.input
-			  .map{inputVar =>
-					val varValueOpts = examples.map(ex => ex.input.find(kv => kv._1 == inputVar._1))
-					(inputVar._1, if (varValueOpts.exists(_.isEmpty)) Types.Unknown else getTypeOfAll(varValueOpts.flatten.map(_._2)))
-				}
-			  // TODO Handle empty sets
-			  .filter(!_._2.equals(Types.Unknown))
-			  .toList
-		val additionalLiterals = getStringLiterals(examples)
-		val vocab = PythonPBETask.vocabFactory(parameters,additionalLiterals)
-
-		val rs = new PythonPBETask(returnType, parameters, vocab, examples, outputVarName)
-		trace.DebugPrints.dprintln(s"Solving Python PBE Task:\n\n$rs")
-		rs
-	}
-
-	private def getStringLiterals(examples: List[Example]): List[String] = {
-		if (examples.exists(ex => Types.typeof(ex.output) != Types.String)) //this is only for strings
-			return Nil
-
-		val opts = examples.map{ex =>
-			val outputVal = ex.output.asInstanceOf[String]
-			val stringInputs = for ((_,inputVal) <- ex.input; if(Types.typeof(inputVal) == Types.String))
-				yield inputVal.asInstanceOf[String];
-			val chars : Iterable[String] =
-				for (char <- outputVal; if (stringInputs.forall(inputVal => !inputVal.contains(char.toLower) && !inputVal.contains(char.toUpper))))
-						yield char.toString
-			chars.toSet
-		}
-		val intersection = opts.reduce((a,b) => a.intersect(b))
-		intersection.toList
-	}
-
-	private def vocabFactory(variables: List[(String, Types.Value)], additionalLiterals: List[String]): VocabFactory =
-	{
-		val defaultStringLiterals = List(" ")
-		val stringLiterals = (defaultStringLiterals ++ additionalLiterals).distinct
-
-		val vocab: List[VocabMaker] =
-			stringLiterals.map{str =>
-				new BasicVocabMaker
-				{
-					override val arity: Int = 0
-					override val childTypes: List[Types] = Nil
-					override val returnType: Types = Types.String
-
-					override def apply(children    : List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						new StringLiteral(str, contexts.length)
-				}
-			} ++ List(
-			// Literals
-			new BasicVocabMaker
+		outputNames
+			.filter(name => if(startingContexts.forall(_.contains(name))) startingContexts.map(_(name)).exists(Types.typeof(_) == Types.String) else false)
+			.flatMap(outputName =>
 			{
-				override val arity: Int = 0
-				override val childTypes: List[Types] = Nil
-				override val returnType: Types = Types.Int
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntLiteral(0, contexts.length)
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 0
-				override val childTypes: List[Types] = Nil
-				override val returnType: Types = Types.Int
-				
-				override def apply(children    : List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntLiteral(1, contexts.length)
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 0
-				override val childTypes: List[Types] = Nil
-				override val returnType: Types = Types.Int
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntLiteral(-1, contexts.length)
-			},
-			// Binary Ops
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.Int, Types.Int)
-				override val returnType: Types = Types.Bool
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new GreaterThan(children.head.asInstanceOf[IntNode], children(1).asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.Int, Types.Int)
-				override val returnType: Types = Types.Bool
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new LessThanEq(children.head.asInstanceOf[IntNode], children(1).asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.String)
-				override val returnType: Types = Types.String
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new StringConcat(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.Int)
-				override val returnType: Types = Types.String
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new BinarySubstring(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.Int)
-				override val returnType: Types = Types.String
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new StringStep(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.String)
-				override val returnType: Types = Types.Int
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new Find(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.String)
-				override val returnType: Types = Types.Bool
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new Contains(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.String)
-				override val returnType: Types = Types.Int
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new Count(children.head.asInstanceOf[StringNode], children(1).asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.Iterable(Types.Any))
-				override val returnType: Types = Types.Int
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new Length(children.head.asInstanceOf[IterableNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.IntList)
-				override val returnType: Types = Types.Int
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new Min(children.head.asInstanceOf[ListNode[Int]])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.IntList)
-				override val returnType: Types = Types.Int
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new Max(children.head.asInstanceOf[ListNode[Int]])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.String)
-				override val returnType: Types = Types.String
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new StringLower(children.head.asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.String)
-				override val returnType: Types = Types.Int
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new StringToInt(children.head.asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.Int)
-				override val returnType: Types = Types.String
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntToString(children.head.asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 3
-				override val childTypes: List[Types] = List(Types.String, Types.Int, Types.Int)
-				override val returnType: Types = Types.String
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new TernarySubstring(
-						children.head.asInstanceOf[StringNode],
-						children(1).asInstanceOf[IntNode],
-						children(2).asInstanceOf[IntNode])
-			},
-			//			new BasicVocabMaker
-			//			{
-			//				override val arity: Int = 3
-			//				override val childTypes: List[Types] = List(Types.String, Types.String, Types.String)
-			//				override val returnType: Types = Types.String
-			//
-			//				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-			//					new StringReplace(
-			//						children.head.asInstanceOf[StringNode],
-			//						children(1).asInstanceOf[StringNode],
-			//						children(2).asInstanceOf[StringNode])
-			//			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.String)
-				override val returnType: Types = Types.StringList
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new StringSplit(children.head.asInstanceOf[StringNode], children.tail.head.asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.String, Types.StringList)
-				override val returnType: Types = Types.String
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new StringJoin(children.head.asInstanceOf[StringNode], children.tail.head.asInstanceOf[ListNode[String]])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 1
-				override val childTypes: List[Types] = List(Types.StringList)
-				override val returnType: Types = Types.StringList
-				
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new SortedStringList(children.head.asInstanceOf[ListNode[String]])
-			},
-			new ListCompVocabMaker(Types.String, Types.String) {
-				override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-					new StringToStringListCompNode(
-						lst.asInstanceOf[ListNode[String]],
-						map.asInstanceOf[StringNode],
-						this.varName)
-			},
-			new ListCompVocabMaker(Types.String, Types.Int) {
-				override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-					new StringToIntListCompNode(
-						lst.asInstanceOf[ListNode[String]],
-						map.asInstanceOf[IntNode],
-						this.varName)
-			},
-			new ListCompVocabMaker(Types.Int, Types.String) {
-				override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-					new IntToStringListCompNode(
-						lst.asInstanceOf[ListNode[Int]],
-						map.asInstanceOf[StringNode],
-						this.varName)
-			},
-			new ListCompVocabMaker(Types.Int, Types.Int) {
-				override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-					new IntToIntListCompNode(
-						lst.asInstanceOf[ListNode[Int]],
-						map.asInstanceOf[IntNode],
-						this.varName)
-			},
-			new ListCompVocabMaker(Types.Int, Types.Int) {
-				override def makeNode(lst: ASTNode, map: ASTNode): ASTNode =
-					new IntToIntListCompNode(
-						lst.asInstanceOf[ListNode[Int]],
-						map.asInstanceOf[IntNode],
-						this.varName)
-			},
-			new MapCompVocabMaker(Types.String, Types.String) {
-				override def makeNode(lst: ASTNode, key: ASTNode, value: ASTNode): ASTNode =
-					new StringStringMapCompNode(lst.asInstanceOf[StringNode], key.asInstanceOf[StringNode], value.asInstanceOf[StringNode], this.varName)
-			},
-			new MapCompVocabMaker(Types.String, Types.Int) {
-				override def makeNode(lst: ASTNode, key: ASTNode, value: ASTNode): ASTNode =
-					new StringIntMapCompNode(lst.asInstanceOf[StringNode], key.asInstanceOf[StringNode], value.asInstanceOf[IntNode], this.varName)
-			},
-			new FilteredMapVocabMaker(Types.String, Types.String) {
-				override def makeNode(map: ASTNode, filter: BoolNode) : ASTNode =
-					new StringStringFilteredMapNode(map.asInstanceOf[StringStringMapNode], filter, this.keyName)
-			},
-			new FilteredMapVocabMaker(Types.String, Types.Int) {
-				override def makeNode(map: ASTNode, filter: BoolNode) : ASTNode =
-					new StringIntFilteredMapNode(map.asInstanceOf[MapNode[String,Int]], filter, this.keyName)
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.Map(Types.String, Types.Int), Types.String)
-				override val returnType: Types = Types.Int
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new MapGet(children.head.asInstanceOf[MapNode[String,Int]], children(1).asInstanceOf[StringNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.Int, Types.Int)
-				override val returnType: Types = Types.Int
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntAddition(children.head.asInstanceOf[IntNode], children(1).asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.Int, Types.Int)
-				override val returnType: Types = Types.Int
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntSubtraction(children.head.asInstanceOf[IntNode], children(1).asInstanceOf[IntNode])
-			},
-			new BasicVocabMaker
-			{
-				override val arity: Int = 2
-				override val childTypes: List[Types] = List(Types.Int, Types.Int)
-				override val returnType: Types = Types.Int
-
-				override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-					new IntDivision(children.head.asInstanceOf[IntNode], children(1).asInstanceOf[IntNode])
-			}
-		)
-
-		VocabFactory(vocab.appendedAll(
-			variables.
-			  map {
-				  case (name, Types.String) => new BasicVocabMaker
-				  {
-					  override val arity: Int = 0
-					  override val childTypes: List[Types] = Nil
-					  override val returnType: Types = Types.String
-					  
-					  override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						  new StringVariable(name, contexts)
-				  }
-				  case (name, Types.Int) => new BasicVocabMaker
-				  {
-					  override val arity: Int = 0
-					  override val childTypes: List[Types] = Nil
-					  override val returnType: Types = Types.Int
-					  
-					  override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						  new IntVariable(name, contexts)
-				  }
-				  case (name, Types.Bool) => new BasicVocabMaker
-				  {
-					  override val arity: Int = 0
-					  override val childTypes: List[Types] = Nil
-					  override val returnType: Types = Types.Bool
-					  
-					  override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						  new BoolVariable(name, contexts)
-				  }
-				  case (name, Types.List(childType)) => new BasicVocabMaker {
-					  override val arity: Int = 0
-					  override val childTypes: List[Types] = Nil
-					  override val returnType: Types = Types.List(childType)
-
-					  override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						  new ListVariable(name, contexts, childType)
-				  }
-				  case (name, Types.Map(keyType, valType)) => new BasicVocabMaker {
-					  override val arity: Int = 0
-					  override val childTypes: List[Types] = Nil
-					  override val returnType: Types = Types.Map(keyType, valType)
-
-					  override def apply(children: List[ASTNode], contexts: List[Map[String, Any]]): ASTNode =
-						  new MapVariable(name, contexts, keyType, valType)
-				  }
-				  case (name, typ) =>
-					  assert(assertion = false, s"Input type $typ not supported for input $name")
-					  null
-			  }
-			))
+				startingContexts.flatMap {
+						ex =>
+							val stringInputs = ex
+								.filter { case (name, value) => !outputNames.contains(name) && Types.typeof(value) == Types.String }
+								.map(_._2.asInstanceOf[String])
+							ex(outputName)
+								.asInstanceOf[String]
+								.filter(char => stringInputs.forall(inputVal => !inputVal.contains(char.toLower) && !inputVal.contains(char.toUpper)))
+								.map(_.toString)
+								.toSet
+					}
+			})
+		.toSet
 	}
 }

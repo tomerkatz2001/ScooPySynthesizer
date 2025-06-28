@@ -7,10 +7,8 @@ import org.antlr.v4.runtime.{BailErrorStrategy, BufferedTokenStream, CharStreams
 
 import scala.jdk.CollectionConverters.ListHasAsScala
 
-class InputParser extends Python3BaseVisitor[Option[Any]]
-{
-	def parse(code: String) : Option[Any] =
-	{
+class InputParser extends Python3BaseVisitor[Option[Any]] {
+	def parse(code: String): Option[Any] = {
 		val lexer = new Python3Lexer(CharStreams.fromString(code.trim))
 		lexer.removeErrorListeners()
 		// lexer.addErrorListener(new ThrowingLexerErrorListener)
@@ -20,29 +18,26 @@ class InputParser extends Python3BaseVisitor[Option[Any]]
 		this.visit(parser.expr())
 	}
 
-	override def visitArith_expr(ctx: Arith_exprContext): Option[Any] =
-	{
+	override def visitArith_expr(ctx: Arith_exprContext): Option[Any] = {
 		if (ctx.term().size() > 1) None
 		else this.visitChildren(ctx)
 	}
 
-	override def visitTerm(ctx: TermContext): Option[Any] =
-	{
+	override def visitTerm(ctx: TermContext): Option[Any] = {
 		if (ctx.factor().size() > 1) None
 		else this.visitChildren(ctx)
 	}
 
 
-	override def visitAtom(ctx: AtomContext): Option[Any] =
-	{
+	override def visitAtom(ctx: AtomContext): Option[Any] = {
 		val strs = ctx.STRING()
 		if (!strs.isEmpty) {
 			// TODO Is there a more robust way of removing string quotes?
 			return Some(
 				strs.stream()
-				  .map(_.getSymbol.getText)
-				  .map((v1: String) => v1.substring(1, v1.length - 1))
-				  .reduce("", (t: String, u: String) => t + u))
+					.map(_.getSymbol.getText)
+					.map((v1: String) => v1.substring(1, v1.length - 1))
+					.reduce("", (t: String, u: String) => t + u))
 		}
 
 		if (ctx.OPEN_BRACK() != null) {
@@ -72,13 +67,12 @@ class InputParser extends Python3BaseVisitor[Option[Any]]
 		visitChildren(ctx)
 	}
 
-	override def visitTestlist_comp(ctx: Testlist_compContext): Option[Any] =
-	{
+	override def visitTestlist_comp(ctx: Testlist_compContext): Option[Any] = {
 		val rs = ctx.children.asScala
-		  .map(_.accept(this))
-		  .filter(_.isDefined)
-		  .map(_.get)
-		  .toList
+			.map(_.accept(this))
+			.filter(_.isDefined)
+			.map(_.get)
+			.toList
 
 
 		if (rs.nonEmpty) {
@@ -91,43 +85,51 @@ class InputParser extends Python3BaseVisitor[Option[Any]]
 		Some(rs)
 	}
 
-	override def visitDictorsetmaker(ctx: DictorsetmakerContext): Option[Any] =
-	{
-		if (!ctx.COLON().isEmpty) {
+	override def visitDictorsetmaker(ctx: DictorsetmakerContext): Option[Any] = {
+		if (ctx.children.isEmpty) {
+			// This is an empty map
+			Some(Map())
+		} else if (!ctx.COLON().isEmpty) {
 			// This is a map
 			val map = ctx.children.asScala
-			              .map(_.accept(this))
-			              .filter(_.isDefined)
-			              .map(_.get)
-			              .zipWithIndex
-						  .groupBy(_._2 / 2)
-						  .map(arr => (arr._2.head._1, arr._2.tail.head._1))
+				.map(_.accept(this))
+				.filter(_.isDefined)
+				.map(_.get)
+				.zipWithIndex
+				.groupBy(_._2 / 2)
+				.map(arr => (arr._2.head._1, arr._2.tail.head._1))
 			val keyTypes = map.keys.map(_.getClass)
 			val valTypes = map.values.map(_.getClass)
 
-			if (keyTypes.exists(!_.equals(keyTypes.head)) || valTypes.exists(!_.equals(valTypes.head)))
-				return None
-			else
-				return Some(map)
-		} else if (!ctx.COMMA().isEmpty) {
+			if (keyTypes.exists(!_.equals(keyTypes.head)) || valTypes.exists(!_.equals(valTypes.head))) {
+				None
+			} else {
+				Some(map)
+			}
+		} else {
 			// This is a set
-			Some(ctx.children.asScala
-			       .map(_.accept(this))
-			       .filter(_.isDefined)
-			       .map(_.get)
-			       .toSet)
-		}
+			val set = ctx.children.asScala
+				.map(_.accept(this))
+				.filter(_.isDefined)
+				.map(_.get)
+				.toSet
 
-		None
+			val types = set.map(_.getClass)
+			if (types.exists(!_.equals(types.head))) {
+				None
+			} else {
+				Some(set)
+			}
+		}
 	}
 
 
-	override def visitFactor(ctx: FactorContext): Option[Any] =
-	{
+	override def visitFactor(ctx: FactorContext): Option[Any] = {
 		if (ctx.MINUS() != null) {
 			// Probably a negative number?
 			this.visitChildren(ctx) match {
-				case Some(a) if a.isInstanceOf[Int] => Some(-a.asInstanceOf[Int])
+				case Some(a: Int) => Some(-a)
+				case Some(a: Double) => Some(-a)
 				case _ => None
 			}
 		} else {
@@ -136,14 +138,15 @@ class InputParser extends Python3BaseVisitor[Option[Any]]
 	}
 
 
-	override def visitTerminal(node: TerminalNode): Option[Any] =
-	{
+	override def visitTerminal(node: TerminalNode): Option[Any] = {
 		// TODO How to get the actual value?
 		node.getSymbol.getType match {
 			case Python3Lexer.TRUE => Some(true)
 			case Python3Lexer.FALSE => Some(false)
-			case Python3Lexer.NUMBER =>
+			case Python3Lexer.INTEGER =>
 				Some(node.getText.toInt)
+			case Python3Lexer.FLOAT_NUMBER =>
+				Some(node.getText.toDouble)
 			case _ => None
 		}
 	}

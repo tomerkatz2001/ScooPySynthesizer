@@ -1,0 +1,60 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"s": "'abcdefg'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'a.c.e.g'"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"letters"
+			],
+			"commentExamples": [
+				{
+					"s": "'abcdefg'",
+					"#": "",
+					"$": "",
+					"time": "-1"
+				}
+			],
+			"assignments": ["'letters = list(s)[::2]'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"s": "'abcdefg'",
+					"letters": "['a', 'c', 'e', 'g']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'a.c.e.g'"
+				}
+			],
+			"assignments": ["'rs = \"\".\"\".join(letters)'"],
+			"commentId": 2
+		}
+	}
+}

@@ -1,0 +1,25 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"time": 10,
+			"a": "'Hello'",
+			"b": "'World'",
+			"#": "",
+			"$": "",
+			"out": "'Hello.World'"
+		},
+		{
+			"time": 20,
+			"a": "' '",
+			"b": "'world'",
+			"#": "",
+			"$": "",
+			"out": "'world'"
+		}
+	],
+	"solutions" : ["if a == \" \":\n\tout = b\nelse:\n\tout = a + \".\" + b"],
+	"previousEnvs": {}
+}

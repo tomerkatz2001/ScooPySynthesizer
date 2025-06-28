@@ -1,0 +1,51 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "['Hello', 'World']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'H-W'"
+				},
+				{
+					"a": "['Augusta', 'Ada', 'King']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'A.A.K'"
+				}
+			],
+			"assignments": ["'rs = 3'"],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "['Augusta', 'ada', 'King']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'A.A.K'"
+				}
+			],
+			"assignments": ["'rs = 7'"],
+			"commentId": "2"
+		}
+	},
+	"solutions": ["if len(a) > 2:\n\trs = \".\".join([var[0] for var in a]).upper()\nelse:\n\trs = \"-\".join([var[0] for var in a])"]
+}

@@ -1,0 +1,48 @@
+
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"time": 4,
+			"#": "",
+			"x": "'spreadsheet'",
+            "idx": "1",
+			"rs": "''s'"
+		},
+		{
+			"time": 5,
+			"#": "",
+			"x": "'spreadsheet'",
+            "idx": "2",
+			"rs": "''p'"
+		},
+		{
+			"time": 6,
+			"#": "",
+			"x": "'spreadsheet'",
+            "idx": "3",
+			"rs": "''r'"
+		},
+        {
+			"time": 7,
+			"#": "",
+			"x": "'spreadsheet'",
+            "idx": "4",
+			"rs": "''e'"
+		},
+        {
+			"time": 8,
+			"#": "",
+			"x": "'spreadsheet'",
+            "idx": "5",
+			"rs": "''a'"
+		}
+	],
+	"solutions": [
+		"x[idx-1]"
+	],
+	"previousEnvs": {},
+    "src": " https=//stackoverflow.com/questions/19558979/excel-how-to-extract-a-substring-by-only-knowing-the-strings-location"
+}

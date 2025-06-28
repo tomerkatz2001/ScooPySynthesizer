@@ -1,0 +1,60 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"name": "'cool long name'",
+			"#": "",
+			"$": "",
+			"time": 0,
+			"rs": "'c.l.n'"
+		},
+		{
+			"name": "'Harmony River Stone'",
+			"#": "",
+			"$": "",
+			"time": 2,
+			"rs": "'H.R.S'"
+		},{
+			"name": "'Luna Jade Winter'",
+			"#": "",
+			"$": "",
+			"time": 3,
+			"rs": "'L.J.W'"
+		},
+		{
+			"name": "'Atlas Phoenix Storm'",
+			"#": "",
+			"$": "",
+			"time": 4,
+			"rs": "'A.P.S'"
+		},
+		{
+			"name": "'Aurora Willow Grace'",
+			"#": "",
+			"$": "",
+			"time":4 ,
+			"rs": "'A.W.G'"
+		},
+		{
+			"name": "'Ruby Ember Skye'",
+			"#": "",
+			"$": "",
+			"time": 5,
+			"rs": "'R.E.S'"
+		},
+		{
+			"name": "'Ava'",
+			"#": "",
+			"$": "",
+			"time": 6,
+			"rs": "''"
+		}
+
+
+	],
+	"solutions": ["if name.count(\" \") > 1:\n\trs = \".\".join([var[0] for var in name.split(\" \")])\nelse:\n\trs = \"\"",
+		"if 2 > name.count(\" \"):\n\trs = \"\"\nelse:\n\trs = \".\".join([var[0] for var in name.split()])"],
+	"previousEnvs": {}
+}

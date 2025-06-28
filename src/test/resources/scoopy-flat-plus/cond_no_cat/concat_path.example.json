@@ -1,0 +1,73 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"time": 10,
+			"a": "'Hello'",
+			"b": "'World'",
+			"#": "",
+			"$": "",
+			"out": "'Hello.World'"
+		},
+		{
+			"time": 20,
+			"a": "' '",
+			"b": "'world'",
+			"#": "",
+			"$": "",
+			"out": "'world'"
+		},
+		{
+			"time": 30,
+			"a": "'one'",
+			"b": "'two'",
+			"#": "",
+			"$": "",
+			"out": "'one.two'"
+		},
+		{
+			"time": 40,
+			"a": "'two words'",
+			"b": "'one'",
+			"#": "",
+			"$": "",
+			"out": "'two words.one'"
+		},
+		{
+			"time": 60,
+			"a": "' '",
+			"b": "''",
+			"#": "",
+			"$": "",
+			"out": "''"
+		},
+		{
+			"time": 70,
+			"a": "'a'",
+			"b": "'a'",
+			"#": "",
+			"$": "",
+			"out": "'a.a'"
+		},
+		{
+			"time": 80,
+			"a": "'a b c'",
+			"b": "''",
+			"#": "",
+			"$": "",
+			"out": "'a b c.'"
+		},
+		{
+			"time": 90,
+			"a": "'longlonglong'",
+			"b": "'short'",
+			"#": "",
+			"$": "",
+			"out": "'longlonglong.short'"
+		}
+	],
+	"solutions" : ["if a == \" \":\n\tout = b\nelse:\n\tout = a + \".\" + b"],
+	"previousEnvs": {}
+}

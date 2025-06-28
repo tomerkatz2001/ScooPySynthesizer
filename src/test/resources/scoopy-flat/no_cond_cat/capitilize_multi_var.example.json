@@ -1,0 +1,18 @@
+{
+	"varNames": [
+		"caps", "words"
+	],
+	"envs": [
+		{
+			"a": "'alison hack'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"caps": "['ALISON', 'HACK']",
+			"words": "['alison', 'hack']"
+		}
+	],
+	"solutions": ["caps = a.upper().split()\nwords = a.split()",
+	"words = a.split()\ncaps = a.upper().split()"],
+	"previousEnvs": {}
+}

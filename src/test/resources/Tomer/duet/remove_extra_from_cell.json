@@ -1,0 +1,27 @@
+
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"time": 4,
+			"#": "",
+            "aux": "-",
+			"x": "'Dec 2, 2014, 11=23 PM - +91 90000 80000= loren ipsum'",
+			"rs": "''Dec 2, 2014, 11=23 PM'"
+		},
+		{
+			"time": 8,
+			"#": "",
+            "aux": "-",
+			"x": "'Dec 2, 2014, 11=24 PM - +91 90000 80000= loren'",
+			"rs": "'Dec 2, 2014, 11=24 PM'"
+		}
+	],
+	"solutions": [
+		"x[:x.find('-')-1]"
+	],
+	"previousEnvs": {},
+    "src": " https=//stackoverflow.com/questions/2171308/how-to-make-a-sub-string-selection-and-concatenation-in-excel"
+}

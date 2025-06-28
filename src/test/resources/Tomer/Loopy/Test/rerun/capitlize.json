@@ -1,0 +1,54 @@
+{
+	"varNames": [
+		"out"
+	],
+	"envs": [
+		{
+			"a": "'hello'",
+			"b": "'world'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'hello-world'"
+		},
+		{
+			"a": "'Hello'",
+			"b": "'world'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'Hello-World'"
+		},
+		{
+			"a": "'bye'",
+			"b": "'bye'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'bye-bye'"
+		},
+		{
+			"a": "'See'",
+			"b": "'you'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'See-You'"
+		},
+		{
+			"a": "'see'",
+			"b": "'You'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"out": "'see-You'"
+		},
+
+	],
+	"previousEnvs": {
+
+	},
+	"solutions": [
+
+	]
+}

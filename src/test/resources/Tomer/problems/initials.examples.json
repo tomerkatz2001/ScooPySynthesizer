@@ -1,0 +1,59 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"initials"
+			],
+			"commentExamples": [
+				{
+					"a": "Tomer katz",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"initials": "T.K"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"words"
+			],
+			"commentExamples": [
+				{
+					"a": "'Tomer katz'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"words": "['Tomer', 'katz']"
+				}
+			],
+			"assignments": ["'words=a.split()'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"initials"
+			],
+			"commentExamples": [{
+				"a": "Tomer katz",
+				"words": "['Tomer', 'katz']",
+				"#": "",
+				"$": "",
+				"time": "-1",
+				"initials": "T.K"
+			}],
+			"assignments": ["'initials=\"\".\"\".join([var for var in words]).upper()'"],
+			"commentId": 2
+		}
+	}
+}

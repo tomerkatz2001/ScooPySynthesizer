@@ -1,0 +1,43 @@
+{
+	"varNames": [
+		"exists"
+	],
+	"envs": [
+		{
+			"#": "",
+			"inp": "[1, 16, 31, 5, 3, 4]",
+			"elem": "21",
+			"exists": "False",
+			"time": 1
+		},
+		{
+			"#": "",
+			"inp": "[1, 16, 31, 5, 3, 4]",
+			"elem": "16",
+			"exists": "True",
+			"time": 2
+		},
+		{
+			"#": "",
+			"inp": "[1, 16, 31, 5, 3, 4]",
+			"elem": "5",
+			"exists": "True",
+			"time": 3
+		},
+		{
+			"#": "",
+			"inp": "[1, 16, 31, 5, 3, 4]",
+			"elem": "1",
+			"exists": "True",
+			"time": 4
+		}
+	],
+	"previousEnvs": {
+		"1": {
+			"#": ""
+		}
+	},
+	"solutions": [
+		"exists = elem in inp"
+	]
+}

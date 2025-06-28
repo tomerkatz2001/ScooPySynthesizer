@@ -1,0 +1,84 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"out"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "123456",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "61728"
+				},
+				{
+					"a": "1234567",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "3703702"
+				}
+			],
+			"assignments": [],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"out"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "123456",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "61728"
+				},
+				{
+					"a": "500000004",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "250000002"
+				}
+			],
+			"assignments": ["'out = 3'"],
+			"commentId": 2
+		},
+		"3": {
+			"outputVarNames": [
+				"out"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "1234567",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "3703702"
+				},
+				{
+					"a": "500000005",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "1500000016"
+				}
+			],
+			"assignments": ["'out = 3'"],
+			"commentId": 3
+		}
+	},
+	"solutions": ["if 1 > a % 2:\n\tout = a // 2\nelse:\n\tout = a + a + a + 1"]
+}

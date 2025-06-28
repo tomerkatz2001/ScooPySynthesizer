@@ -1,0 +1,53 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"out"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "' '",
+					"b": "'world'",
+					"#": "",
+					"$": "",
+					"out": "'world'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"out"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "'Hello'",
+					"b": "'World'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "'Hello.World'"
+				},
+				{
+					"a": "'#path'",
+					"b": "'field'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"out": "'#path.field'"
+				}
+			],
+			"assignments": ["'out = 3'"],
+			"commentId": "2"
+		}
+	},
+	"solutions" : ["if a == \" \":\n\tout = b\nelse:\n\tout = a + \".\" + b"]
+}

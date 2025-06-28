@@ -1,0 +1,63 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"s": "'abcdefg'",
+					"c": "'e'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'False'"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"lastChar"
+			],
+			"commentExamples": [
+				{
+					"s": "'abcdefg'",
+					"c": "'e'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"lastChar": "'g'"
+				}
+			],
+			"assignments": [],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"lastChar": "'g'",
+					"c": "'e'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'False'"
+				}
+			],
+			"assignments": [],
+			"commentId": 2
+		}
+	}
+}

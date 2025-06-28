@@ -1,0 +1,20 @@
+ {
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'1/17/16-9/18/18'",
+			"sep": "'-'",
+			"i": "2",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'9'"
+		}
+	],
+	"solutions": [
+		"r = text.split(sep)[-1] if (i > 1) else text.split(sep)[0]\nrs = r[0]"
+	],
+	"previousEnvs": {}
+}

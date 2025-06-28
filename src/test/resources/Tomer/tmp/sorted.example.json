@@ -1,0 +1,61 @@
+{
+	"scopeTree": {
+		"16": {
+			"NoBranch": {
+				"23": {},
+				"24": {}
+			}
+		}
+	},
+	"scopes": {
+		"16": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "['1', '6', '3', '0']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'[0,1,3,6]'"
+				}
+			],
+			"assignments": [],
+			"commentId": 16
+		},
+		"23": {
+			"outputVarNames": [
+				"l"
+			],
+			"commentExamples": [
+				{
+					"a": "['1', '6', '3', '0']",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"l": "'[1,6,3,0]'"
+				}
+			],
+			"assignments": [],
+			"commentId": 23
+		},
+		"24": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "['1', '6', '3', '0']",
+					"l": "[1, 6, 3, 0]",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'[0,1,3,6]'"
+				}
+			],
+			"assignments": [],
+			"commentId": 24
+		}
+	}
+}

@@ -1,0 +1,65 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"a": "'abhdj'",
+			"#": "",
+			"$": "",
+			"time": 10,
+			"rs": "5"
+		},
+		{
+			"a": "'abhdjd'",
+			"#": "",
+			"$": "",
+			"time": 20,
+			"rs": "3"
+		},
+		{
+			"a": "'mkl'",
+			"#": "",
+			"$": "",
+			"time": 30,
+			"rs": "3"
+		},
+		{
+			"a": "'aabb'",
+			"#": "",
+			"$": "",
+			"time": 40,
+			"rs": "2"
+		},
+		{
+			"a": "'aabbdddd'",
+			"#": "",
+			"$": "",
+			"time": 50,
+			"rs": "4"
+		},
+		{
+			"a": "'aabbdffddd'",
+			"#": "",
+			"$": "",
+			"time": 60,
+			"rs": "5"
+		},
+		{
+			"a": "'aabbdffdddbb'",
+			"#": "",
+			"$": "",
+			"time": 60,
+			"rs": "6"
+		},
+		{
+			"a": "'AAA'",
+			"#": "",
+			"$": "",
+			"time": 60,
+			"rs": "3"
+		}
+	],
+	"solutions": ["aux = len(a)\nrs = aux + 1 if (1 > aux % 2) else aux / 2", "if 1 > len(a) % 2:\n\trs = len(a[::2])\nelse:\n\trs = len(a)"],
+	"previousEnvs": {}
+}

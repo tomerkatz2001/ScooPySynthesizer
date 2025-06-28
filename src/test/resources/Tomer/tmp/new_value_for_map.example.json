@@ -1,0 +1,67 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"new_val"
+			],
+			"commentExamples": [
+				{
+					"m": "'{'a': 20, 'b': 40, 'c': 90}'",
+					"k": "'b'",
+					"v": "30",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"new_val": "10"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"old_val"
+			],
+			"commentExamples": [
+				{
+					"m": "'{'a': 20, 'b': 40, 'c': 90}'",
+					"k": "'b'",
+					"v": "30",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"old_val": "40"
+				}
+			],
+			"assignments": [],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"new_val"
+			],
+			"commentExamples": [
+				{
+					"m": "'{'a': 20, 'b': 40, 'c': 90}'",
+					"k": "'b'",
+					"v": "30",
+					"old_val": "40",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"new_val": "10"
+				}
+			],
+			"assignments": [],
+			"commentId": 2
+		}
+	}
+}

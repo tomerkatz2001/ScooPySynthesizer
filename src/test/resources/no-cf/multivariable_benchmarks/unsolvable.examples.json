@@ -1,0 +1,18 @@
+{
+	"varNames": [
+		"abbr"
+	],
+	"envs": [
+		{
+			"name": "'Sorin Lerner'",
+			"abbr": "'s.l'",
+			"time": 1,
+			"#": ""
+		}
+	],
+	"solutions": [
+		"abbr = \".\".join([var[0] for var in name.split(\" \")]).lower()",
+		"abbr = \".\".join([var[0] for var in name.split()]).lower()"
+	],
+	"previousEnvs": {}
+}

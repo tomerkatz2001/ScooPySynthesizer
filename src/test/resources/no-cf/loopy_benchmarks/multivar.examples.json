@@ -1,0 +1,32 @@
+{
+	"varNames": [
+		"x",
+		"y"
+	],
+	"envs": [
+		{
+			"time": 10,
+			"#": "",
+			"$": "",
+			"z": "1",
+			"x": "2",
+			"y": "3",
+			"lineno": 3,
+			"prev_lineno": 2,
+			"next_lineno": "R3"
+		}
+	],
+	"solutions": [
+		"x += x\ny = x + y",
+		"x += z\ny = x + z",
+		"x += x\ny += x",
+		"x += z\ny += x"
+	],
+	"previousEnvs": {
+		"10": {
+			"z": "1",
+			"x": "1",
+			"y": "1"
+		}
+	}
+}

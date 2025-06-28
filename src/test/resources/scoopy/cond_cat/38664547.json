@@ -1,0 +1,108 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB": {
+				"2": {},
+				"3": {
+					"T": {
+						"4": {}
+					},
+					"F": {
+						"5": {}
+					}
+				}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'knowthat'",
+					"sep": "'that'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'know'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"i"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'knowthat'",
+					"sep": "'that'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"i": "4"
+				}
+			],
+			"assignments": [
+				"'i=2'"
+			],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"sub"
+			],
+			"rawCommentExamples": [],
+			"assignments": [
+				"'i=2'"
+			],
+			"commentId": "2"
+		},
+		"4": {
+			"outputVarNames": [
+				"sub"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'knowthat!'",
+					"i": "4",
+					"sep": "'that'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"sub": "'know'"
+				}
+			],
+			"assignments": [
+				"'i=2'"
+			],
+			"commentId": "2"
+		},
+		"5": {
+			"outputVarNames": [
+				"sub"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'mouse!'",
+					"sep": "'that'",
+					"i": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"sub": "'mouse!'"
+				}
+			],
+			"assignments": [
+				"'sub=2'"
+			],
+			"commentId": "2"
+		}
+	},
+	"solutions": [
+		"i = len(sep)\nsub = text[0:i] if (sep in text) else text\nrs = sub"
+	]
+}

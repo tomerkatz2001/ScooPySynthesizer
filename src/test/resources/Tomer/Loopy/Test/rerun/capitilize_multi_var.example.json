@@ -1,0 +1,22 @@
+{
+	"varNames": [
+		"caps", "words"
+	],
+	"envs": [
+		{
+			"a": "'alison hack'",
+			"#": "",
+			"$": "",
+			"time": -1,
+			"caps": "['ALISON', 'HACK']",
+			"words": "['alison', 'hack']"
+		}
+	],
+	"previousEnvs": {
+
+	},
+	"solutions": [
+
+	]
+}
+

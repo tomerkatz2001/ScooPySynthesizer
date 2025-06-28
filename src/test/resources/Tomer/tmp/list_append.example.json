@@ -1,0 +1,62 @@
+{
+	"scopeTree": {
+		"0": {
+			"NoBranch": {
+				"1": {},
+				"2": {}
+			}
+		}
+	},
+	"scopes": {
+		"0": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [
+				{
+					"a": "['a', 'b']",
+					"b": "'c'",
+					"c": "'d'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'['a','b','c','d']'"
+				}
+			],
+			"assignments": [],
+			"commentId": 0
+		},
+		"1": {
+			"outputVarNames": [
+				"first"
+			],
+			"commentExamples": [
+				{
+					"a": "['a', 'b']",
+					"b": "'c'",
+					"c": "'d'",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"first": "'['a','b','c']'"
+				}
+			],
+			"assignments": ["'first = a + [b]'"],
+			"commentId": 1
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"commentExamples": [{
+				"a" : "['a', 'b']",
+				"b": "'c'",
+				"c" : "'d'",
+				"first": "['a', 'b', 'c']",
+				 "rs":  "['a','b','c','d']"
+				}],
+			"assignments": [",'rs = first + [c]'"],
+			"commentId": 2
+		}
+	}
+}

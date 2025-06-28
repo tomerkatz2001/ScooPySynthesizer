@@ -1,0 +1,97 @@
+{
+    "scopesTree": {
+        "1": {
+            "NB": {
+                "2": {},
+                "3": {
+                    "T": {
+                        "-1": {}
+                    },
+                    "F": {
+                        "4": {}
+                    }
+                }
+            }
+        }
+    },
+    "scopes": {
+        "1": {
+            "outputVarNames": [
+                "rs"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'-%134'",
+                    "sign": "'-'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "rs": "'%134'"
+                }
+            ],
+            "assignments": [],
+            "commentId": "1"
+        },
+        "2": {
+            "outputVarNames": [
+                "i"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'the number is: -%134'",
+                    "sign": "'-'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "i": "15"
+                }
+            ],
+            "assignments": [
+                "'i=2'"
+            ],
+            "commentId": "2"
+        },
+        "3": {
+            "outputVarNames": [
+                "num"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'500'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "num": "'500'",
+                    "i": "-1"
+                }
+            ],
+            "assignments": [
+                "'i=3"
+            ],
+            "commentId": "3"
+        },
+        "4": {
+            "outputVarNames": [
+                "num"
+            ],
+            "rawCommentExamples": [
+                {
+                    "text": "'-%134'",
+                    "#": "",
+                    "$": "",
+                    "time": "-1",
+                    "num": "'%134'",
+                    "i": "0"
+                }
+            ],
+            "assignments": [
+                "'sub=2'"
+            ],
+            "commentId": "4"
+        }
+    },
+    "solutions": [
+        "i = text.find(sign)\nnum = text[1:len(text)] if (i > -1) else text\nrs = num", "i = text.find(sign)\nnum = text[i:len(text)] if (i > -1) else text\nrs = num"
+
+    ]
+}

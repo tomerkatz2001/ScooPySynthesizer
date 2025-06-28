@@ -1,0 +1,76 @@
+{
+	"scopesTree": {
+		"5": {
+			"NB": {
+				"1": {},
+				"3": {},
+				"4": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "20",
+					"#": "",
+					"$": "",
+					"rs": "25"
+				}
+			],
+			"assignments": ["'rs = n + 5'"],
+			"commentId": "1"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in" : "30",
+					"rs": "35"
+				}
+			],
+			"assignments": ["'rs = rs_in + 5'"],
+			"commentId": "3"
+		},
+		"4": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs_in" : "35",
+					"rs": "45"
+				}
+			],
+			"assignments": ["'rs = rs_in + 10'"],
+			"commentId": "4"
+		},
+		"5": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"n": "10",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "35"
+				}
+			],
+			"assignments": [],
+			"commentId": "5"
+		}
+	}
+}

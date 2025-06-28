@@ -1,0 +1,64 @@
+{
+	"scopesTree": {
+		"1": {
+			"NB":
+{
+"2":{},
+"-1":{}
+}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'1/17/16-9/18/18'",
+					"sep": "'-'",
+					"i": "2",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"rs": "'9'"
+				}
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"r"
+			],
+			"rawCommentExamples": [
+				{
+					"text": "'1/17/16-1/18/17'",
+					"sep": "'-'",
+					"i": "1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"r": "'1/17/16'"
+				},
+				{
+					"text": "'1/17/16-1/18/17'",
+					"sep": "'-'",
+					"i": "2",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"r": "'1/18/17'"
+				}
+
+			],
+			"assignments": [
+				"'r=2'"
+			],
+			"commentId": "2"
+		}
+	},
+	"solutions": [
+		"r = text.split(sep)[-1] if (i > 1) else text.split(sep)[0]\nrs = r[0]"
+	]
+}

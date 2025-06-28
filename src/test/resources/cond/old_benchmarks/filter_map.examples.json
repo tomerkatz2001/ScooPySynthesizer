@@ -1,0 +1,18 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"inp": "'aabbcde'",
+			"counts": "{'a': 2, 'b': 2, 'c': 1, 'd': 1, 'e': 1}",
+			"rs": "{'a': 2, 'b': 2}",
+			"time": 1,
+			"#": ""
+		}
+	],
+	"solutions": [
+		"rs = {key: counts[key] for key in counts if inp.count(key) > 1}"
+	],
+	"previousEnvs": {}
+}

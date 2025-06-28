@@ -1,0 +1,139 @@
+{
+	"scopesTree": {
+		"1": {
+			"T": {
+				"2": {}
+			},
+			"F": {
+				"3": {}
+			}
+		}
+	},
+	"scopes": {
+		"1": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "7",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				},
+				{
+					"a": "10",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				}
+
+			],
+			"assignments": [],
+			"commentId": "1"
+		},
+		"2": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "4",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				},
+				{
+					"a": "6",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				},
+				{
+					"a": "12",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				},
+				{
+					"a": "24",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				},
+				{
+					"a": "100",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'even'"
+				}
+			],
+			"assignments": ["'rs = 2'"],
+			"commentId": "2"
+		},
+		"3": {
+			"outputVarNames": [
+				"rs"
+			],
+			"rawCommentExamples": [
+				{
+					"a": "3",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				},
+				{
+					"a": "1",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				},
+				{
+					"a": "11",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				},
+				{
+					"a": "111",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				},
+				{
+					"a": "123",
+					"#": "",
+					"$": "",
+					"time": "-1",
+					"options" :"['even', 'odd']",
+					"rs": "'odd'"
+				}
+			],
+			"assignments": ["'rs = 3'"],
+			"commentId": "3"
+		}
+	},
+	"solutions": ["if 1 > a % 2:\n\trs = options[0]\nelse:\n\trs = options[-1]"]
+}

@@ -1,0 +1,31 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"prefix": "'The number is '",
+			"options": "['greater than 5', 'less than 5']",
+			"b": "5",
+			"a": "4",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'The number is less than 5'"
+
+		},
+		{
+			"prefix": "'The number is '",
+			"options": "['greater than 5', 'less than 5']",
+			"b": "5",
+			"a": "6",
+			"#": "",
+			"$": "",
+			"time": 2,
+			"rs": "'The number is greater than 5'"
+		}
+	],
+	"previousEnvs": {},
+	"solutions": ["aux = options[0] if (a > b) else options[-1]\nrs = prefix + aux",
+	"if a > b:\n\trs = prefix + options[0]\nelse:\n\trs = prefix + options[-1]"]
+}

@@ -1,0 +1,19 @@
+{
+	"varNames": [
+		"rs"
+	],
+	"envs": [
+		{
+			"text": "'anthory r. tom brown'",
+			"#": "",
+			"$": "",
+			"time": 1,
+			"rs": "'r. tom'"
+		},
+		
+	],
+	"solutions": [
+		"rs = \" \".join(text.split()[1:-1])"
+	],
+	"previousEnvs": {}
+}
