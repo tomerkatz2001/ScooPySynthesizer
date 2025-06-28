@@ -1,3 +1,3 @@
-# SnipPy Synthesizer
+# ScooPy Synthesizer
 
-This is the synthesizer backend for [SnipPy](https://weirdmachine.me/papers/2020_snippy.pdf). Please see [the meta-repository](https://github.com/KasraF/SnipPy) for how to build and run SnipPy. 
+This is the synthesizer backend for [ScooPy]. Please see [the meta-repository](#add link here) for how to build and run ScooPy. 
